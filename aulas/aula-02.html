@@ -908,8 +908,7 @@
 
       <p><strong>Passo 2: Criação do Arquivo .gitignore</strong></p>
       <p>Arquivos compilados, pastas <code>.nbproject</code> locais ou artefatos do NetBeans não devem poluir o GitHub. Crie um arquivo chamado <code>.gitignore</code> na raiz do projeto com o seguinte conteúdo:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">.gitignore</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>/build/
-/dist/
+      <div class="code-block"><div class="code-head"><span class="code-lang">.gitignore</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>/target/
 /nbproject/private/
 *.class
 *.jar
@@ -1010,7 +1009,8 @@
 
     <section id="s5">
       <h2><span class="num">05</span>Avanço no Projeto Exemplo TenisShop</h2>
-      <p>O TenisShop é construído em aula, ao vivo, junto com a turma: o professor cria cada peça no NetBeans 28 enquanto projeta, e cada grupo repete exatamente o mesmo passo a passo no seu próprio projeto. Vamos acompanhar essa construção, desde a criação do projeto Maven até a primeira versão publicada no repositório da disciplina.</p>
+      <p>O TenisShop é construído em aula, ao vivo, junto com a turma: o professor cria cada peça no NetBeans 28 enquanto projeta, e cada grupo repete o mesmo passo a passo no seu próprio projeto. Vamos acompanhar essa construção, desde a criação do projeto Maven até a primeira versão publicada no repositório da disciplina.</p>
+      <div class="callout"><strong>Até onde ir hoje:</strong> o TenisShop é o exemplo de referência que o professor evolui ao longo de todo o semestre, seguindo o cronograma da Aula 01. Nesta aula, o requisito de entrega dos grupos é a criação do projeto Maven e do <code>pom.xml</code> (ver checklist da Seção 07); o banco de dados, a <code>ConexaoBanco</code> e as demais camadas mostradas a seguir chegam aos projetos dos grupos nas datas já previstas no cronograma (Script SQL em 18/09, Camada de Conexão em 02/10).</div>
 
       <h3>Passo a Passo: Criação do Projeto Maven no NetBeans 28</h3>
       <ol class="plain">
@@ -1342,7 +1342,7 @@ Atendimento à demanda de extensão da **[Nome da Entidade]**, no município de 
 * Estudante 3
 
 ## Tecnologias Utilizadas
-* Java 21 / JavaFX
+* Java 25 / JavaFX
 * NetBeans 28
 * MySQL
 * Git / GitHub

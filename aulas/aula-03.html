@@ -1,4 +1,4 @@
-<title>Informática e Sociedade III: Registro de Aulas</title>
+<title>Aula 03: Informática e Sociedade III</title>
 <style>
   :root {
     --bg: #fafafa;
@@ -732,36 +732,20 @@
     nav.toc ol { columns: 1; }
     .wrap, .wrap-header, .wrap-wide { padding: 0 16px; }
   }
-
-  .lesson-grid { margin-top: 22px; }
-  .lesson-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    text-decoration: none;
-    color: var(--text);
-    transition: border-color 0.15s ease, transform 0.15s ease;
-  }
-  .lesson-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .lesson-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .lesson-card .eyebrow { margin: 0; }
-  .lesson-card h4 { margin: 2px 0 0; font-size: 1rem; font-weight: 700; line-height: 1.35; text-wrap: balance; }
-  .lesson-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
-  .lesson-note { font-size: 0.82rem; color: var(--text-faint); margin: 18px 0 0; }
 </style>
 
 <header class="site">
   <div class="wrap-header topbar">
     <div class="topbar-left">
-      <span class="topbar-text" style="border-left:none;padding-left:0;">IFSul · Câmpus Venâncio Aires · Tecnólogo em Análise e Desenvolvimento de Sistemas</span>
+      <a class="back-link" href="../index.html">← Índice</a>
+      <span class="topbar-text">IFSul · Câmpus Venâncio Aires · Tecnólogo em Análise e Desenvolvimento de Sistemas</span>
     </div>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema">
       <span id="themeIcon">🌙</span><span id="themeLabel">Escuro</span>
     </button>
   </div>
   <div class="wrap-header mainbar">
-    <a class="brand" href="https://github.com/GeovaneGriesang/20262_IS3" target="_blank" rel="noreferrer">
+    <a class="brand" href="../index.html">
       <svg width="30" height="40.6" viewBox="0 0 61.2 82.8" aria-hidden="true">
         <rect x="21.6" y="0" width="18" height="18" rx="1.8" fill="#2f9e41"></rect>
         <rect x="43.2" y="0" width="18" height="18" rx="1.8" fill="#2f9e41"></rect>
@@ -776,16 +760,16 @@
       </svg>
       <span class="brand-name">Informática e Sociedade III</span>
     </a>
-    <span class="doc-badge">Índice</span>
+    <span class="doc-badge">Aula 03</span>
   </div>
 </header>
 
 <main>
   <div class="wrap">
     <div class="cover">
-      <span class="eyebrow">2026/2 · Câmpus Venâncio Aires</span>
-      <h1 class="title">Informática e Sociedade III: Registro de Aulas</h1>
-      <p class="subtitle">Acompanhamento das aulas da disciplina: plano de ensino, cronograma e as atividades práticas desenvolvidas em cada encontro.</p>
+      <span class="eyebrow">Aula 03 · 14/08/2026</span>
+      <h1 class="title">Branches no Git e Início da Camada de Dados do TenisShop</h1>
+      <p class="subtitle">Guia completo da Aula 03: fluxo de trabalho com branches e merge no Git, primeiro contato estruturado com a entidade parceira e a primeira classe DAO do projeto de referência TenisShop.</p>
       <dl class="meta">
         <div><dt>Curso</dt><dd>Tecnólogo em Análise e Desenvolvimento de Sistemas</dd></div>
         <div><dt>Disciplina</dt><dd>Informática e Sociedade III</dd></div>
@@ -795,26 +779,311 @@
       </dl>
     </div>
 
-    <section id="lista-aulas">
-      <h2>Aulas</h2>
-      <div class="card-grid lesson-grid">
-        <a class="card lesson-card" href="aulas/aula-01.html">
-          <span class="eyebrow">31/07/2026</span>
-          <h4>Apresentação da Disciplina, Plano de Ensino e Combinados de Extensão</h4>
-          <p>Ementa, objetivos, grupos de extensão e cronograma do semestre.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-02.html">
-          <span class="eyebrow">07/08/2026</span>
-          <h4>Prática com Git, GitHub e Configuração do Ambiente (NetBeans 28, JavaFX, MySQL)</h4>
-          <p>Fluxo de Git/GitHub e criação do projeto de referência TenisShop.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-03.html">
-          <span class="eyebrow">14/08/2026</span>
-          <h4>Branches no Git e Início da Camada de Dados do TenisShop</h4>
-          <p>Trabalho com branches e merge, levantamento de requisitos com a entidade parceira e a primeira DAO do TenisShop.</p>
-        </a>
+    <div class="callout"><strong>Antes de começar:</strong> confira se os itens do <a href="aula-02.html#s7">checklist da Aula 02</a> estão concluídos, repositório criado, <code>.gitignore</code> commitado, projeto Maven versionado e sincronizado com o GitHub. A aula de hoje parte desse ponto.</div>
+
+    <nav class="toc" aria-label="Índice">
+      <h2>Índice</h2>
+      <ol>
+        <li><a href="#s1"><span class="n">01</span>Visão Geral e Objetivos de Aprendizagem</a></li>
+        <li><a href="#s2"><span class="n">02</span>Articulação com a Entidade Parceira: Levantamento de Requisitos</a></li>
+        <li><a href="#s3"><span class="n">03</span>Branches no Git: Trabalho Paralelo sem Pisar no Colega</a></li>
+        <li><a href="#s4"><span class="n">04</span>Prática Guiada: Criando, Mesclando e Resolvendo Conflitos</a></li>
+        <li><a href="#s5"><span class="n">05</span>Avanço no Projeto Exemplo TenisShop: Camada DAO</a></li>
+        <li><a href="#s6"><span class="n">06</span>Atividade Prática dos Grupos de Extensão</a></li>
+        <li><a href="#s7"><span class="n">07</span>Checklist e Avaliação Processual</a></li>
+        <li><a href="#s8"><span class="n">08</span>Referências e Materiais Complementares</a></li>
+      </ol>
+    </nav>
+
+    <section id="s1">
+      <h2><span class="num">01</span>Visão Geral e Objetivos de Aprendizagem</h2>
+      <p class="lead">A Aula 02 deixou o repositório de cada grupo com um projeto Maven versionado e sincronizado no GitHub. Hoje entram em cena dois problemas práticos: como duas ou mais pessoas trabalham na mesma base de código sem sobrescrever o trabalho uma da outra, e como transformar a conversa com a entidade parceira em requisitos que orientam o que programar. Fechamos avançando a camada de acesso a dados do TenisShop.</p>
+      <h3>Objetivos de Aprendizagem</h3>
+      <ul>
+        <li>Entender por que trabalhar direto na branch <code>main</code> em equipe é arriscado.</li>
+        <li>Criar, alternar e mesclar branches de funcionalidade no fluxo local do Git.</li>
+        <li>Reconhecer os marcadores de um conflito de merge e saber resolvê-lo.</li>
+        <li>Conduzir uma primeira reunião estruturada de levantamento de requisitos com a entidade parceira.</li>
+        <li>Implementar a primeira classe DAO do TenisShop, reaproveitando a <code>ConexaoBanco</code> criada na Aula 02.</li>
+      </ul>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">02</span>Articulação com a Entidade Parceira: Levantamento de Requisitos</h2>
+      <p>Antes de programar qualquer tela ou regra de negócio, o grupo precisa entender o problema do ponto de vista de quem vai usar o sistema. É isso que o cronograma da disciplina chama de "início do desenvolvimento do software": ainda não é escrever código, é escrever com clareza o que o código vai precisar resolver.</p>
+
+      <h3>Por que Conversar com a Entidade Antes de Codar?</h3>
+      <p>Um sistema construído sem ouvir quem vai usá-lo tende a resolver o problema errado, por mais bem escrito que o código esteja. A entidade parceira conhece a rotina, as exceções do dia a dia e as regras não escritas do processo atual; é ela quem aponta o que realmente precisa mudar.</p>
+
+      <h3>Roteiro para a Primeira Reunião</h3>
+      <p>Leve estas perguntas para a conversa com a entidade parceira (presencial, remota ou por formulário) e registre as respostas por escrito:</p>
+      <div class="card-grid">
+        <div class="card"><h4><span class="dot"></span>Processo Atual</h4><p>Como essa tarefa é feita hoje? Em papel, planilha, outro sistema? Quantas pessoas participam?</p></div>
+        <div class="card"><h4><span class="dot"></span>Problemas</h4><p>O que mais atrasa, gera erro ou se repete sem necessidade no processo atual?</p></div>
+        <div class="card"><h4><span class="dot"></span>Usuários</h4><p>Quem vai usar o sistema no dia a dia? Existem perfis diferentes de acesso, como administrador e operador?</p></div>
+        <div class="card"><h4><span class="dot"></span>Dados</h4><p>Quais informações precisam ser cadastradas, consultadas ou geradas em relatório?</p></div>
+        <div class="card"><h4><span class="dot"></span>Prioridades</h4><p>Se o software só pudesse resolver uma coisa neste semestre, qual seria?</p></div>
       </div>
-      <p class="lesson-note">As próximas aulas serão adicionadas aqui conforme o cronograma do semestre.</p>
+
+      <h3>Da Conversa para a Lista de Funcionalidades</h3>
+      <p>Depois da reunião, traduza as respostas em frases curtas no formato <em>"o sistema deve permitir que [usuário] [ação]"</em>. Essa lista inicial orienta as próximas aulas técnicas e compõe parte da <strong>Avaliação B</strong> (entrega do software e documentações), prevista no plano de ensino.</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">markdown</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>## Requisitos Levantados com [Nome da Entidade] em [Data]
+
+1. O sistema deve permitir que o(a) administrador(a) cadastre novos usuários com perfil de acesso.
+2. O sistema deve permitir que o(a) operador(a) registre [ação principal do domínio].
+3. O sistema deve gerar um relatório de [dado relevante] por período.
+4. ...</code></pre></div>
+
+      <div class="callout"><strong>Onde registrar:</strong> inclua essa lista no <code>README.md</code> do repositório do grupo, na seção de contexto, ou em um arquivo próprio (<code>docs/requisitos.md</code>). O professor acompanha o avanço pela planilha de cada grupo, apresentada na Aula 01.</div>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">03</span>Branches no Git: Trabalho Paralelo sem Pisar no Colega</h2>
+      <p>Na Aula 02 o grupo trabalhou direto na branch <code>main</code>, alternando quem fazia <code>push</code> e avisando os colegas antes. Isso funciona com poucas mudanças pequenas, mas fica arriscado assim que duas pessoas mexem no mesmo arquivo ao mesmo tempo. As branches de funcionalidade resolvem esse problema.</p>
+
+      <h3>Por que não Trabalhar Direto na Main?</h3>
+      <p>A branch <code>main</code> deve sempre representar uma versão que funciona, pronta para ser mostrada à entidade parceira. Se cada integrante desenvolve direto nela, um código incompleto ou com erro fica visível para o grupo inteiro até ser corrigido. Uma <strong>branch de funcionalidade</strong> isola o trabalho em andamento: só volta para a <code>main</code> quando estiver pronto.</p>
+
+      <h3>Criando e Alternando entre Branches</h3>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Lista as branches locais (a atual aparece com *)</span>
+<span class="tok-kw">git</span> <span class="tok-fn">branch</span>
+
+<span class="tok-comment"># Cria uma nova branch de funcionalidade e já muda para ela</span>
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-flag">-b</span> <span class="tok-var">feature/usuario-dao</span>
+
+<span class="tok-comment"># Alterna de volta para uma branch já existente</span>
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span></code></pre></div>
+
+      <h3>Padrão de Nomenclatura de Branches</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Prefixo</th><th>Quando usar</th><th>Exemplo</th></tr></thead>
+          <tbody>
+            <tr><td><code>feature/</code></td><td>Nova funcionalidade</td><td><code>feature/usuario-dao</code></td></tr>
+            <tr><td><code>fix/</code></td><td>Correção de um bug</td><td><code>fix/validacao-email</code></td></tr>
+            <tr><td><code>docs/</code></td><td>Documentação</td><td><code>docs/requisitos-entidade</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Mesclando uma Branch (Merge)</h3>
+      <p>Quando a funcionalidade estiver pronta e testada, volte para a <code>main</code> e traga as mudanças da branch com <code>git merge</code>:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Garanta que está na main antes de mesclar</span>
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span>
+
+<span class="tok-comment"># Traz as mudanças da branch de funcionalidade para a main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">merge</span> <span class="tok-var">feature/usuario-dao</span></code></pre></div>
+
+      <div class="flow-diagram" role="img" aria-label="Fluxo: cria branch a partir da main, trabalha e comita na branch, depois faz merge de volta na main">
+        <div class="flow-step">main</div>
+        <div class="flow-arrow"><span class="arrow-line">──▶</span><code>git checkout -b</code></div>
+        <div class="flow-step">feature/...</div>
+        <div class="flow-arrow"><span class="arrow-line">──▶</span><code>commits</code></div>
+        <div class="flow-step">feature/... pronta</div>
+        <div class="flow-arrow"><span class="arrow-line">──▶</span><code>git merge</code></div>
+        <div class="flow-step">main atualizada</div>
+      </div>
+
+      <h3>Conflitos de Merge: o que são e como resolver</h3>
+      <p>Um conflito acontece quando a mesma linha de um arquivo foi alterada de formas diferentes na <code>main</code> e na branch de funcionalidade, e o Git não consegue decidir sozinho qual versão manter. O arquivo fica marcado assim:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">plaintext</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+    private Boolean ativo;
+    private Double desconto;
+=======
+    private Boolean ativo;
+    private Integer estoqueMinimo;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/categoria-estoque</code></pre></div>
+      <p>Nada está quebrado: o Git só está pedindo uma decisão humana. O trecho entre <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> e <code>=======</code> é o que já estava na main; o trecho entre <code>=======</code> e <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> é o que veio da branch.</p>
+      <div class="callout-warn">
+        <strong>Passo a passo para resolver um conflito</strong>
+        <ol class="plain">
+          <li>Abra o arquivo indicado pelo Git (ele aparece na saída do <code>git merge</code> como "CONFLICT").</li>
+          <li>Converse com quem editou a outra parte e decida juntos o conteúdo final.</li>
+          <li>Edite o arquivo mantendo só o resultado desejado e apague as três linhas de marcação (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code>, <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>).</li>
+          <li>Adicione o arquivo resolvido e conclua o merge com um commit.</li>
+        </ol>
+      </div>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Depois de editar o arquivo e remover os marcadores</span>
+<span class="tok-kw">git</span> <span class="tok-fn">add</span> Categoria.java
+
+<span class="tok-comment"># Conclui o merge com um commit</span>
+<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"merge: resolve conflito entre desconto e estoqueMinimo em Categoria"</span></code></pre></div>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">04</span>Prática Guiada: Criando, Mesclando e Resolvendo Conflitos</h2>
+      <p>Aplique agora o fluxo de branches no repositório do seu grupo. Os passos abaixo usam a classe <code>Categoria.java</code>, criada na Aula 02, como exemplo; adapte o nome da branch e do atributo para a funcionalidade real que seu grupo está implementando.</p>
+
+      <p><strong>Passo 1: Atualize a Main Antes de Começar</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">pull</span> origin main</code></pre></div>
+
+      <p><strong>Passo 2: Crie a Branch de Funcionalidade</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-flag">-b</span> <span class="tok-var">feature/categoria-estoque</span></code></pre></div>
+
+      <p><strong>Passo 3: Trabalhe e Faça Commits Normalmente</strong></p>
+      <p>Edite os arquivos necessários dentro da branch e registre o progresso com commits pequenos e frequentes, como já praticado na Aula 02:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">add</span> .
+<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: adiciona atributo de estoque minimo na Categoria"</span></code></pre></div>
+
+      <p><strong>Passo 4: Volte para a Main e Mescle</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">merge</span> <span class="tok-var">feature/categoria-estoque</span></code></pre></div>
+      <div class="callout"><strong>Se aparecer "CONFLICT":</strong> siga o passo a passo da Seção 03 antes de continuar. Só avance para o próximo passo depois que o <code>git status</code> não mostrar mais nenhum arquivo em conflito.</div>
+
+      <p><strong>Passo 5: Envie a Main Atualizada ao GitHub</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">05</span>Avanço no Projeto Exemplo TenisShop: Camada DAO</h2>
+      <p>Com a <code>ConexaoBanco</code> pronta desde a Aula 02, o TenisShop ganha hoje sua primeira classe de negócio real: uma DAO que efetivamente lê dados da tabela <code>usuarios</code>. É esse tipo de entrega, uma funcionalidade isolada e testável, que deve nascer dentro de uma branch, seguindo o fluxo da Seção 04.</p>
+
+      <div class="callout"><strong>Até onde ir hoje:</strong> o TenisShop segue como exemplo de referência construído ao longo do semestre, conforme o cronograma da Aula 01. O que se espera de cada grupo hoje é aplicar a mesma técnica: uma branch de funcionalidade com pelo menos um método de DAO, mesmo que simples, para a entidade central do projeto do grupo. Não é preciso reproduzir a <code>UsuarioDAO</code> inteira, só a mesma ideia.</div>
+
+      <h3>Relembrando o Padrão DAO</h3>
+      <p>Como visto na Aula 02, uma DAO isola tudo o que envolve SQL: montar a consulta, executar, e transformar cada linha da tabela em um objeto de domínio. Nenhuma outra parte do sistema deve escrever SQL diretamente; ela só chama métodos da DAO.</p>
+
+      <h3>Por que PreparedStatement em vez de Statement?</h3>
+      <p>A <code>UsuarioDAO</code> usa <code>PreparedStatement</code> para montar as consultas SQL. Diferente de concatenar texto direto na string do comando, o <code>PreparedStatement</code> separa o comando dos valores: o <code>?</code> é substituído com segurança por <code>setString</code>, <code>setInt</code> e métodos equivalentes. Isso evita um ataque conhecido como <strong>SQL Injection</strong>, em que alguém digita um valor malicioso (por exemplo, <code>' OR '1'='1</code>) esperando alterar o comando SQL que será executado.</p>
+
+      <h3>Classe UsuarioDAO.java</h3>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/dao/UsuarioDAO.java</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.dao;
+
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.<span class="tok-fn">Usuario</span>;
+<span class="tok-kw">import</span> java.sql.<span class="tok-fn">Connection</span>;
+<span class="tok-kw">import</span> java.sql.<span class="tok-fn">PreparedStatement</span>;
+<span class="tok-kw">import</span> java.sql.<span class="tok-fn">ResultSet</span>;
+<span class="tok-kw">import</span> java.sql.<span class="tok-fn">SQLException</span>;
+<span class="tok-kw">import</span> java.util.<span class="tok-fn">ArrayList</span>;
+<span class="tok-kw">import</span> java.util.<span class="tok-fn">List</span>;
+
+<span class="tok-comment">/**
+ * Classe responsável pelo acesso a dados da entidade Usuario.
+ * Aplica o padrão de projeto DAO (Data Access Object).
+ *
+ * @author Geovane Griesang
+ */</span>
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">UsuarioDAO</span> {
+
+    <span class="tok-comment">/**
+     * Lista todos os usuários cadastrados no banco de dados.
+     * @return List&lt;Usuario&gt; lista de usuários encontrados
+     * @throws SQLException caso ocorra falha na consulta
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-fn">List</span>&lt;<span class="tok-fn">Usuario</span>&gt; listarTodos() <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
+        <span class="tok-fn">List</span>&lt;<span class="tok-fn">Usuario</span>&gt; usuarios = <span class="tok-kw">new</span> <span class="tok-fn">ArrayList</span>&lt;&gt;();
+        <span class="tok-fn">String</span> sql = <span class="tok-str">&quot;SELECT id, nome, email, senha, perfil, ativo FROM usuarios ORDER BY nome&quot;</span>;
+
+        <span class="tok-fn">Connection</span> conexao = <span class="tok-fn">ConexaoBanco</span>.getConexao();
+        <span class="tok-kw">try</span> (<span class="tok-fn">PreparedStatement</span> stmt = conexao.prepareStatement(sql);
+             <span class="tok-fn">ResultSet</span> rs = stmt.executeQuery()) {
+
+            <span class="tok-kw">while</span> (rs.next()) {
+                usuarios.add(mapearUsuario(rs));
+            }
+        }
+        <span class="tok-kw">return</span> usuarios;
+    }
+
+    <span class="tok-comment">/**
+     * Busca um usuário pelo e-mail cadastrado.
+     * @param email e-mail do usuário buscado
+     * @return Usuario encontrado, ou null se não existir
+     * @throws SQLException caso ocorra falha na consulta
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-fn">Usuario</span> buscarPorEmail(<span class="tok-fn">String</span> email) <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
+        <span class="tok-fn">String</span> sql = <span class="tok-str">&quot;SELECT id, nome, email, senha, perfil, ativo FROM usuarios WHERE email = ?&quot;</span>;
+
+        <span class="tok-fn">Connection</span> conexao = <span class="tok-fn">ConexaoBanco</span>.getConexao();
+        <span class="tok-kw">try</span> (<span class="tok-fn">PreparedStatement</span> stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, email);
+
+            <span class="tok-kw">try</span> (<span class="tok-fn">ResultSet</span> rs = stmt.executeQuery()) {
+                <span class="tok-kw">if</span> (rs.next()) {
+                    <span class="tok-kw">return</span> mapearUsuario(rs);
+                }
+            }
+        }
+        <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-fn">Usuario</span> mapearUsuario(<span class="tok-fn">ResultSet</span> rs) <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
+        <span class="tok-fn">Usuario</span> usuario = <span class="tok-kw">new</span> <span class="tok-fn">Usuario</span>();
+        usuario.setId(rs.getInt(<span class="tok-str">&quot;id&quot;</span>));
+        usuario.setNome(rs.getString(<span class="tok-str">&quot;nome&quot;</span>));
+        usuario.setEmail(rs.getString(<span class="tok-str">&quot;email&quot;</span>));
+        usuario.setSenha(rs.getString(<span class="tok-str">&quot;senha&quot;</span>));
+        usuario.setPerfil(rs.getString(<span class="tok-str">&quot;perfil&quot;</span>));
+        usuario.setAtivo(rs.getBoolean(<span class="tok-str">&quot;ativo&quot;</span>));
+        <span class="tok-kw">return</span> usuario;
+    }
+}</code></pre></div>
+      <button type="button" class="download-btn" data-filename="UsuarioDAO.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsKCmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5Vc3VhcmlvOwppbXBvcnQgamF2YS5zcWwuQ29ubmVjdGlvbjsKaW1wb3J0IGphdmEuc3FsLlByZXBhcmVkU3RhdGVtZW50OwppbXBvcnQgamF2YS5zcWwuUmVzdWx0U2V0OwppbXBvcnQgamF2YS5zcWwuU1FMRXhjZXB0aW9uOwppbXBvcnQgamF2YS51dGlsLkFycmF5TGlzdDsKaW1wb3J0IGphdmEudXRpbC5MaXN0OwoKLyoqCiAqIENsYXNzZSByZXNwb25zw6F2ZWwgcGVsbyBhY2Vzc28gYSBkYWRvcyBkYSBlbnRpZGFkZSBVc3VhcmlvLgogKiBBcGxpY2EgbyBwYWRyw6NvIGRlIHByb2pldG8gREFPIChEYXRhIEFjY2VzcyBPYmplY3QpLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBVc3VhcmlvREFPIHsKCiAgICAvKioKICAgICAqIExpc3RhIHRvZG9zIG9zIHVzdcOhcmlvcyBjYWRhc3RyYWRvcyBubyBiYW5jbyBkZSBkYWRvcy4KICAgICAqIEByZXR1cm4gTGlzdDxVc3VhcmlvPiBsaXN0YSBkZSB1c3XDoXJpb3MgZW5jb250cmFkb3MKICAgICAqIEB0aHJvd3MgU1FMRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIG5hIGNvbnN1bHRhCiAgICAgKi8KICAgIHB1YmxpYyBMaXN0PFVzdWFyaW8+IGxpc3RhclRvZG9zKCkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgTGlzdDxVc3VhcmlvPiB1c3VhcmlvcyA9IG5ldyBBcnJheUxpc3Q8PigpOwogICAgICAgIFN0cmluZyBzcWwgPSAiU0VMRUNUIGlkLCBub21lLCBlbWFpbCwgc2VuaGEsIHBlcmZpbCwgYXRpdm8gRlJPTSB1c3VhcmlvcyBPUkRFUiBCWSBub21lIjsKCiAgICAgICAgQ29ubmVjdGlvbiBjb25leGFvID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICB0cnkgKFByZXBhcmVkU3RhdGVtZW50IHN0bXQgPSBjb25leGFvLnByZXBhcmVTdGF0ZW1lbnQoc3FsKTsKICAgICAgICAgICAgIFJlc3VsdFNldCBycyA9IHN0bXQuZXhlY3V0ZVF1ZXJ5KCkpIHsKCiAgICAgICAgICAgIHdoaWxlIChycy5uZXh0KCkpIHsKICAgICAgICAgICAgICAgIHVzdWFyaW9zLmFkZChtYXBlYXJVc3VhcmlvKHJzKSk7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgcmV0dXJuIHVzdWFyaW9zOwogICAgfQoKICAgIC8qKgogICAgICogQnVzY2EgdW0gdXN1w6FyaW8gcGVsbyBlLW1haWwgY2FkYXN0cmFkby4KICAgICAqIEBwYXJhbSBlbWFpbCBlLW1haWwgZG8gdXN1w6FyaW8gYnVzY2FkbwogICAgICogQHJldHVybiBVc3VhcmlvIGVuY29udHJhZG8sIG91IG51bGwgc2UgbsOjbyBleGlzdGlyCiAgICAgKiBAdGhyb3dzIFNRTEV4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBuYSBjb25zdWx0YQogICAgICovCiAgICBwdWJsaWMgVXN1YXJpbyBidXNjYXJQb3JFbWFpbChTdHJpbmcgZW1haWwpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIFN0cmluZyBzcWwgPSAiU0VMRUNUIGlkLCBub21lLCBlbWFpbCwgc2VuaGEsIHBlcmZpbCwgYXRpdm8gRlJPTSB1c3VhcmlvcyBXSEVSRSBlbWFpbCA9ID8iOwoKICAgICAgICBDb25uZWN0aW9uIGNvbmV4YW8gPSBDb25leGFvQmFuY28uZ2V0Q29uZXhhbygpOwogICAgICAgIHRyeSAoUHJlcGFyZWRTdGF0ZW1lbnQgc3RtdCA9IGNvbmV4YW8ucHJlcGFyZVN0YXRlbWVudChzcWwpKSB7CiAgICAgICAgICAgIHN0bXQuc2V0U3RyaW5nKDEsIGVtYWlsKTsKCiAgICAgICAgICAgIHRyeSAoUmVzdWx0U2V0IHJzID0gc3RtdC5leGVjdXRlUXVlcnkoKSkgewogICAgICAgICAgICAgICAgaWYgKHJzLm5leHQoKSkgewogICAgICAgICAgICAgICAgICAgIHJldHVybiBtYXBlYXJVc3VhcmlvKHJzKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICByZXR1cm4gbnVsbDsKICAgIH0KCiAgICBwcml2YXRlIFVzdWFyaW8gbWFwZWFyVXN1YXJpbyhSZXN1bHRTZXQgcnMpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIFVzdWFyaW8gdXN1YXJpbyA9IG5ldyBVc3VhcmlvKCk7CiAgICAgICAgdXN1YXJpby5zZXRJZChycy5nZXRJbnQoImlkIikpOwogICAgICAgIHVzdWFyaW8uc2V0Tm9tZShycy5nZXRTdHJpbmcoIm5vbWUiKSk7CiAgICAgICAgdXN1YXJpby5zZXRFbWFpbChycy5nZXRTdHJpbmcoImVtYWlsIikpOwogICAgICAgIHVzdWFyaW8uc2V0U2VuaGEocnMuZ2V0U3RyaW5nKCJzZW5oYSIpKTsKICAgICAgICB1c3VhcmlvLnNldFBlcmZpbChycy5nZXRTdHJpbmcoInBlcmZpbCIpKTsKICAgICAgICB1c3VhcmlvLnNldEF0aXZvKHJzLmdldEJvb2xlYW4oImF0aXZvIikpOwogICAgICAgIHJldHVybiB1c3VhcmlvOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar UsuarioDAO.java</span></button>
+
+      <h3>Estrutura de Pacotes Atualizada</h3>
+      <div class="code-block"><div class="code-head"><span class="code-lang">plaintext</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">br.edu.ifsul.venancio.tenisshop/</span>
+<span class="tree-guide">├── </span><span class="tok-fn">TenisShop.java</span>
+<span class="tree-guide">└── </span><span class="tok-kw">model/</span>
+<span class="tree-guide">    ├── </span><span class="tok-kw">domain/</span>
+<span class="tree-guide">    │   ├── </span><span class="tok-fn">Usuario.java</span>
+<span class="tree-guide">    │   └── </span><span class="tok-fn">Categoria.java</span>
+<span class="tree-guide">    └── </span><span class="tok-kw">dao/</span>
+<span class="tree-guide">        ├── </span><span class="tok-fn">ConexaoBanco.java</span>
+<span class="tree-guide">        └── </span><span class="tok-fn">UsuarioDAO.java</span></code></pre></div>
+    </section>
+
+    <section id="s6">
+      <h2><span class="num">06</span>Atividade Prática dos Grupos de Extensão</h2>
+      <p>A lista de grupos, entidades parceiras e planilhas de acompanhamento é a mesma publicada na <a href="aula-02.html#s6">Seção 06 da Aula 02</a>. Hoje o trabalho de cada grupo tem duas frentes, que podem ser divididas entre os integrantes.</p>
+
+      <h3>Frente 1: Levantamento de Requisitos</h3>
+      <ol class="plain">
+        <li>Conduza (ou revise, se já tiver ocorrido) a conversa com a entidade parceira usando o roteiro da Seção 02.</li>
+        <li>Registre a lista inicial de funcionalidades no <code>README.md</code> ou em <code>docs/requisitos.md</code> do repositório do grupo.</li>
+        <li>Faça commit e push dessa documentação direto na <code>main</code>; documentação não precisa de branch separada.</li>
+      </ol>
+
+      <h3>Frente 2: Primeira Branch de Funcionalidade</h3>
+      <ol class="plain">
+        <li>Escolha, junto com o grupo, a entidade de domínio central do projeto (equivalente ao <code>Usuario</code> do TenisShop).</li>
+        <li>Crie uma branch <code>feature/&lt;entidade&gt;-dao</code> e implemente ao menos um método de DAO, como listar todos os registros, seguindo o exemplo da Seção 05.</li>
+        <li>Faça merge da branch para a <code>main</code> localmente, resolvendo qualquer conflito conforme a Seção 03.</li>
+        <li>Envie (<code>push</code>) a <code>main</code> atualizada ao GitHub.</li>
+      </ol>
+
+      <div class="callout-warn">
+        <strong>Regras de ouro do laboratório (seguem valendo)</strong>
+        <ol class="plain">
+          <li>Chegou no computador da escola? A primeira ação é <code>git pull origin main</code>.</li>
+          <li>Vai criar uma branch? Avise o grupo para ninguém duplicar o mesmo trabalho.</li>
+          <li>Ao sair, confirme que fez <code>push</code> e removeu credenciais e Personal Access Token do laboratório.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="s7">
+      <h2><span class="num">07</span>Checklist e Critérios para Avaliação Processual</h2>
+      <p>Estes itens compõem a avaliação processual contínua (30% da nota final) referente à Aula 03. Verifique antes do término da aula:</p>
+      <ul class="checklist">
+        <li>Lista inicial de requisitos da entidade parceira registrada no repositório (<code>README.md</code> ou <code>docs/requisitos.md</code>).</li>
+        <li>Branch de funcionalidade criada com nome padronizado (<code>feature/...</code>).</li>
+        <li>Pelo menos um método de DAO implementado para a entidade central do projeto do grupo.</li>
+        <li>Merge da branch para a <code>main</code> concluído, sem marcadores de conflito esquecidos no código.</li>
+        <li>Repositório sincronizado (<code>git push</code>) com sucesso na branch <code>main</code>.</li>
+        <li>Credenciais temporárias e Personal Access Token limpos nos terminais do laboratório.</li>
+      </ul>
+    </section>
+
+    <section id="s8">
+      <h2><span class="num">08</span>Referências e Materiais Complementares</h2>
+      <ul class="refs">
+        <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
+        <li><span class="ref-kind">Livro</span>RANGEL, Pablo; CARVALHO JUNIOR, José Gomes de. <strong>Sistemas Orientados a Objetos: teoria e prática com UML e Java</strong>. Rio de Janeiro: Brasport, 2021.</li>
+        <li><span class="ref-kind">Livro</span>NOGUEIRA, Marcelo. <strong>Engenharia de Software: métodos orientados a objetos e ágeis</strong>. Joinville, SC: Clube de Autores, 2018.</li>
+        <li><span class="ref-kind">Documentação</span>Documentação Oficial do Git. Disponível em: <a href="https://git-scm.com/doc" target="_blank" rel="noreferrer">git-scm.com/doc</a>.</li>
+      </ul>
     </section>
   </div>
 </main>
