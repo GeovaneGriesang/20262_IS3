@@ -1,6 +1,8 @@
 package br.edu.ifsul.venancio.tenisshop.model.dao;
 
+import br.edu.ifsul.venancio.tenisshop.model.domain.Perfil;
 import br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
+import br.edu.ifsul.venancio.tenisshop.model.util.SenhaUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,13 +60,34 @@ public class UsuarioDAO {
         return null;
     }
 
+    /**
+     * Autentica um usuário comparando o hash da senha digitada com o hash
+     * armazenado no banco; a senha em si nunca é comparada diretamente.
+     * @param email e-mail digitado no login
+     * @param senhaDigitada senha em texto puro digitada no login
+     * @return Usuario autenticado, ou null se e-mail ou senha não conferirem
+     * @throws SQLException caso ocorra falha na consulta
+     */
+    public Usuario autenticar(String email, String senhaDigitada) throws SQLException {
+        Usuario usuario = buscarPorEmail(email);
+        if (usuario == null) {
+            return null;
+        }
+
+        String hashDigitado = SenhaUtil.gerarHash(senhaDigitada);
+        if (hashDigitado.equals(usuario.getSenha())) {
+            return usuario;
+        }
+        return null;
+    }
+
     private Usuario mapearUsuario(ResultSet rs) throws SQLException {
         Usuario usuario = new Usuario();
         usuario.setId(rs.getInt("id"));
         usuario.setNome(rs.getString("nome"));
         usuario.setEmail(rs.getString("email"));
         usuario.setSenha(rs.getString("senha"));
-        usuario.setPerfil(rs.getString("perfil"));
+        usuario.setPerfil(Perfil.valueOf(rs.getString("perfil")));
         usuario.setAtivo(rs.getBoolean("ativo"));
         return usuario;
     }

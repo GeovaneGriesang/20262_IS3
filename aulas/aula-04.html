@@ -1,4 +1,4 @@
-<title>Aula 02: Informática e Sociedade III</title>
+<title>Aula 04: Informática e Sociedade III</title>
 <style>
   :root {
     --bg: #fafafa;
@@ -760,16 +760,16 @@
       </svg>
       <span class="brand-name">Informática e Sociedade III</span>
     </a>
-    <span class="doc-badge">Aula 02</span>
+    <span class="doc-badge">Aula 04</span>
   </div>
 </header>
 
 <main>
   <div class="wrap">
     <div class="cover">
-      <span class="eyebrow">Aula 02 · 07/08/2026</span>
-      <h1 class="title">Controle de Versão com Git e GitHub na Prática</h1>
-      <p class="subtitle">Guia completo da Aula 02: cuidados no laboratório multiusuário, conceitos de versionamento, prática guiada de Git e o avanço do projeto de referência TenisShop.</p>
+      <span class="eyebrow">Aula 04 · 21/08/2026</span>
+      <h1 class="title">Perfis com Enum e Senhas com Hash no TenisShop</h1>
+      <p class="subtitle">Guia completo da Aula 04: por que representar perfis de acesso com Enum em vez de String solta, como nunca guardar senha em texto puro, e a autenticação por hash na UsuarioDAO do TenisShop.</p>
       <dl class="meta">
         <div><dt>Curso</dt><dd>Tecnólogo em Análise e Desenvolvimento de Sistemas</dd></div>
         <div><dt>Disciplina</dt><dd>Informática e Sociedade III</dd></div>
@@ -779,15 +779,15 @@
       </dl>
     </div>
 
-    <div class="callout"><strong>Moodle da disciplina disponível:</strong> a partir de hoje, o ambiente virtual de Informática e Sociedade III já está acessível no Moodle do IFSul. Acessem o curso em <a href="https://apnp.ifsul.edu.br/course/view.php?id=40249" target="_blank" rel="noreferrer">apnp.ifsul.edu.br/course/view.php?id=40249</a> e acompanhem materiais e avisos por lá também.</div>
+    <div class="callout"><strong>Antes de começar:</strong> confira o <a href="aula-03.html#s7">checklist da Aula 03</a>, branch mesclada, <code>UsuarioDAO</code> funcionando e lista de requisitos registrada. A aula de hoje refina a arquitetura de <code>Usuario</code> construída até aqui.</div>
 
     <nav class="toc" aria-label="Índice">
       <h2>Índice</h2>
       <ol>
         <li><a href="#s1"><span class="n">01</span>Visão Geral e Objetivos de Aprendizagem</a></li>
-        <li><a href="#s2"><span class="n">02</span>Ambiente Institucional: Cuidados no Laboratório</a></li>
-        <li><a href="#s3"><span class="n">03</span>Entendendo os Conceitos sem Complicação</a></li>
-        <li><a href="#s4"><span class="n">04</span>Prática Guiada: Configuração Inicial do Projeto</a></li>
+        <li><a href="#s2"><span class="n">02</span>Conceitos: Enum para Perfis e Hash para Senhas</a></li>
+        <li><a href="#s3"><span class="n">03</span>Prática Guiada: Criando um Enum e Mesclando pela Branch</a></li>
+        <li><a href="#s4"><span class="n">04</span>Planejando os Níveis de Acesso</a></li>
         <li><a href="#s5"><span class="n">05</span>Avanço no Projeto Exemplo TenisShop</a></li>
         <li><a href="#s6"><span class="n">06</span>Atividade Prática dos Grupos de Extensão</a></li>
         <li><a href="#s7"><span class="n">07</span>Checklist e Avaliação Processual</a></li>
@@ -797,323 +797,142 @@
 
     <section id="s1">
       <h2><span class="num">01</span>Visão Geral e Objetivos de Aprendizagem</h2>
-      <p class="lead">Nesta aula, daremos o primeiro passo prático na construção dos projetos de software do semestre. O objetivo principal é dominar as rotinas do Git e do GitHub para garantir a rastreabilidade, o trabalho em equipe sem conflitos e a entrega contínua dos softwares às entidades parceiras de Venâncio Aires.</p>
+      <p class="lead">A Aula 03 deixou o TenisShop com uma DAO funcional e o grupo já sabe trabalhar com branches. Hoje a arquitetura de <code>Usuario</code> fica mais sólida em dois pontos que qualquer sistema com login precisa resolver desde cedo: representar perfis de acesso de um jeito que o compilador ajuda a proteger, e nunca guardar senha em texto puro no banco. A tela de login em si só chega na Aula 05 (28/08); hoje preparamos a base que ela vai usar.</p>
       <h3>Objetivos de Aprendizagem</h3>
       <ul>
-        <li>Compreender o funcionamento do controle de versão distribuído no fluxo de desenvolvimento.</li>
-        <li>Configurar o ambiente de desenvolvimento nos laboratórios do IFSul de forma segura.</li>
-        <li>Criar e estruturar repositórios no GitHub adicionando os membros da equipe e o professor como colaborador.</li>
-        <li>Dominar os comandos essenciais de ciclo de vida do código (status, add, commit, push, pull).</li>
-        <li>Compreender a utilidade e a nomenclatura de branches e arquivos <code>.gitignore</code>.</li>
+        <li>Entender por que um Enum é mais seguro que uma String solta para representar categorias fixas.</li>
+        <li>Criar o Enum <code>Perfil</code> e atualizar <code>Usuario</code> e <code>UsuarioDAO</code> para usá-lo.</li>
+        <li>Entender o que é uma função de hash e por que ela nunca deve ser revertida para a senha original.</li>
+        <li>Implementar um utilitário de hash com SHA-256 e um método de autenticação na <code>UsuarioDAO</code>.</li>
+        <li>Planejar, por escrito, o que cada perfil pode ou não fazer no sistema.</li>
       </ul>
     </section>
 
     <section id="s2">
-      <h2><span class="num">02</span>Ambiente Institucional: Cuidados e Configurações nos Laboratórios</h2>
-      <p>Os computadores dos laboratórios do IFSul Câmpus Venâncio Aires são utilizados por diversas turmas diariamente. Para evitar vazamento de credenciais ou sobrescrita acidental do trabalho de outros estudantes, siga rigorosamente as orientações abaixo:</p>
+      <h2><span class="num">02</span>Conceitos: Enum para Perfis e Hash para Senhas</h2>
 
-      <div class="callout-warn">
-        <strong>Atenção especial: ambiente multiusuário de laboratório</strong>
-        <ol class="plain">
-          <li>Nunca salve credenciais globais no terminal do laboratório.</li>
-          <li>Sempre valide o usuário do Git antes de realizar qualquer commit.</li>
-          <li>Ao finalizar a aula, remova seu Personal Access Token (PAT) do PC.</li>
-          <li>Faça sincronização (push) de todos os dados antes de sair da sala.</li>
-        </ol>
-      </div>
+      <h3>O Problema de Representar Perfis com String</h3>
+      <p>Até a Aula 02, o atributo <code>perfil</code> da classe <code>Usuario</code> era uma <code>String</code> comum. O compilador aceita qualquer texto nesse campo, então um erro de digitação como <code>"Admnistrador"</code> ou uma diferença de maiúsculas como <code>"administrador"</code> compila normalmente e só quebra em tempo de execução, quando alguma comparação falha silenciosamente:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">if</span> (usuario.getPerfil().equals(<span class="tok-str">&quot;Administrador&quot;</span>)) { <span class="tok-comment">/* ... */</span> }
 
-      <h3>Verificando e Configurando sua Identidade</h3>
-      <p>Sempre que sentar em uma bancada do laboratório, siga esta sequência em vez de configurar direto: assim você confere quem está "assinando" os commits naquela máquina antes de sobrescrever qualquer coisa.</p>
+<span class="tok-comment">// Funciona só se o texto salvo for EXATAMENTE "Administrador".</span>
+<span class="tok-comment">// "ADMINISTRADOR", "administrador" ou "Admnistrador" (erro de digitação)</span>
+<span class="tok-comment">// não batem, e o compilador não avisa nada disso.</span></code></pre></div>
 
-      <p><strong>1. Inspeção prévia:</strong> verifique o nome e o e-mail configurados globalmente no momento:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Verificar o nome configurado globalmente</span>
-<span class="tok-kw">git</span> <span class="tok-fn">config</span> <span class="tok-flag">--global</span> user.name
-
-<span class="tok-comment"># Verificar o e-mail configurado globalmente</span>
-<span class="tok-kw">git</span> <span class="tok-fn">config</span> <span class="tok-flag">--global</span> user.email</code></pre></div>
-      <div class="callout"><strong>Diagnóstico:</strong> se o terminal devolver os seus próprios dados, o ambiente já está pronto. Se devolver os dados de outro(a) estudante (ou ficar em branco), é necessário atualizar a identidade antes de continuar.</div>
-
-      <p>Para visualizar todas as configurações globais ativas de uma vez (editor padrão, branch padrão etc.):</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">config</span> <span class="tok-flag">--list</span> <span class="tok-flag">--global</span></code></pre></div>
-
-      <p>E para saber de qual arquivo cada configuração está sendo lida (do sistema, do usuário ou do repositório):</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">config</span> <span class="tok-flag">--list</span> <span class="tok-flag">--show-origin</span></code></pre></div>
-
-      <p><strong>2. Definição da identidade:</strong> configure a identidade apenas dentro da pasta do repositório do seu projeto, com <code>--local</code>: assim você não altera a configuração global da máquina nem afeta colegas de outros turnos.</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Entre na pasta do seu projeto clonado</span>
-<span class="tok-kw">cd</span> <span class="tok-var">20262_IS3_GrupoXX</span>
-
-<span class="tok-comment"># Configure a identidade APENAS para este repositório</span>
-<span class="tok-kw">git</span> <span class="tok-fn">config</span> <span class="tok-flag">--local</span> user.name <span class="tok-str">"Seu Nome Completo"</span>
-<span class="tok-kw">git</span> <span class="tok-fn">config</span> <span class="tok-flag">--local</span> user.email <span class="tok-str">"seu.email@academico.ifsul.edu.br"</span></code></pre></div>
-    </section>
-
-    <section id="s3">
-      <h2><span class="num">03</span>Entendendo os Conceitos sem Complicação</h2>
-      <p>Para quem está lidando com controle de versão pela primeira vez, alguns termos podem parecer abstratos. Vamos traduzi-los para o nosso dia a dia de projeto:</p>
-
-      <h3>O que é um Repositório?</h3>
-      <p>Pense no repositório como a pasta inteligente do seu projeto. Além de guardar seus arquivos em Java, telas FXML e scripts SQL, ele guarda todo o histórico de alterações: quem alterou, quando alterou e o que exatamente foi modificado.</p>
-
-      <h3>O que é um Commit?</h3>
-      <p>Um commit é como uma foto (snapshot) do estado atual do seu projeto em um momento em que as coisas estão funcionando. Cada commit recebe uma mensagem explicativa do que foi construído ou corrigido.</p>
-
-      <h3>Padronização de Commits (Conventional Commits)</h3>
-      <p>Para manter o histórico do projeto organizado e fácil de entender, adotamos o padrão <strong>Conventional Commits</strong>: toda mensagem de commit segue a estrutura <code>tipo: descrição</code>, em que o tipo indica a natureza da alteração.</p>
+      <h3>Enum: um Tipo com um Conjunto Fixo de Valores</h3>
+      <p>Um <em>enum</em> (enumeration) é um tipo especial do Java para quando o conjunto de valores possíveis é conhecido e fixo, exatamente o caso de um perfil de acesso. Em vez de aceitar qualquer texto, o Enum só aceita as constantes declaradas; um erro de digitação vira erro de compilação, não um bug escondido em produção.</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Tipo</th><th>Quando usar</th><th>Exemplo</th></tr></thead>
+          <thead><tr><th>Característica</th><th>Com String</th><th>Com Enum</th></tr></thead>
           <tbody>
-            <tr><td><code>feat:</code></td><td>Nova funcionalidade</td><td><code>feat: adiciona tela de cadastro de usuário</code></td></tr>
-            <tr><td><code>fix:</code></td><td>Correção de um bug</td><td><code>fix: corrige validação de e-mail duplicado</code></td></tr>
-            <tr><td><code>docs:</code></td><td>Alterações em documentação</td><td><code>docs: atualiza README com instruções de setup</code></td></tr>
-            <tr><td><code>style:</code></td><td>Formatação, sem mudança de lógica</td><td><code>style: ajusta indentação da classe Usuario</code></td></tr>
-            <tr><td><code>refactor:</code></td><td>Reestruturação de código sem mudar comportamento</td><td><code>refactor: extrai validação para a classe Utils</code></td></tr>
-            <tr><td><code>build:</code></td><td>Mudanças de build ou dependências</td><td><code>build: adiciona dependência mysql-connector-j no pom.xml</code></td></tr>
+            <tr><td>Valores possíveis</td><td>Qualquer texto</td><td>Só as constantes declaradas</td></tr>
+            <tr><td>Erro de digitação</td><td>Compila, falha em tempo de execução</td><td>Não compila</td></tr>
+            <tr><td>Comparação</td><td><code>.equals()</code>, sensível a maiúsculas</td><td><code>==</code>, mais simples e segura</td></tr>
+            <tr><td>Sugestão na IDE</td><td>Nenhuma</td><td>NetBeans sugere os valores automaticamente</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3>O que é Branch Padrão (Main)?</h3>
-      <p><em>Branch</em> significa "ramificação". Quando criamos um repositório, o Git cria uma linha do tempo principal para o código: a <strong>branch main</strong>, onde reside o código estável e pronto para testes ou demonstrações para as entidades parceiras.</p>
-      <p>Na prática cotidiana, criamos branches secundárias (como <code>feature/tela-login</code>) para trabalhar em funcionalidades isoladas sem quebrar a versão principal que está funcionando.</p>
-
-      <h3>Os Quatro Pilares do Git</h3>
-      <p>Todo arquivo do seu projeto passa por até quatro lugares diferentes, nesta ordem:</p>
+      <h3>Hash: Por que Nunca Guardar Senha em Texto Puro</h3>
+      <p>A tabela <code>usuarios</code> criada na Aula 02 guarda a senha como texto puro, na linha <code>VALUES (..., 'admin123', ...)</code>. Isso é uma falha de segurança séria: qualquer pessoa com acesso ao banco (um vazamento, um backup mal guardado, um acesso indevido) lê a senha de todo mundo diretamente. A solução é nunca guardar a senha em si, só o resultado de uma função de hash aplicada a ela.</p>
+      <p>Um hash é uma função de mão única: transforma qualquer texto em uma sequência fixa de caracteres, mas não existe operação inversa que devolva o texto original a partir do hash. Para conferir uma senha digitada, o sistema não descriptografa nada: ele aplica a mesma função de hash na senha digitada e compara o resultado com o hash já guardado no banco.</p>
       <div class="card-grid">
-        <div class="card"><h4><span class="dot"></span>Working Directory</h4><p>A pasta de trabalho local no seu PC, onde você edita os arquivos normalmente.</p></div>
-        <div class="card"><h4><span class="dot"></span>Staging Area</h4><p>A "mesa de preparação/fotografia": alimentada via <code>git add</code>, é onde você escolhe exatamente o que entrará no próximo commit.</p></div>
-        <div class="card"><h4><span class="dot"></span>Local Repository</h4><p>O cofre de histórico local, atualizado a cada <code>git commit</code>; cada commit é uma foto permanente daquele momento.</p></div>
-        <div class="card"><h4><span class="dot"></span>Remote Repository</h4><p>O servidor na nuvem (GitHub), sincronizado via <code>git push</code>; garante backup e permite que o grupo e o professor acompanhem o progresso.</p></div>
+        <div class="card"><h4><span class="dot"></span>No Cadastro</h4><p>A senha digitada passa pelo <code>SenhaUtil.gerarHash()</code> uma vez; só o hash resultante é gravado na coluna <code>senha</code> do banco. A senha original nunca é armazenada.</p></div>
+        <div class="card"><h4><span class="dot"></span>No Login</h4><p>A senha digitada passa pelo mesmo <code>SenhaUtil.gerarHash()</code>; o resultado é comparado com o hash já salvo no banco. Se forem iguais, a senha está correta, sem nunca descriptografar nada.</p></div>
       </div>
 
-      <div class="flow-diagram" role="img" aria-label="Fluxo: Working Directory, via git add, para Staging Area, via git commit, para Local Repository, via git push, para GitHub Remote">
-        <div class="flow-step">Working Directory</div>
-        <div class="flow-arrow"><span class="arrow-line">──▶</span><code>git add</code></div>
-        <div class="flow-step">Staging Area</div>
-        <div class="flow-arrow"><span class="arrow-line">──▶</span><code>git commit</code></div>
-        <div class="flow-step">Local Repository</div>
-        <div class="flow-arrow"><span class="arrow-line">──▶</span><code>git push</code></div>
-        <div class="flow-step">GitHub Remote</div>
+      <div class="callout-warn">
+        <strong>SHA-256 puro é didático, não é o que produção usa</strong>
+        <p style="margin:0;">Em sistemas reais, usa-se um algoritmo pensado para senhas (BCrypt, Argon2, PBKDF2) combinado com um <em>salt</em> aleatório por usuário, o que dificulta ataques com tabelas pré-computadas (rainbow tables). O SHA-256 desta aula ilustra o princípio central, nunca guardar a senha em si, usando o que já vem pronto no JDK, sem precisar adicionar uma nova dependência ao <code>pom.xml</code>.</p>
       </div>
     </section>
 
-    <section id="s4">
-      <h2><span class="num">04</span>Prática Guiada: Configuração Inicial do Projeto</h2>
-      <p>Siga os passos a seguir no laboratório para iniciar a estrutura de um projeto JavaFX/NetBeans 28 com Git.</p>
+    <section id="s3">
+      <h2><span class="num">03</span>Prática Guiada: Criando um Enum e Mesclando pela Branch</h2>
+      <p>Pratique a criação e o merge de um Enum antes de aplicar a mesma técnica no TenisShop, usando a <code>Categoria.java</code> da Aula 02 como exercício. Este passo a passo é só para treino; não é preciso commitar essa versão no repositório de referência da disciplina.</p>
 
-      <p><strong>Passo 1: Inicialização do Repositório Local</strong></p>
-      <p>No terminal do NetBeans ou do sistema operacional, na pasta raiz do seu projeto:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">init</span></code></pre></div>
+      <p><strong>Passo 1: Atualize e Crie a Branch</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">pull</span> origin main
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-flag">-b</span> <span class="tok-var">feature/categoria-tipo</span></code></pre></div>
 
-      <p><strong>Passo 2: Criação do Arquivo .gitignore</strong></p>
-      <p>Arquivos compilados, pastas <code>.nbproject</code> locais ou artefatos do NetBeans não devem poluir o GitHub. Crie um arquivo chamado <code>.gitignore</code> na raiz do projeto com o seguinte conteúdo:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">.gitignore</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>/target/
-/nbproject/private/
-*.class
-*.jar
-*.log
-.DS_Store</code></pre></div>
-
-      <p><strong>Passo 3: Adição e Primeiro Commit</strong></p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Adiciona todos os arquivos válidos para a Staging Area</span>
-<span class="tok-kw">git</span> <span class="tok-fn">add</span> .
-
-<span class="tok-comment"># Realiza o primeiro registro histórico</span>
-<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: estrutura inicial do projeto com NetBeans 28 e JavaFX"</span></code></pre></div>
-
-      <h3>Fluxo de Trabalho em Equipe: Git Pull, Push e Colaboração</h3>
-      <p>Na prática, o grupo trabalha em paralelo no mesmo repositório. Veja como duas pessoas colaboram sem pisar no trabalho uma da outra:</p>
-
-      <p><strong>Estudante A (criador/a):</strong> inspeciona a identidade local (<code>git config user.name</code> e <code>git config user.email</code>), cria a classe de domínio <code>Categoria.java</code> no projeto do grupo e envia a alteração para o GitHub:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">add</span> .
-<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: adiciona classe de dominio Categoria"</span>
-<span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
-
-      <div class="callout"><strong>Aviso de sincronia:</strong> Estudante A avisa o grupo que enviou a alteração para o GitHub; combinado é sempre melhor do que descoberto depois.</div>
-
-      <p><strong>Estudante B (colaborador/a):</strong> antes de começar a trabalhar, busca as alterações mais recentes do repositório remoto:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">pull</span> origin main</code></pre></div>
-      <p>Ao reabrir o projeto no NetBeans 28, a árvore de arquivos é atualizada automaticamente e a classe <code>Categoria.java</code> aparece no computador do Estudante B, sem precisar copiar nada manualmente.</p>
-
-      <p>O Estudante B insere um novo atributo na classe recebida (<code>private Boolean ativo;</code>) e envia a contribuição de volta:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">add</span> .
-<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: adiciona atributo de status ativo na Categoria"</span>
-<span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
-
-      <p>Resultado final da colaboração, a classe <code>Categoria.java</code> depois das duas contribuições:</p>
-      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/domain/Categoria.java</code></p>
+      <p><strong>Passo 2: Crie o Enum TipoCategoria</strong></p>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/domain/TipoCategoria.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.domain;
 
-<span class="tok-comment">/**
- * Representa a entidade Categoria no sistema TenisShop.
- * Contém os atributos, construtores, getters e setters.
- *
- * @author Geovane Griesang
- */</span>
-<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">Categoria</span> {
-    <span class="tok-kw">private</span> <span class="tok-fn">Integer</span> id;
-    <span class="tok-kw">private</span> <span class="tok-fn">String</span> nome;
-    <span class="tok-kw">private</span> <span class="tok-fn">Boolean</span> ativo;
-
-    <span class="tok-kw">public</span> <span class="tok-fn">Categoria</span>() {
-    }
-
-    <span class="tok-kw">public</span> <span class="tok-fn">Categoria</span>(<span class="tok-fn">Integer</span> id, <span class="tok-fn">String</span> nome, <span class="tok-fn">Boolean</span> ativo) {
-        <span class="tok-kw">this</span>.id = id;
-        <span class="tok-kw">this</span>.nome = nome;
-        <span class="tok-kw">this</span>.ativo = ativo;
-    }
-
-    <span class="tok-comment">// Getters e Setters</span>
-    <span class="tok-kw">public</span> <span class="tok-fn">Integer</span> getId() {
-        <span class="tok-kw">return</span> id;
-    }
-
-    <span class="tok-kw">public</span> <span class="tok-kw">void</span> setId(<span class="tok-fn">Integer</span> id) {
-        <span class="tok-kw">this</span>.id = id;
-    }
-
-    <span class="tok-kw">public</span> <span class="tok-fn">String</span> getNome() {
-        <span class="tok-kw">return</span> nome;
-    }
-
-    <span class="tok-kw">public</span> <span class="tok-kw">void</span> setNome(<span class="tok-fn">String</span> nome) {
-        <span class="tok-kw">this</span>.nome = nome;
-    }
-
-    <span class="tok-kw">public</span> <span class="tok-fn">Boolean</span> getAtivo() {
-        <span class="tok-kw">return</span> ativo;
-    }
-
-    <span class="tok-kw">public</span> <span class="tok-kw">void</span> setAtivo(<span class="tok-fn">Boolean</span> ativo) {
-        <span class="tok-kw">this</span>.ativo = ativo;
-    }
-
-    <span class="tok-flag">@Override</span>
-    <span class="tok-kw">public</span> <span class="tok-fn">String</span> toString() {
-        <span class="tok-kw">return</span> <span class="tok-kw">this</span>.nome;
-    }
+<span class="tok-kw">public</span> <span class="tok-kw">enum</span> <span class="tok-fn">TipoCategoria</span> {
+    CALCADO,
+    VESTUARIO,
+    ACESSORIO
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="Categoria.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCi8qKgogKiBSZXByZXNlbnRhIGEgZW50aWRhZGUgQ2F0ZWdvcmlhIG5vIHNpc3RlbWEgVGVuaXNTaG9wLgogKiBDb250w6ltIG9zIGF0cmlidXRvcywgY29uc3RydXRvcmVzLCBnZXR0ZXJzIGUgc2V0dGVycy4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgQ2F0ZWdvcmlhIHsKICAgIHByaXZhdGUgSW50ZWdlciBpZDsKICAgIHByaXZhdGUgU3RyaW5nIG5vbWU7CiAgICBwcml2YXRlIEJvb2xlYW4gYXRpdm87CgogICAgcHVibGljIENhdGVnb3JpYSgpIHsKICAgIH0KCiAgICBwdWJsaWMgQ2F0ZWdvcmlhKEludGVnZXIgaWQsIFN0cmluZyBub21lLCBCb29sZWFuIGF0aXZvKSB7CiAgICAgICAgdGhpcy5pZCA9IGlkOwogICAgICAgIHRoaXMubm9tZSA9IG5vbWU7CiAgICAgICAgdGhpcy5hdGl2byA9IGF0aXZvOwogICAgfQoKICAgIC8vIEdldHRlcnMgZSBTZXR0ZXJzCiAgICBwdWJsaWMgSW50ZWdlciBnZXRJZCgpIHsKICAgICAgICByZXR1cm4gaWQ7CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0SWQoSW50ZWdlciBpZCkgewogICAgICAgIHRoaXMuaWQgPSBpZDsKICAgIH0KCiAgICBwdWJsaWMgU3RyaW5nIGdldE5vbWUoKSB7CiAgICAgICAgcmV0dXJuIG5vbWU7CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0Tm9tZShTdHJpbmcgbm9tZSkgewogICAgICAgIHRoaXMubm9tZSA9IG5vbWU7CiAgICB9CgogICAgcHVibGljIEJvb2xlYW4gZ2V0QXRpdm8oKSB7CiAgICAgICAgcmV0dXJuIGF0aXZvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldEF0aXZvKEJvb2xlYW4gYXRpdm8pIHsKICAgICAgICB0aGlzLmF0aXZvID0gYXRpdm87CiAgICB9CgogICAgQE92ZXJyaWRlCiAgICBwdWJsaWMgU3RyaW5nIHRvU3RyaW5nKCkgewogICAgICAgIHJldHVybiB0aGlzLm5vbWU7CiAgICB9Cn0="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Categoria.java</span></button>
 
-      <div class="callout-warn">
-        <strong>Regras de ouro para o laboratório</strong>
-        <ol class="plain">
-          <li>Chegou no computador da escola? A primeira ação é executar <code>git pull origin main</code>.</li>
-          <li>Vai trabalhar em uma nova tarefa? Avise a equipe para evitar alterações sobrepostas.</li>
-          <li>Mantenha os commits pequenos, frequentes e com mensagens claras.</li>
-        </ol>
+      <p><strong>Passo 3: Adicione o Atributo na Categoria</strong></p>
+      <p>Acrescente o campo e o getter/setter na <code>Categoria.java</code> existente, sem remover o que já está lá:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">private</span> <span class="tok-fn">TipoCategoria</span> tipo;
+
+<span class="tok-kw">public</span> <span class="tok-fn">TipoCategoria</span> getTipo() {
+    <span class="tok-kw">return</span> tipo;
+}
+
+<span class="tok-kw">public</span> <span class="tok-kw">void</span> setTipo(<span class="tok-fn">TipoCategoria</span> tipo) {
+    <span class="tok-kw">this</span>.tipo = tipo;
+}</code></pre></div>
+
+      <p><strong>Passo 4: Commit, Merge e Push</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">add</span> .
+<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: adiciona tipo de categoria (Enum) na Categoria"</span>
+
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">merge</span> <span class="tok-var">feature/categoria-tipo</span>
+<span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">04</span>Planejando os Níveis de Acesso</h2>
+      <p>Antes de existir uma tela de login (Aula 05, 28/08), vale decidir por escrito o que cada perfil pode ou não fazer. Isso evita decisões improvisadas na hora de programar os Controllers mais adiante, e é exatamente o que o cronograma chama de "arquitetura de usuários".</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Funcionalidade</th><th>ADMINISTRADOR</th><th>OPERADOR</th></tr></thead>
+          <tbody>
+            <tr><td>Cadastrar novo usuário</td><td>Sim</td><td>Não</td></tr>
+            <tr><td>Listar e consultar usuários</td><td>Sim</td><td>Não</td></tr>
+            <tr><td>Cadastrar categorias</td><td>Sim</td><td>Sim</td></tr>
+            <tr><td>Registrar a operação principal do domínio</td><td>Sim</td><td>Sim</td></tr>
+            <tr><td>Gerar relatórios gerenciais</td><td>Sim</td><td>Não</td></tr>
+          </tbody>
+        </table>
       </div>
+      <div class="callout"><strong>Onde registrar:</strong> mantenha essa tabela no <code>README.md</code> ou <code>docs/requisitos.md</code> do grupo, ao lado da lista de funcionalidades levantada na Aula 03. Ela vira a base direta dos Controllers quando o login existir.</div>
     </section>
 
     <section id="s5">
       <h2><span class="num">05</span>Avanço no Projeto Exemplo TenisShop</h2>
-      <p>O TenisShop é construído em aula, ao vivo, junto com a turma: o professor cria cada peça no NetBeans 28 enquanto projeta, e cada grupo repete o mesmo passo a passo no <strong>seu próprio projeto</strong>, com o nome, pacote e domínio da sua entidade parceira (não é uma cópia nem um clone do repositório do TenisShop). Vamos acompanhar essa construção, desde a criação do projeto Maven até a primeira versão publicada no repositório da disciplina.</p>
-      <div class="callout"><strong>Até onde ir hoje:</strong> o TenisShop é o exemplo de referência que o professor evolui ao longo de todo o semestre, seguindo o cronograma da Aula 01. Nesta aula, o requisito de entrega dos grupos é a criação do projeto Maven e do <code>pom.xml</code> (ver checklist da Seção 07); o banco de dados, a <code>ConexaoBanco</code> e as demais camadas mostradas a seguir chegam aos projetos dos grupos nas datas já previstas no cronograma (Script SQL em 18/09, Camada de Conexão em 02/10).</div>
+      <p>Agora aplique a mesma técnica de branch no repositório de referência: o Enum <code>Perfil</code> substitui a <code>String</code> solta em <code>Usuario</code>, e um novo utilitário de hash prepara a autenticação que a tela de login vai usar na Aula 05.</p>
 
-      <h3>Passo a Passo: Criação do Projeto Maven no NetBeans 28</h3>
-      <ol class="plain">
-        <li>Abra o Apache NetBeans 28.</li>
-        <li>Clique no menu <strong>File → New Project...</strong> (ou pressione <code>Ctrl + Shift + N</code>).</li>
-        <li>Na categoria <strong>Java with Maven</strong>, selecione <strong>Java Application</strong> e clique em <strong>Next</strong>.</li>
-        <li>
-          Defina as configurações do projeto:
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Campo</th><th>Valor</th></tr></thead>
-              <tbody>
-                <tr><td>Project Name</td><td><code>TenisShop</code></td></tr>
-                <tr><td>Project Location</td><td>Diretório da pasta onde foi feito o <code>git init</code> (Passo a Passo da Seção 04)</td></tr>
-                <tr><td>Group Id</td><td><code>br.edu.ifsul.venancio</code></td></tr>
-                <tr><td>Artifact Id</td><td><code>TenisShop</code></td></tr>
-                <tr><td>Package</td><td><code>br.edu.ifsul.venancio.tenisshop</code></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </li>
-        <li>Clique em <strong>Finish</strong>.</li>
-      </ol>
+      <div class="callout"><strong>Até onde ir hoje:</strong> esta seção mostra a versão de referência completa. Para o projeto do próprio grupo, o esperado é aplicar a mesma ideia (Enum para uma categoria fixa e, se o projeto tiver login, hash de senha), não necessariamente reproduzir estas quatro classes inteiras.</div>
 
-      <h3>Configuração do pom.xml (JavaFX e Driver MySQL)</h3>
-      <p>Abra o arquivo <code>pom.xml</code> na raiz do projeto e adicione as dependências do JavaFX e do driver MySQL Connector/J:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;<span class="tok-kw">dependencies</span>&gt;
-    <span class="tok-comment">&lt;!-- Driver MySQL JDBC --&gt;</span>
-    &lt;<span class="tok-kw">dependency</span>&gt;
-        &lt;<span class="tok-kw">groupId</span>&gt;com.mysql&lt;/<span class="tok-kw">groupId</span>&gt;
-        &lt;<span class="tok-kw">artifactId</span>&gt;mysql-connector-j&lt;/<span class="tok-kw">artifactId</span>&gt;
-        &lt;<span class="tok-kw">version</span>&gt;8.3.0&lt;/<span class="tok-kw">version</span>&gt;
-    &lt;/<span class="tok-kw">dependency</span>&gt;
+      <p><strong>Branch para a mudança</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">pull</span> origin main
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-flag">-b</span> <span class="tok-var">feature/perfil-e-hash</span></code></pre></div>
 
-    <span class="tok-comment">&lt;!-- JavaFX Controls --&gt;</span>
-    &lt;<span class="tok-kw">dependency</span>&gt;
-        &lt;<span class="tok-kw">groupId</span>&gt;org.openjfx&lt;/<span class="tok-kw">groupId</span>&gt;
-        &lt;<span class="tok-kw">artifactId</span>&gt;javafx-controls&lt;/<span class="tok-kw">artifactId</span>&gt;
-        &lt;<span class="tok-kw">version</span>&gt;21.0.2&lt;/<span class="tok-kw">version</span>&gt;
-    &lt;/<span class="tok-kw">dependency</span>&gt;
+      <h3>Enum Perfil</h3>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/domain/Perfil.java</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.domain;
 
-    <span class="tok-comment">&lt;!-- JavaFX FXML --&gt;</span>
-    &lt;<span class="tok-kw">dependency</span>&gt;
-        &lt;<span class="tok-kw">groupId</span>&gt;org.openjfx&lt;/<span class="tok-kw">groupId</span>&gt;
-        &lt;<span class="tok-kw">artifactId</span>&gt;javafx-fxml&lt;/<span class="tok-kw">artifactId</span>&gt;
-        &lt;<span class="tok-kw">version</span>&gt;21.0.2&lt;/<span class="tok-kw">version</span>&gt;
-    &lt;/<span class="tok-kw">dependency</span>&gt;
-&lt;/<span class="tok-kw">dependencies</span>&gt;</code></pre></div>
-      <div class="callout"><strong>Por que JavaFX já entra agora, se ainda não vamos usar?</strong> Só a dependência é adicionada nesta aula, deixando o projeto pronto. O código de telas (FXML/JavaFX) só começa a ser escrito em 23/10/2026, e a integração com os Controllers em 30/10/2026, conforme o cronograma. Até lá, o TenisShop segue só com Java puro (classes de domínio, DAO e o teste de conexão).</div>
+<span class="tok-comment">/**
+ * Representa os níveis de acesso disponíveis para um Usuario no sistema TenisShop.
+ *
+ * @author Geovane Griesang
+ */</span>
+<span class="tok-kw">public</span> <span class="tok-kw">enum</span> <span class="tok-fn">Perfil</span> {
+    ADMINISTRADOR,
+    OPERADOR
+}</code></pre></div>
+      <button type="button" class="download-btn" data-filename="Perfil.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCi8qKgogKiBSZXByZXNlbnRhIG9zIG7DrXZlaXMgZGUgYWNlc3NvIGRpc3BvbsOtdmVpcyBwYXJhIHVtIFVzdWFyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGVudW0gUGVyZmlsIHsKICAgIEFETUlOSVNUUkFET1IsCiAgICBPUEVSQURPUgp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Perfil.java</span></button>
 
-      <h3>Criação do Banco de Dados MySQL</h3>
-      <p>Antes de escrever a classe de conexão, o banco precisa existir. Abra o MySQL Workbench (ou o terminal do MySQL) e execute:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">-- Criação do banco de dados do sistema exemplo</span>
-<span class="tok-kw">CREATE DATABASE IF NOT EXISTS</span> tenisshop_db
-  <span class="tok-kw">DEFAULT CHARACTER SET</span> utf8mb4
-  <span class="tok-kw">DEFAULT COLLATE</span> utf8mb4_unicode_ci;
-
-<span class="tok-kw">USE</span> tenisshop_db;
-
-<span class="tok-comment">-- Tabela de usuários para exemplo didático</span>
-<span class="tok-kw">CREATE TABLE IF NOT EXISTS</span> usuarios (
-    id <span class="tok-fn">INT</span> <span class="tok-kw">AUTO_INCREMENT PRIMARY KEY</span>,
-    nome <span class="tok-fn">VARCHAR</span>(100) <span class="tok-kw">NOT NULL</span>,
-    email <span class="tok-fn">VARCHAR</span>(100) <span class="tok-kw">NOT NULL UNIQUE</span>,
-    senha <span class="tok-fn">VARCHAR</span>(255) <span class="tok-kw">NOT NULL</span>,
-    perfil <span class="tok-fn">VARCHAR</span>(20) <span class="tok-kw">NOT NULL DEFAULT</span> <span class="tok-str">'OPERADOR'</span>,
-    ativo <span class="tok-fn">BOOLEAN</span> <span class="tok-kw">DEFAULT</span> <span class="tok-kw">TRUE</span>,
-    data_cadastro <span class="tok-fn">TIMESTAMP</span> <span class="tok-kw">DEFAULT</span> <span class="tok-fn">CURRENT_TIMESTAMP</span>
-);
-
-<span class="tok-comment">-- Inserção de um usuário inicial para testes</span>
-<span class="tok-kw">INSERT INTO</span> usuarios (nome, email, senha, perfil)
-<span class="tok-kw">VALUES</span> (<span class="tok-str">'Geovane Griesang'</span>, <span class="tok-str">'geovanegriesang@ifsul.edu.br'</span>, <span class="tok-str">'admin123'</span>, <span class="tok-str">'ADMINISTRADOR'</span>);</code></pre></div>
-
-      <h3>Padrões de Projeto Usados no TenisShop</h3>
-      <p>Antes de olhar para a árvore de pacotes, vale entender por que ela é organizada assim.</p>
-
-      <p><strong>O que é um padrão de projeto?</strong> Um padrão de projeto (design pattern) é uma solução conhecida e testada pela comunidade de programadores para um problema que se repete na hora de organizar código. Não é uma biblioteca para instalar nem um framework, é uma forma combinada de estruturar as classes para que o sistema fique mais fácil de entender, manter e evoluir. O TenisShop usa dois: o <strong>MVC</strong> (para organizar a aplicação inteira) e o <strong>Singleton</strong> (para controlar a conexão com o banco de dados).</p>
-
-      <p><strong>MVC (Model, View e Controller).</strong> O TenisShop é um software único, sem cliente e servidor separados: tudo roda no mesmo programa, na mesma máquina, e o banco MySQL é apenas onde os dados ficam guardados. O MVC não muda isso; ele só organiza as responsabilidades dentro desse único programa, em três papéis:</p>
-      <div class="card-grid">
-        <div class="card"><h4><span class="dot"></span>Model</h4><p>As classes de domínio (<code>Usuario</code>, <code>Categoria</code>) e a camada de acesso a dados (DAO). Representam os dados e as regras do sistema.</p></div>
-        <div class="card"><h4><span class="dot"></span>View</h4><p>As telas construídas com JavaFX e FXML, que a turma vai criar nas próximas aulas. Mostram os dados e recebem a interação de quem usa o sistema.</p></div>
-        <div class="card"><h4><span class="dot"></span>Controller</h4><p>As classes que recebem os eventos da tela (um clique, um envio de formulário), decidem o que fazer e atualizam o Model e a View.</p></div>
-      </div>
-
-      <p><strong>Singleton.</strong> A classe <code>ConexaoBanco</code> usa esse padrão: em vez de abrir uma conexão nova toda vez que alguma parte do sistema precisa falar com o banco, ela guarda uma única conexão ativa (numa variável <code>static</code>) e a reaproveita enquanto estiver aberta. Isso evita o desperdício de abrir e fechar conexões repetidamente.</p>
-
-      <p><strong>O que é uma classe de domínio?</strong> É o que fica dentro da pasta <code>model/domain</code>, que você já deve ter clicado no NetBeans. São as classes que representam os "substantivos" do problema, as coisas do mundo real que o sistema precisa controlar: um <code>Usuario</code>, uma <code>Categoria</code>, futuramente um <code>Tenis</code>, um <code>Pedido</code>. Cada classe de domínio guarda só os dados (atributos) e comportamentos simples ligados diretamente a esse conceito; ela não sabe nada sobre banco de dados ou tela.</p>
-
-      <p><strong>O que é DAO (Data Access Object)?</strong> É o que fica dentro da pasta <code>model/dao</code>. São as classes responsáveis por conversar com o banco de dados: abrir conexão, executar comandos SQL, transformar linhas de tabela em objetos de domínio e vice-versa. A ideia do padrão DAO é isolar toda a lógica de persistência num lugar só, para que o restante do sistema não precise saber como os dados são salvos ou lidos, só pedir para o DAO fazer isso.</p>
-
-      <h3>Estrutura de Pacotes do TenisShop</h3>
-      <p>A estrutura de pastas no NetBeans 28 deve seguir rigorosamente os padrões de orientação a objetos e divisão arquitetural em camadas:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">plaintext</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">br.edu.ifsul.venancio.tenisshop/</span>
-<span class="tree-guide">├── </span><span class="tok-fn">TenisShop.java</span>
-<span class="tree-guide">└── </span><span class="tok-kw">model/</span>
-<span class="tree-guide">    ├── </span><span class="tok-kw">domain/</span>
-<span class="tree-guide">    │   └── </span><span class="tok-fn">Usuario.java</span>
-<span class="tree-guide">    └── </span><span class="tok-kw">dao/</span>
-<span class="tree-guide">        └── </span><span class="tok-fn">ConexaoBanco.java</span></code></pre></div>
-
-      <h3>Classe de Domínio: Usuario.java</h3>
+      <h3>Usuario.java Atualizado</h3>
+      <p>O campo <code>perfil</code>, o construtor e o getter/setter passam a usar o tipo <code>Perfil</code>; o restante da classe continua igual à Aula 02.</p>
       <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/domain/Usuario.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.domain;
 
@@ -1130,14 +949,14 @@
     <span class="tok-kw">private</span> <span class="tok-fn">String</span> nome;
     <span class="tok-kw">private</span> <span class="tok-fn">String</span> email;
     <span class="tok-kw">private</span> <span class="tok-fn">String</span> senha;
-    <span class="tok-kw">private</span> <span class="tok-fn">String</span> perfil;
+    <span class="tok-kw">private</span> <span class="tok-fn">Perfil</span> perfil;
     <span class="tok-kw">private</span> <span class="tok-fn">Boolean</span> ativo;
     <span class="tok-kw">private</span> <span class="tok-fn">LocalDateTime</span> dataCadastro;
 
     <span class="tok-kw">public</span> <span class="tok-fn">Usuario</span>() {
     }
 
-    <span class="tok-kw">public</span> <span class="tok-fn">Usuario</span>(<span class="tok-fn">Integer</span> id, <span class="tok-fn">String</span> nome, <span class="tok-fn">String</span> email, <span class="tok-fn">String</span> senha, <span class="tok-fn">String</span> perfil, <span class="tok-fn">Boolean</span> ativo) {
+    <span class="tok-kw">public</span> <span class="tok-fn">Usuario</span>(<span class="tok-fn">Integer</span> id, <span class="tok-fn">String</span> nome, <span class="tok-fn">String</span> email, <span class="tok-fn">String</span> senha, <span class="tok-fn">Perfil</span> perfil, <span class="tok-fn">Boolean</span> ativo) {
         <span class="tok-kw">this</span>.id = id;
         <span class="tok-kw">this</span>.nome = nome;
         <span class="tok-kw">this</span>.email = email;
@@ -1179,11 +998,11 @@
         <span class="tok-kw">this</span>.senha = senha;
     }
 
-    <span class="tok-kw">public</span> <span class="tok-fn">String</span> getPerfil() {
+    <span class="tok-kw">public</span> <span class="tok-fn">Perfil</span> getPerfil() {
         <span class="tok-kw">return</span> perfil;
     }
 
-    <span class="tok-kw">public</span> <span class="tok-kw">void</span> setPerfil(<span class="tok-fn">String</span> perfil) {
+    <span class="tok-kw">public</span> <span class="tok-kw">void</span> setPerfil(<span class="tok-fn">Perfil</span> perfil) {
         <span class="tok-kw">this</span>.perfil = perfil;
     }
 
@@ -1208,154 +1027,218 @@
         <span class="tok-kw">return</span> <span class="tok-kw">this</span>.nome + <span class="tok-str">&quot; (&quot;</span> + <span class="tok-kw">this</span>.perfil + <span class="tok-str">&quot;)&quot;</span>;
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="Usuario.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCmltcG9ydCBqYXZhLnRpbWUuTG9jYWxEYXRlVGltZTsKCi8qKgogKiBSZXByZXNlbnRhIGEgZW50aWRhZGUgVXN1w6FyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqIENvbnTDqW0gb3MgYXRyaWJ1dG9zLCBjb25zdHJ1dG9yZXMsIGdldHRlcnMgZSBzZXR0ZXJzLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBVc3VhcmlvIHsKICAgIHByaXZhdGUgSW50ZWdlciBpZDsKICAgIHByaXZhdGUgU3RyaW5nIG5vbWU7CiAgICBwcml2YXRlIFN0cmluZyBlbWFpbDsKICAgIHByaXZhdGUgU3RyaW5nIHNlbmhhOwogICAgcHJpdmF0ZSBTdHJpbmcgcGVyZmlsOwogICAgcHJpdmF0ZSBCb29sZWFuIGF0aXZvOwogICAgcHJpdmF0ZSBMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybzsKCiAgICBwdWJsaWMgVXN1YXJpbygpIHsKICAgIH0KCiAgICBwdWJsaWMgVXN1YXJpbyhJbnRlZ2VyIGlkLCBTdHJpbmcgbm9tZSwgU3RyaW5nIGVtYWlsLCBTdHJpbmcgc2VuaGEsIFN0cmluZyBwZXJmaWwsIEJvb2xlYW4gYXRpdm8pIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICAgICAgdGhpcy5ub21lID0gbm9tZTsKICAgICAgICB0aGlzLmVtYWlsID0gZW1haWw7CiAgICAgICAgdGhpcy5zZW5oYSA9IHNlbmhhOwogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgICAgIHRoaXMuYXRpdm8gPSBhdGl2bzsKICAgIH0KCiAgICAvLyBHZXR0ZXJzIGUgU2V0dGVycwogICAgcHVibGljIEludGVnZXIgZ2V0SWQoKSB7CiAgICAgICAgcmV0dXJuIGlkOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldElkKEludGVnZXIgaWQpIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXROb21lKCkgewogICAgICAgIHJldHVybiBub21lOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldE5vbWUoU3RyaW5nIG5vbWUpIHsKICAgICAgICB0aGlzLm5vbWUgPSBub21lOwogICAgfQoKICAgIHB1YmxpYyBTdHJpbmcgZ2V0RW1haWwoKSB7CiAgICAgICAgcmV0dXJuIGVtYWlsOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldEVtYWlsKFN0cmluZyBlbWFpbCkgewogICAgICAgIHRoaXMuZW1haWwgPSBlbWFpbDsKICAgIH0KCiAgICBwdWJsaWMgU3RyaW5nIGdldFNlbmhhKCkgewogICAgICAgIHJldHVybiBzZW5oYTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRTZW5oYShTdHJpbmcgc2VuaGEpIHsKICAgICAgICB0aGlzLnNlbmhhID0gc2VuaGE7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXRQZXJmaWwoKSB7CiAgICAgICAgcmV0dXJuIHBlcmZpbDsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRQZXJmaWwoU3RyaW5nIHBlcmZpbCkgewogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgfQoKICAgIHB1YmxpYyBCb29sZWFuIGdldEF0aXZvKCkgewogICAgICAgIHJldHVybiBhdGl2bzsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRBdGl2byhCb29sZWFuIGF0aXZvKSB7CiAgICAgICAgdGhpcy5hdGl2byA9IGF0aXZvOwogICAgfQoKICAgIHB1YmxpYyBMb2NhbERhdGVUaW1lIGdldERhdGFDYWRhc3RybygpIHsKICAgICAgICByZXR1cm4gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldERhdGFDYWRhc3RybyhMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybykgewogICAgICAgIHRoaXMuZGF0YUNhZGFzdHJvID0gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIEBPdmVycmlkZQogICAgcHVibGljIFN0cmluZyB0b1N0cmluZygpIHsKICAgICAgICByZXR1cm4gdGhpcy5ub21lICsgIiAoIiArIHRoaXMucGVyZmlsICsgIikiOwogICAgfQp9"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Usuario.java</span></button>
+      <button type="button" class="download-btn" data-filename="Usuario.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCmltcG9ydCBqYXZhLnRpbWUuTG9jYWxEYXRlVGltZTsKCi8qKgogKiBSZXByZXNlbnRhIGEgZW50aWRhZGUgVXN1w6FyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqIENvbnTDqW0gb3MgYXRyaWJ1dG9zLCBjb25zdHJ1dG9yZXMsIGdldHRlcnMgZSBzZXR0ZXJzLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBVc3VhcmlvIHsKICAgIHByaXZhdGUgSW50ZWdlciBpZDsKICAgIHByaXZhdGUgU3RyaW5nIG5vbWU7CiAgICBwcml2YXRlIFN0cmluZyBlbWFpbDsKICAgIHByaXZhdGUgU3RyaW5nIHNlbmhhOwogICAgcHJpdmF0ZSBQZXJmaWwgcGVyZmlsOwogICAgcHJpdmF0ZSBCb29sZWFuIGF0aXZvOwogICAgcHJpdmF0ZSBMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybzsKCiAgICBwdWJsaWMgVXN1YXJpbygpIHsKICAgIH0KCiAgICBwdWJsaWMgVXN1YXJpbyhJbnRlZ2VyIGlkLCBTdHJpbmcgbm9tZSwgU3RyaW5nIGVtYWlsLCBTdHJpbmcgc2VuaGEsIFBlcmZpbCBwZXJmaWwsIEJvb2xlYW4gYXRpdm8pIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICAgICAgdGhpcy5ub21lID0gbm9tZTsKICAgICAgICB0aGlzLmVtYWlsID0gZW1haWw7CiAgICAgICAgdGhpcy5zZW5oYSA9IHNlbmhhOwogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgICAgIHRoaXMuYXRpdm8gPSBhdGl2bzsKICAgIH0KCiAgICAvLyBHZXR0ZXJzIGUgU2V0dGVycwogICAgcHVibGljIEludGVnZXIgZ2V0SWQoKSB7CiAgICAgICAgcmV0dXJuIGlkOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldElkKEludGVnZXIgaWQpIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXROb21lKCkgewogICAgICAgIHJldHVybiBub21lOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldE5vbWUoU3RyaW5nIG5vbWUpIHsKICAgICAgICB0aGlzLm5vbWUgPSBub21lOwogICAgfQoKICAgIHB1YmxpYyBTdHJpbmcgZ2V0RW1haWwoKSB7CiAgICAgICAgcmV0dXJuIGVtYWlsOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldEVtYWlsKFN0cmluZyBlbWFpbCkgewogICAgICAgIHRoaXMuZW1haWwgPSBlbWFpbDsKICAgIH0KCiAgICBwdWJsaWMgU3RyaW5nIGdldFNlbmhhKCkgewogICAgICAgIHJldHVybiBzZW5oYTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRTZW5oYShTdHJpbmcgc2VuaGEpIHsKICAgICAgICB0aGlzLnNlbmhhID0gc2VuaGE7CiAgICB9CgogICAgcHVibGljIFBlcmZpbCBnZXRQZXJmaWwoKSB7CiAgICAgICAgcmV0dXJuIHBlcmZpbDsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRQZXJmaWwoUGVyZmlsIHBlcmZpbCkgewogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgfQoKICAgIHB1YmxpYyBCb29sZWFuIGdldEF0aXZvKCkgewogICAgICAgIHJldHVybiBhdGl2bzsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRBdGl2byhCb29sZWFuIGF0aXZvKSB7CiAgICAgICAgdGhpcy5hdGl2byA9IGF0aXZvOwogICAgfQoKICAgIHB1YmxpYyBMb2NhbERhdGVUaW1lIGdldERhdGFDYWRhc3RybygpIHsKICAgICAgICByZXR1cm4gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldERhdGFDYWRhc3RybyhMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybykgewogICAgICAgIHRoaXMuZGF0YUNhZGFzdHJvID0gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIEBPdmVycmlkZQogICAgcHVibGljIFN0cmluZyB0b1N0cmluZygpIHsKICAgICAgICByZXR1cm4gdGhpcy5ub21lICsgIiAoIiArIHRoaXMucGVyZmlsICsgIikiOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Usuario.java</span></button>
 
-      <h3>Conexão com o Banco de Dados: ConexaoBanco.java</h3>
-      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/dao/ConexaoBanco.java</code></p>
+      <h3>Utilitário de Hash: SenhaUtil.java</h3>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/util/SenhaUtil.java</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.util;
+
+<span class="tok-kw">import</span> java.security.<span class="tok-fn">MessageDigest</span>;
+<span class="tok-kw">import</span> java.security.<span class="tok-fn">NoSuchAlgorithmException</span>;
+
+<span class="tok-comment">/**
+ * Classe utilitária para gerar o hash de senhas com o algoritmo SHA-256.
+ * Uso didático: sistemas em produção devem usar um algoritmo pensado para
+ * senhas (BCrypt, Argon2, PBKDF2) combinado com "salt" por usuário.
+ *
+ * @author Geovane Griesang
+ */</span>
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">SenhaUtil</span> {
+
+    <span class="tok-comment">/**
+     * Gera o hash SHA-256 de uma senha em texto puro, em hexadecimal.
+     * @param senhaTextoPuro senha digitada pelo usuário
+     * @return String hash em hexadecimal (64 caracteres)
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-fn">String</span> gerarHash(<span class="tok-fn">String</span> senhaTextoPuro) {
+        <span class="tok-kw">try</span> {
+            <span class="tok-fn">MessageDigest</span> digestor = <span class="tok-fn">MessageDigest</span>.getInstance(<span class="tok-str">&quot;SHA-256&quot;</span>);
+            <span class="tok-kw">byte</span>[] bytesHash = digestor.digest(senhaTextoPuro.getBytes());
+
+            <span class="tok-fn">StringBuilder</span> hexadecimal = <span class="tok-kw">new</span> <span class="tok-fn">StringBuilder</span>();
+            <span class="tok-kw">for</span> (<span class="tok-kw">byte</span> b : bytesHash) {
+                hexadecimal.append(<span class="tok-fn">String</span>.format(<span class="tok-str">&quot;%02x&quot;</span>, b));
+            }
+            <span class="tok-kw">return</span> hexadecimal.toString();
+        } <span class="tok-kw">catch</span> (<span class="tok-fn">NoSuchAlgorithmException</span> e) {
+            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-fn">RuntimeException</span>(<span class="tok-str">&quot;[ERRO] Algoritmo SHA-256 indisponível.&quot;</span>, e);
+        }
+    }
+}</code></pre></div>
+      <button type="button" class="download-btn" data-filename="SenhaUtil.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLnV0aWw7CgppbXBvcnQgamF2YS5zZWN1cml0eS5NZXNzYWdlRGlnZXN0OwppbXBvcnQgamF2YS5zZWN1cml0eS5Ob1N1Y2hBbGdvcml0aG1FeGNlcHRpb247CgovKioKICogQ2xhc3NlIHV0aWxpdMOhcmlhIHBhcmEgZ2VyYXIgbyBoYXNoIGRlIHNlbmhhcyBjb20gbyBhbGdvcml0bW8gU0hBLTI1Ni4KICogVXNvIGRpZMOhdGljbzogc2lzdGVtYXMgZW0gcHJvZHXDp8OjbyBkZXZlbSB1c2FyIHVtIGFsZ29yaXRtbyBwZW5zYWRvIHBhcmEKICogc2VuaGFzIChCQ3J5cHQsIEFyZ29uMiwgUEJLREYyKSBjb21iaW5hZG8gY29tICJzYWx0IiBwb3IgdXN1w6FyaW8uCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGNsYXNzIFNlbmhhVXRpbCB7CgogICAgLyoqCiAgICAgKiBHZXJhIG8gaGFzaCBTSEEtMjU2IGRlIHVtYSBzZW5oYSBlbSB0ZXh0byBwdXJvLCBlbSBoZXhhZGVjaW1hbC4KICAgICAqIEBwYXJhbSBzZW5oYVRleHRvUHVybyBzZW5oYSBkaWdpdGFkYSBwZWxvIHVzdcOhcmlvCiAgICAgKiBAcmV0dXJuIFN0cmluZyBoYXNoIGVtIGhleGFkZWNpbWFsICg2NCBjYXJhY3RlcmVzKQogICAgICovCiAgICBwdWJsaWMgc3RhdGljIFN0cmluZyBnZXJhckhhc2goU3RyaW5nIHNlbmhhVGV4dG9QdXJvKSB7CiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgTWVzc2FnZURpZ2VzdCBkaWdlc3RvciA9IE1lc3NhZ2VEaWdlc3QuZ2V0SW5zdGFuY2UoIlNIQS0yNTYiKTsKICAgICAgICAgICAgYnl0ZVtdIGJ5dGVzSGFzaCA9IGRpZ2VzdG9yLmRpZ2VzdChzZW5oYVRleHRvUHVyby5nZXRCeXRlcygpKTsKCiAgICAgICAgICAgIFN0cmluZ0J1aWxkZXIgaGV4YWRlY2ltYWwgPSBuZXcgU3RyaW5nQnVpbGRlcigpOwogICAgICAgICAgICBmb3IgKGJ5dGUgYiA6IGJ5dGVzSGFzaCkgewogICAgICAgICAgICAgICAgaGV4YWRlY2ltYWwuYXBwZW5kKFN0cmluZy5mb3JtYXQoIiUwMngiLCBiKSk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIGhleGFkZWNpbWFsLnRvU3RyaW5nKCk7CiAgICAgICAgfSBjYXRjaCAoTm9TdWNoQWxnb3JpdGhtRXhjZXB0aW9uIGUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IFJ1bnRpbWVFeGNlcHRpb24oIltFUlJPXSBBbGdvcml0bW8gU0hBLTI1NiBpbmRpc3BvbsOtdmVsLiIsIGUpOwogICAgICAgIH0KICAgIH0KfQo="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar SenhaUtil.java</span></button>
+
+      <h3>Atualizando o Usuário Semente no Banco</h3>
+      <p>A linha inserida na Aula 02 guarda a senha <code>admin123</code> em texto puro. Agora que existe um utilitário de hash, ela precisa ser atualizada para o hash correspondente antes de qualquer teste de autenticação:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">-- Atualiza a senha do usuário semente para o hash SHA-256 de "admin123"</span>
+<span class="tok-kw">UPDATE</span> usuarios
+<span class="tok-kw">SET</span> senha = <span class="tok-str">'240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'</span>
+<span class="tok-kw">WHERE</span> email = <span class="tok-str">'geovanegriesang@ifsul.edu.br'</span>;</code></pre></div>
+      <div class="callout"><strong>De onde veio esse hash:</strong> é o resultado de <code>SenhaUtil.gerarHash("admin123")</code>. Ao trocar a senha do usuário semente do seu grupo, gere um novo hash com o mesmo método antes de atualizar o banco; nunca escreva a senha em texto puro no <code>INSERT</code> ou <code>UPDATE</code>.</div>
+
+      <h3>UsuarioDAO.java Atualizado: Mapeamento por Enum e Autenticação</h3>
+      <p>O método <code>mapearUsuario</code> agora converte o texto do banco para a constante do Enum com <code>Perfil.valueOf(...)</code>. A classe ganha também o método <code>autenticar</code>, que busca o usuário pelo e-mail e compara hashes, nunca a senha em si:</p>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/dao/UsuarioDAO.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.dao;
 
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.<span class="tok-fn">Perfil</span>;
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.<span class="tok-fn">Usuario</span>;
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.util.<span class="tok-fn">SenhaUtil</span>;
 <span class="tok-kw">import</span> java.sql.<span class="tok-fn">Connection</span>;
-<span class="tok-kw">import</span> java.sql.<span class="tok-fn">DriverManager</span>;
+<span class="tok-kw">import</span> java.sql.<span class="tok-fn">PreparedStatement</span>;
+<span class="tok-kw">import</span> java.sql.<span class="tok-fn">ResultSet</span>;
 <span class="tok-kw">import</span> java.sql.<span class="tok-fn">SQLException</span>;
+<span class="tok-kw">import</span> java.util.<span class="tok-fn">ArrayList</span>;
+<span class="tok-kw">import</span> java.util.<span class="tok-fn">List</span>;
 
 <span class="tok-comment">/**
- * Classe responsável por gerenciar e fornecer conexões com o banco de dados MySQL.
- * Aplica o padrão de projeto Singleton simples para reaproveitamento da conexão.
+ * Classe responsável pelo acesso a dados da entidade Usuario.
+ * Aplica o padrão de projeto DAO (Data Access Object).
  *
  * @author Geovane Griesang
  */</span>
-<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">ConexaoBanco</span> {
-
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">String</span> <span class="tok-fn">URL</span> = <span class="tok-str">&quot;jdbc:mysql://localhost:3306/tenisshop_db?useSSL=false&amp;serverTimezone=UTC&quot;</span>;
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">String</span> <span class="tok-fn">USUARIO</span> = <span class="tok-str">&quot;root&quot;</span>;
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">String</span> <span class="tok-fn">SENHA</span> = <span class="tok-str">&quot;changeme&quot;</span>; <span class="tok-comment">// Insira a senha do MySQL do laboratório, se houver</span>
-
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-fn">Connection</span> conexao = <span class="tok-kw">null</span>;
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">UsuarioDAO</span> {
 
     <span class="tok-comment">/**
-     * Obtém uma conexão ativa com o banco de dados.
-     * @return Connection objeto de conexão SQL
-     * @throws SQLException caso ocorra falha na conexão
+     * Lista todos os usuários cadastrados no banco de dados.
+     * @return List&lt;Usuario&gt; lista de usuários encontrados
+     * @throws SQLException caso ocorra falha na consulta
      */</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-fn">Connection</span> getConexao() <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
-        <span class="tok-kw">try</span> {
-            <span class="tok-kw">if</span> (conexao == <span class="tok-kw">null</span> || conexao.isClosed()) {
-                <span class="tok-fn">Class</span>.forName(<span class="tok-str">&quot;com.mysql.cj.jdbc.Driver&quot;</span>);
-                conexao = <span class="tok-fn">DriverManager</span>.getConnection(<span class="tok-fn">URL</span>, <span class="tok-fn">USUARIO</span>, <span class="tok-fn">SENHA</span>);
-                <span class="tok-fn">System</span>.out.println(<span class="tok-str">&quot;[INFO] Conexão com o banco de dados realizada com sucesso!&quot;</span>);
+    <span class="tok-kw">public</span> <span class="tok-fn">List</span>&lt;<span class="tok-fn">Usuario</span>&gt; listarTodos() <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
+        <span class="tok-fn">List</span>&lt;<span class="tok-fn">Usuario</span>&gt; usuarios = <span class="tok-kw">new</span> <span class="tok-fn">ArrayList</span>&lt;&gt;();
+        <span class="tok-fn">String</span> sql = <span class="tok-str">&quot;SELECT id, nome, email, senha, perfil, ativo FROM usuarios ORDER BY nome&quot;</span>;
+
+        <span class="tok-fn">Connection</span> conexao = <span class="tok-fn">ConexaoBanco</span>.getConexao();
+        <span class="tok-kw">try</span> (<span class="tok-fn">PreparedStatement</span> stmt = conexao.prepareStatement(sql);
+             <span class="tok-fn">ResultSet</span> rs = stmt.executeQuery()) {
+
+            <span class="tok-kw">while</span> (rs.next()) {
+                usuarios.add(mapearUsuario(rs));
             }
-            <span class="tok-kw">return</span> conexao;
-        } <span class="tok-kw">catch</span> (<span class="tok-fn">ClassNotFoundException</span> e) {
-            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-fn">SQLException</span>(<span class="tok-str">&quot;[ERRO] Driver JDBC do MySQL não foi encontrado.&quot;</span>, e);
         }
+        <span class="tok-kw">return</span> usuarios;
     }
 
     <span class="tok-comment">/**
-     * Fecha a conexão com o banco de dados caso esteja aberta.
+     * Busca um usuário pelo e-mail cadastrado.
+     * @param email e-mail do usuário buscado
+     * @return Usuario encontrado, ou null se não existir
+     * @throws SQLException caso ocorra falha na consulta
      */</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> fecharConexao() {
-        <span class="tok-kw">if</span> (conexao != <span class="tok-kw">null</span>) {
-            <span class="tok-kw">try</span> {
-                <span class="tok-kw">if</span> (!conexao.isClosed()) {
-                    conexao.close();
-                    <span class="tok-fn">System</span>.out.println(<span class="tok-str">&quot;[INFO] Conexão com o banco de dados encerrada.&quot;</span>);
+    <span class="tok-kw">public</span> <span class="tok-fn">Usuario</span> buscarPorEmail(<span class="tok-fn">String</span> email) <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
+        <span class="tok-fn">String</span> sql = <span class="tok-str">&quot;SELECT id, nome, email, senha, perfil, ativo FROM usuarios WHERE email = ?&quot;</span>;
+
+        <span class="tok-fn">Connection</span> conexao = <span class="tok-fn">ConexaoBanco</span>.getConexao();
+        <span class="tok-kw">try</span> (<span class="tok-fn">PreparedStatement</span> stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, email);
+
+            <span class="tok-kw">try</span> (<span class="tok-fn">ResultSet</span> rs = stmt.executeQuery()) {
+                <span class="tok-kw">if</span> (rs.next()) {
+                    <span class="tok-kw">return</span> mapearUsuario(rs);
                 }
-            } <span class="tok-kw">catch</span> (<span class="tok-fn">SQLException</span> e) {
-                <span class="tok-fn">System</span>.err.println(<span class="tok-str">&quot;[ERRO] Falha ao fechar a conexão: &quot;</span> + e.getMessage());
             }
         }
+        <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
     }
-}</code></pre></div>
-      <button type="button" class="download-btn" data-filename="ConexaoBanco.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsKCmltcG9ydCBqYXZhLnNxbC5Db25uZWN0aW9uOwppbXBvcnQgamF2YS5zcWwuRHJpdmVyTWFuYWdlcjsKaW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKCi8qKgogKiBDbGFzc2UgcmVzcG9uc8OhdmVsIHBvciBnZXJlbmNpYXIgZSBmb3JuZWNlciBjb25leMO1ZXMgY29tIG8gYmFuY28gZGUgZGFkb3MgTXlTUUwuCiAqIEFwbGljYSBvIHBhZHLDo28gZGUgcHJvamV0byBTaW5nbGV0b24gc2ltcGxlcyBwYXJhIHJlYXByb3ZlaXRhbWVudG8gZGEgY29uZXjDo28uCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGNsYXNzIENvbmV4YW9CYW5jbyB7CgogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgU3RyaW5nIFVSTCA9ICJqZGJjOm15c3FsOi8vbG9jYWxob3N0OjMzMDYvdGVuaXNzaG9wX2RiP3VzZVNTTD1mYWxzZSZzZXJ2ZXJUaW1lem9uZT1VVEMiOwogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgU3RyaW5nIFVTVUFSSU8gPSAicm9vdCI7CiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBTdHJpbmcgU0VOSEEgPSAiY2hhbmdlbWUiOyAvLyBJbnNpcmEgYSBzZW5oYSBkbyBNeVNRTCBkbyBsYWJvcmF0w7NyaW8sIHNlIGhvdXZlcgoKICAgIHByaXZhdGUgc3RhdGljIENvbm5lY3Rpb24gY29uZXhhbyA9IG51bGw7CgogICAgLyoqCiAgICAgKiBPYnTDqW0gdW1hIGNvbmV4w6NvIGF0aXZhIGNvbSBvIGJhbmNvIGRlIGRhZG9zLgogICAgICogQHJldHVybiBDb25uZWN0aW9uIG9iamV0byBkZSBjb25leMOjbyBTUUwKICAgICAqIEB0aHJvd3MgU1FMRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIG5hIGNvbmV4w6NvCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgQ29ubmVjdGlvbiBnZXRDb25leGFvKCkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgaWYgKGNvbmV4YW8gPT0gbnVsbCB8fCBjb25leGFvLmlzQ2xvc2VkKCkpIHsKICAgICAgICAgICAgICAgIENsYXNzLmZvck5hbWUoImNvbS5teXNxbC5jai5qZGJjLkRyaXZlciIpOwogICAgICAgICAgICAgICAgY29uZXhhbyA9IERyaXZlck1hbmFnZXIuZ2V0Q29ubmVjdGlvbihVUkwsIFVTVUFSSU8sIFNFTkhBKTsKICAgICAgICAgICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiW0lORk9dIENvbmV4w6NvIGNvbSBvIGJhbmNvIGRlIGRhZG9zIHJlYWxpemFkYSBjb20gc3VjZXNzbyEiKTsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4gY29uZXhhbzsKICAgICAgICB9IGNhdGNoIChDbGFzc05vdEZvdW5kRXhjZXB0aW9uIGUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IFNRTEV4Y2VwdGlvbigiW0VSUk9dIERyaXZlciBKREJDIGRvIE15U1FMIG7Do28gZm9pIGVuY29udHJhZG8uIiwgZSk7CiAgICAgICAgfQogICAgfQoKICAgIC8qKgogICAgICogRmVjaGEgYSBjb25leMOjbyBjb20gbyBiYW5jbyBkZSBkYWRvcyBjYXNvIGVzdGVqYSBhYmVydGEuCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBmZWNoYXJDb25leGFvKCkgewogICAgICAgIGlmIChjb25leGFvICE9IG51bGwpIHsKICAgICAgICAgICAgdHJ5IHsKICAgICAgICAgICAgICAgIGlmICghY29uZXhhby5pc0Nsb3NlZCgpKSB7CiAgICAgICAgICAgICAgICAgICAgY29uZXhhby5jbG9zZSgpOwogICAgICAgICAgICAgICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiW0lORk9dIENvbmV4w6NvIGNvbSBvIGJhbmNvIGRlIGRhZG9zIGVuY2VycmFkYS4iKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGUpIHsKICAgICAgICAgICAgICAgIFN5c3RlbS5lcnIucHJpbnRsbigiW0VSUk9dIEZhbGhhIGFvIGZlY2hhciBhIGNvbmV4w6NvOiAiICsgZS5nZXRNZXNzYWdlKCkpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQp9"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar ConexaoBanco.java</span></button>
 
-      <h3>Classe Principal: TenisShop.java</h3>
-      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/TenisShop.java</code></p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop;
-
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.dao.<span class="tok-fn">ConexaoBanco</span>;
-<span class="tok-kw">import</span> java.sql.<span class="tok-fn">Connection</span>;
-<span class="tok-kw">import</span> java.sql.<span class="tok-fn">SQLException</span>;
-
-<span class="tok-comment">/**
- * Classe de inicialização e teste de infraestrutura da aplicação TenisShop.
- *
- * @author Geovane Griesang
- */</span>
-<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">TenisShop</span> {
-
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> main(<span class="tok-fn">String</span>[] args) {
-        <span class="tok-fn">System</span>.out.println(<span class="tok-str">&quot;=========================================&quot;</span>);
-        <span class="tok-fn">System</span>.out.println(<span class="tok-str">&quot;   Iniciando Aplicação TenisShop         &quot;</span>);
-        <span class="tok-fn">System</span>.out.println(<span class="tok-str">&quot;=========================================&quot;</span>);
-
-        <span class="tok-kw">try</span> {
-            <span class="tok-fn">Connection</span> conn = <span class="tok-fn">ConexaoBanco</span>.getConexao();
-            <span class="tok-kw">if</span> (conn != <span class="tok-kw">null</span> &amp;&amp; !conn.isClosed()) {
-                <span class="tok-fn">System</span>.out.println(<span class="tok-str">&quot;&gt;&gt;&gt; Teste de Conexão: SUCESSO!&quot;</span>);
-            }
-        } <span class="tok-kw">catch</span> (<span class="tok-fn">SQLException</span> e) {
-            <span class="tok-fn">System</span>.err.println(<span class="tok-str">&quot;&gt;&gt;&gt; Teste de Conexão: FALHA!&quot;</span>);
-            <span class="tok-fn">System</span>.err.println(<span class="tok-str">&quot;Detalhes do erro: &quot;</span> + e.getMessage());
-        } <span class="tok-kw">finally</span> {
-            <span class="tok-fn">ConexaoBanco</span>.fecharConexao();
+    <span class="tok-comment">/**
+     * Autentica um usuário comparando o hash da senha digitada com o hash
+     * armazenado no banco; a senha em si nunca é comparada diretamente.
+     * @param email e-mail digitado no login
+     * @param senhaDigitada senha em texto puro digitada no login
+     * @return Usuario autenticado, ou null se e-mail ou senha não conferirem
+     * @throws SQLException caso ocorra falha na consulta
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-fn">Usuario</span> autenticar(<span class="tok-fn">String</span> email, <span class="tok-fn">String</span> senhaDigitada) <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
+        <span class="tok-fn">Usuario</span> usuario = buscarPorEmail(email);
+        <span class="tok-kw">if</span> (usuario == <span class="tok-kw">null</span>) {
+            <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
         }
+
+        <span class="tok-fn">String</span> hashDigitado = <span class="tok-fn">SenhaUtil</span>.gerarHash(senhaDigitada);
+        <span class="tok-kw">if</span> (hashDigitado.equals(usuario.getSenha())) {
+            <span class="tok-kw">return</span> usuario;
+        }
+        <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-fn">Usuario</span> mapearUsuario(<span class="tok-fn">ResultSet</span> rs) <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
+        <span class="tok-fn">Usuario</span> usuario = <span class="tok-kw">new</span> <span class="tok-fn">Usuario</span>();
+        usuario.setId(rs.getInt(<span class="tok-str">&quot;id&quot;</span>));
+        usuario.setNome(rs.getString(<span class="tok-str">&quot;nome&quot;</span>));
+        usuario.setEmail(rs.getString(<span class="tok-str">&quot;email&quot;</span>));
+        usuario.setSenha(rs.getString(<span class="tok-str">&quot;senha&quot;</span>));
+        usuario.setPerfil(<span class="tok-fn">Perfil</span>.valueOf(rs.getString(<span class="tok-str">&quot;perfil&quot;</span>)));
+        usuario.setAtivo(rs.getBoolean(<span class="tok-str">&quot;ativo&quot;</span>));
+        <span class="tok-kw">return</span> usuario;
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="TenisShop.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wOwoKaW1wb3J0IGJyLmVkdS5pZnN1bC52ZW5hbmNpby50ZW5pc3Nob3AubW9kZWwuZGFvLkNvbmV4YW9CYW5jbzsKaW1wb3J0IGphdmEuc3FsLkNvbm5lY3Rpb247CmltcG9ydCBqYXZhLnNxbC5TUUxFeGNlcHRpb247CgovKioKICogQ2xhc3NlIGRlIGluaWNpYWxpemHDp8OjbyBlIHRlc3RlIGRlIGluZnJhZXN0cnV0dXJhIGRhIGFwbGljYcOnw6NvIFRlbmlzU2hvcC4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgVGVuaXNTaG9wIHsKCiAgICBwdWJsaWMgc3RhdGljIHZvaWQgbWFpbihTdHJpbmdbXSBhcmdzKSB7CiAgICAgICAgU3lzdGVtLm91dC5wcmludGxuKCI9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSIpOwogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiICAgSW5pY2lhbmRvIEFwbGljYcOnw6NvIFRlbmlzU2hvcCAgICAgICAgICIpOwogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0iKTsKCiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgQ29ubmVjdGlvbiBjb25uID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICAgICAgaWYgKGNvbm4gIT0gbnVsbCAmJiAhY29ubi5pc0Nsb3NlZCgpKSB7CiAgICAgICAgICAgICAgICBTeXN0ZW0ub3V0LnByaW50bG4oIj4+PiBUZXN0ZSBkZSBDb25leMOjbzogU1VDRVNTTyEiKTsKICAgICAgICAgICAgfQogICAgICAgIH0gY2F0Y2ggKFNRTEV4Y2VwdGlvbiBlKSB7CiAgICAgICAgICAgIFN5c3RlbS5lcnIucHJpbnRsbigiPj4+IFRlc3RlIGRlIENvbmV4w6NvOiBGQUxIQSEiKTsKICAgICAgICAgICAgU3lzdGVtLmVyci5wcmludGxuKCJEZXRhbGhlcyBkbyBlcnJvOiAiICsgZS5nZXRNZXNzYWdlKCkpOwogICAgICAgIH0gZmluYWxseSB7CiAgICAgICAgICAgIENvbmV4YW9CYW5jby5mZWNoYXJDb25leGFvKCk7CiAgICAgICAgfQogICAgfQp9"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar TenisShop.java</span></button>
+      <button type="button" class="download-btn" data-filename="UsuarioDAO.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsKCmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5QZXJmaWw7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5Vc3VhcmlvOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC51dGlsLlNlbmhhVXRpbDsKaW1wb3J0IGphdmEuc3FsLkNvbm5lY3Rpb247CmltcG9ydCBqYXZhLnNxbC5QcmVwYXJlZFN0YXRlbWVudDsKaW1wb3J0IGphdmEuc3FsLlJlc3VsdFNldDsKaW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKaW1wb3J0IGphdmEudXRpbC5BcnJheUxpc3Q7CmltcG9ydCBqYXZhLnV0aWwuTGlzdDsKCi8qKgogKiBDbGFzc2UgcmVzcG9uc8OhdmVsIHBlbG8gYWNlc3NvIGEgZGFkb3MgZGEgZW50aWRhZGUgVXN1YXJpby4KICogQXBsaWNhIG8gcGFkcsOjbyBkZSBwcm9qZXRvIERBTyAoRGF0YSBBY2Nlc3MgT2JqZWN0KS4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgVXN1YXJpb0RBTyB7CgogICAgLyoqCiAgICAgKiBMaXN0YSB0b2RvcyBvcyB1c3XDoXJpb3MgY2FkYXN0cmFkb3Mgbm8gYmFuY28gZGUgZGFkb3MuCiAgICAgKiBAcmV0dXJuIExpc3Q8VXN1YXJpbz4gbGlzdGEgZGUgdXN1w6FyaW9zIGVuY29udHJhZG9zCiAgICAgKiBAdGhyb3dzIFNRTEV4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBuYSBjb25zdWx0YQogICAgICovCiAgICBwdWJsaWMgTGlzdDxVc3VhcmlvPiBsaXN0YXJUb2RvcygpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIExpc3Q8VXN1YXJpbz4gdXN1YXJpb3MgPSBuZXcgQXJyYXlMaXN0PD4oKTsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvIEZST00gdXN1YXJpb3MgT1JERVIgQlkgbm9tZSI7CgogICAgICAgIENvbm5lY3Rpb24gY29uZXhhbyA9IENvbmV4YW9CYW5jby5nZXRDb25leGFvKCk7CiAgICAgICAgdHJ5IChQcmVwYXJlZFN0YXRlbWVudCBzdG10ID0gY29uZXhhby5wcmVwYXJlU3RhdGVtZW50KHNxbCk7CiAgICAgICAgICAgICBSZXN1bHRTZXQgcnMgPSBzdG10LmV4ZWN1dGVRdWVyeSgpKSB7CgogICAgICAgICAgICB3aGlsZSAocnMubmV4dCgpKSB7CiAgICAgICAgICAgICAgICB1c3Vhcmlvcy5hZGQobWFwZWFyVXN1YXJpbyhycykpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIHJldHVybiB1c3VhcmlvczsKICAgIH0KCiAgICAvKioKICAgICAqIEJ1c2NhIHVtIHVzdcOhcmlvIHBlbG8gZS1tYWlsIGNhZGFzdHJhZG8uCiAgICAgKiBAcGFyYW0gZW1haWwgZS1tYWlsIGRvIHVzdcOhcmlvIGJ1c2NhZG8KICAgICAqIEByZXR1cm4gVXN1YXJpbyBlbmNvbnRyYWRvLCBvdSBudWxsIHNlIG7Do28gZXhpc3RpcgogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgY29uc3VsdGEKICAgICAqLwogICAgcHVibGljIFVzdWFyaW8gYnVzY2FyUG9yRW1haWwoU3RyaW5nIGVtYWlsKSB0aHJvd3MgU1FMRXhjZXB0aW9uIHsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvIEZST00gdXN1YXJpb3MgV0hFUkUgZW1haWwgPSA/IjsKCiAgICAgICAgQ29ubmVjdGlvbiBjb25leGFvID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICB0cnkgKFByZXBhcmVkU3RhdGVtZW50IHN0bXQgPSBjb25leGFvLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICBzdG10LnNldFN0cmluZygxLCBlbWFpbCk7CgogICAgICAgICAgICB0cnkgKFJlc3VsdFNldCBycyA9IHN0bXQuZXhlY3V0ZVF1ZXJ5KCkpIHsKICAgICAgICAgICAgICAgIGlmIChycy5uZXh0KCkpIHsKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbWFwZWFyVXN1YXJpbyhycyk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgcmV0dXJuIG51bGw7CiAgICB9CgogICAgLyoqCiAgICAgKiBBdXRlbnRpY2EgdW0gdXN1w6FyaW8gY29tcGFyYW5kbyBvIGhhc2ggZGEgc2VuaGEgZGlnaXRhZGEgY29tIG8gaGFzaAogICAgICogYXJtYXplbmFkbyBubyBiYW5jbzsgYSBzZW5oYSBlbSBzaSBudW5jYSDDqSBjb21wYXJhZGEgZGlyZXRhbWVudGUuCiAgICAgKiBAcGFyYW0gZW1haWwgZS1tYWlsIGRpZ2l0YWRvIG5vIGxvZ2luCiAgICAgKiBAcGFyYW0gc2VuaGFEaWdpdGFkYSBzZW5oYSBlbSB0ZXh0byBwdXJvIGRpZ2l0YWRhIG5vIGxvZ2luCiAgICAgKiBAcmV0dXJuIFVzdWFyaW8gYXV0ZW50aWNhZG8sIG91IG51bGwgc2UgZS1tYWlsIG91IHNlbmhhIG7Do28gY29uZmVyaXJlbQogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgY29uc3VsdGEKICAgICAqLwogICAgcHVibGljIFVzdWFyaW8gYXV0ZW50aWNhcihTdHJpbmcgZW1haWwsIFN0cmluZyBzZW5oYURpZ2l0YWRhKSB0aHJvd3MgU1FMRXhjZXB0aW9uIHsKICAgICAgICBVc3VhcmlvIHVzdWFyaW8gPSBidXNjYXJQb3JFbWFpbChlbWFpbCk7CiAgICAgICAgaWYgKHVzdWFyaW8gPT0gbnVsbCkgewogICAgICAgICAgICByZXR1cm4gbnVsbDsKICAgICAgICB9CgogICAgICAgIFN0cmluZyBoYXNoRGlnaXRhZG8gPSBTZW5oYVV0aWwuZ2VyYXJIYXNoKHNlbmhhRGlnaXRhZGEpOwogICAgICAgIGlmIChoYXNoRGlnaXRhZG8uZXF1YWxzKHVzdWFyaW8uZ2V0U2VuaGEoKSkpIHsKICAgICAgICAgICAgcmV0dXJuIHVzdWFyaW87CiAgICAgICAgfQogICAgICAgIHJldHVybiBudWxsOwogICAgfQoKICAgIHByaXZhdGUgVXN1YXJpbyBtYXBlYXJVc3VhcmlvKFJlc3VsdFNldCBycykgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgVXN1YXJpbyB1c3VhcmlvID0gbmV3IFVzdWFyaW8oKTsKICAgICAgICB1c3VhcmlvLnNldElkKHJzLmdldEludCgiaWQiKSk7CiAgICAgICAgdXN1YXJpby5zZXROb21lKHJzLmdldFN0cmluZygibm9tZSIpKTsKICAgICAgICB1c3VhcmlvLnNldEVtYWlsKHJzLmdldFN0cmluZygiZW1haWwiKSk7CiAgICAgICAgdXN1YXJpby5zZXRTZW5oYShycy5nZXRTdHJpbmcoInNlbmhhIikpOwogICAgICAgIHVzdWFyaW8uc2V0UGVyZmlsKFBlcmZpbC52YWx1ZU9mKHJzLmdldFN0cmluZygicGVyZmlsIikpKTsKICAgICAgICB1c3VhcmlvLnNldEF0aXZvKHJzLmdldEJvb2xlYW4oImF0aXZvIikpOwogICAgICAgIHJldHVybiB1c3VhcmlvOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar UsuarioDAO.java</span></button>
+
+      <p><strong>Fechando a branch</strong></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">add</span> .
+<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: perfil tipado com Enum e autenticacao com hash de senha"</span>
+
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-var">main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">merge</span> <span class="tok-var">feature/perfil-e-hash</span>
+<span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
+
+      <h3>Estrutura de Pacotes Atualizada</h3>
+      <div class="code-block"><div class="code-head"><span class="code-lang">plaintext</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">br.edu.ifsul.venancio.tenisshop/</span>
+<span class="tree-guide">├── </span><span class="tok-fn">TenisShop.java</span>
+<span class="tree-guide">└── </span><span class="tok-kw">model/</span>
+<span class="tree-guide">    ├── </span><span class="tok-kw">domain/</span>
+<span class="tree-guide">    │   ├── </span><span class="tok-fn">Usuario.java</span>
+<span class="tree-guide">    │   ├── </span><span class="tok-fn">Categoria.java</span>
+<span class="tree-guide">    │   └── </span><span class="tok-fn">Perfil.java</span>
+<span class="tree-guide">    ├── </span><span class="tok-kw">dao/</span>
+<span class="tree-guide">    │   ├── </span><span class="tok-fn">ConexaoBanco.java</span>
+<span class="tree-guide">    │   └── </span><span class="tok-fn">UsuarioDAO.java</span>
+<span class="tree-guide">    └── </span><span class="tok-kw">util/</span>
+<span class="tree-guide">        └── </span><span class="tok-fn">SenhaUtil.java</span></code></pre></div>
     </section>
 
     <section id="s6">
       <h2><span class="num">06</span>Atividade Prática dos Grupos de Extensão</h2>
-      <p>Cada grupo de extensão trabalhará diretamente na solução da entidade parceira configurada na Unidade I/II do Plano de Ensino. A lista de grupos, entidades parceiras e links de acompanhamento está centralizada na <a href="../index.html#projetos">página inicial da disciplina (seção Projetos)</a>.</p>
+      <p>Aplique as mesmas duas técnicas na entidade central do projeto do grupo. Mesmo que o domínio não tenha "perfil de usuário" no sentido literal, a técnica do Enum serve para qualquer atributo de categorias fixas (status, tipo, situação); a técnica de hash só se aplica de fato se o projeto do grupo tiver login.</p>
 
-      <h3>Passo a Passo Obrigatório para os Grupos no Laboratório</h3>
+      <h3>Passo a Passo Obrigatório no Laboratório</h3>
       <ol class="plain">
-        <li><strong>Criação do repositório organizado:</strong> o líder ou um integrante do grupo deve criar o repositório no GitHub com a nomenclatura padrão <code>20262_IS3_GrupoXX_NomeDoProjeto</code> (ex.: <code>20262_IS3_Grupo03_GestChe</code>).</li>
-        <li><strong>Inclusão de colaboradores:</strong> convide todos os colegas do grupo em <em>Settings → Collaborators</em>. É obrigatório adicionar o usuário do professor (<code>GeovaneGriesang</code>) como colaborador, para acompanhamento continuado.</li>
-        <li>
-          <strong>Criação da documentação do repositório (README.md):</strong> o repositório precisa conter uma descrição clara para a comunidade externa e para avaliação:
-          <div class="code-block"><div class="code-head"><span class="code-lang">markdown</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code># Projeto: [Nome do Software]
-
-## Contexto e Entidade Parceira
-Atendimento à demanda de extensão da **[Nome da Entidade]**, no município de Venâncio Aires/RS.
-
-## Integrantes do Grupo
-* Estudante 1
-* Estudante 2
-* Estudante 3
-
-## Tecnologias Utilizadas
-* Java 25 / JavaFX
-* NetBeans 28
-* MySQL
-* Git / GitHub
-
-## Como Executar o Projeto
-(Instruções serão atualizadas ao longo do semestre)</code></pre></div>
-        </li>
+        <li>Identifique um atributo de categorias fixas na entidade central do grupo (por exemplo, status de uma ordem de serviço, tipo de ocorrência, situação de um sócio) e transforme-o em Enum, dentro de uma branch <code>feature/...</code>.</li>
+        <li>Se o projeto do grupo tiver conceito de usuário e login, aplique também o hash de senha com a mesma técnica de <code>SenhaUtil</code>.</li>
+        <li>Preencha a tabela de níveis de acesso da Seção 04 para o projeto do grupo, mesmo que a implementação do controle de acesso só chegue mais adiante.</li>
+        <li>Faça merge da branch para a <code>main</code> e envie (<code>push</code>) ao GitHub.</li>
       </ol>
+
+      <div class="callout-warn">
+        <strong>Regras de ouro do laboratório (seguem valendo)</strong>
+        <ol class="plain">
+          <li>Chegou no computador da escola? A primeira ação é <code>git pull origin main</code>.</li>
+          <li>Vai criar uma branch? Avise o grupo para ninguém duplicar o mesmo trabalho.</li>
+          <li>Ao sair, confirme que fez <code>push</code> e removeu credenciais e Personal Access Token do laboratório.</li>
+        </ol>
+      </div>
     </section>
 
     <section id="s7">
       <h2><span class="num">07</span>Checklist e Critérios para Avaliação Processual</h2>
-      <p>Para garantir que o grupo concluiu satisfatoriamente as atividades previstas na Aula 02 (que compõem a avaliação processual contínua de <strong>30% da nota final</strong>), verifique os pontos abaixo antes do término da aula:</p>
+      <p>Estes itens compõem a avaliação processual contínua (30% da nota final) referente à Aula 04. Verifique antes do término da aula:</p>
       <ul class="checklist">
-        <li>Repositório criado no GitHub com nome padronizado.</li>
-        <li>Arquivo <code>.gitignore</code> devidamente configurado e commitado (sem subida da pasta <code>build</code> ou <code>nbproject/private</code>).</li>
-        <li>Arquivo <code>README.md</code> inicial preenchido com a entidade parceira e nome dos integrantes.</li>
-        <li>Professor adicionado como colaborador do repositório.</li>
-        <li>Projeto NetBeans 28 / JavaFX criado, versionado e sincronizado (<code>git push</code>) com sucesso na branch padrão <code>main</code>.</li>
-        <li>Credenciais temporárias limpas nos terminais do laboratório.</li>
+        <li>Enum criado para pelo menos um atributo de categorias fixas da entidade central do projeto do grupo.</li>
+        <li>Se aplicável ao projeto do grupo: senha armazenada como hash, nunca em texto puro.</li>
+        <li>Tabela de níveis de acesso por perfil registrada no repositório.</li>
+        <li>Branch mesclada para a <code>main</code> sem marcadores de conflito esquecidos no código.</li>
+        <li>Repositório sincronizado (<code>git push</code>) com sucesso na branch <code>main</code>.</li>
+        <li>Credenciais temporárias e Personal Access Token limpos nos terminais do laboratório.</li>
       </ul>
     </section>
 
     <section id="s8">
       <h2><span class="num">08</span>Referências e Materiais Complementares</h2>
       <ul class="refs">
-        <li><span class="ref-kind">Livro</span>DEITEL, P. J.; DEITEL, H. M. <strong>Java: como programar</strong>. 10. ed. São Paulo, SP: Pearson, 2017.</li>
         <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
+        <li><span class="ref-kind">Livro</span>RANGEL, Pablo; CARVALHO JUNIOR, José Gomes de. <strong>Sistemas Orientados a Objetos: teoria e prática com UML e Java</strong>. Rio de Janeiro: Brasport, 2021.</li>
+        <li><span class="ref-kind">Livro</span>NOGUEIRA, Marcelo. <strong>Engenharia de Software: métodos orientados a objetos e ágeis</strong>. Joinville, SC: Clube de Autores, 2018.</li>
         <li><span class="ref-kind">Documentação</span>Documentação Oficial do Git. Disponível em: <a href="https://git-scm.com/doc" target="_blank" rel="noreferrer">git-scm.com/doc</a>.</li>
-        <li><span class="ref-kind">Documentação</span>Documentação Oficial do JavaFX. Disponível em: <a href="https://openjfx.io" target="_blank" rel="noreferrer">openjfx.io</a>.</li>
       </ul>
     </section>
   </div>

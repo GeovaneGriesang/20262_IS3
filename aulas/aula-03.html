@@ -1036,7 +1036,35 @@
 
     <section id="s6">
       <h2><span class="num">06</span>Atividade Prática dos Grupos de Extensão</h2>
-      <p>A lista de grupos, entidades parceiras e planilhas de acompanhamento é a mesma publicada na <a href="aula-02.html#s6">Seção 06 da Aula 02</a>. Hoje o trabalho de cada grupo tem duas frentes, que podem ser divididas entre os integrantes.</p>
+      <p>A lista de grupos, entidades parceiras e planilhas de acompanhamento é a mesma publicada na <a href="../index.html#projetos">página inicial da disciplina (seção Projetos)</a>. Hoje o trabalho de cada grupo tem duas frentes, que podem ser divididas entre os integrantes.</p>
+
+      <h3>Publicando o Projeto do Grupo no Repositório do GitHub (Passo Obrigatório)</h3>
+      <p>Depois de criar o projeto que vocês estão desenvolvendo junto à entidade (com o <code>git init</code> feito na Aula 02) e de criar o repositório vazio no GitHub (Seção 06 da Aula 02), é necessário subir esse projeto para o repositório remoto:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># 1. Conectar o repositório local ao repositório remoto no GitHub</span>
+<span class="tok-kw">git</span> <span class="tok-fn">remote</span> <span class="tok-fn">add</span> origin <span class="tok-var">&lt;LINK DO REPOSITÓRIO NO GITHUB&gt;</span>
+
+<span class="tok-comment"># 2. Enviar o branch local (master) para o remoto</span>
+<span class="tok-kw">git</span> <span class="tok-fn">push</span> <span class="tok-flag">-u</span> origin master
+
+<span class="tok-comment"># 3. Buscar o branch main que já existia no GitHub (criado com README ao criar o repositório)</span>
+<span class="tok-kw">git</span> <span class="tok-fn">fetch</span> origin main:refs/remotes/origin/main
+
+<span class="tok-comment"># 4. Criar um branch local "main" rastreando o main remoto</span>
+<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-flag">-b</span> main origin/main
+
+<span class="tok-comment"># 5. Mesclar o conteúdo do master (todo o projeto) dentro do main</span>
+<span class="tok-kw">git</span> <span class="tok-fn">merge</span> master <span class="tok-flag">-m</span> <span class="tok-str">"merge: unifica main com conteudo do master"</span> <span class="tok-flag">--allow-unrelated-histories</span>
+
+<span class="tok-comment"># 6. Enviar o main atualizado (com todo o projeto) para o GitHub</span>
+<span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
+      <div class="callout"><strong>Observação:</strong> os passos 3–5 só são necessários se o repositório no GitHub já tinha um branch <code>main</code> com um README criado na hora de gerar o repositório, diferente do <code>master</code> local. Se o repositório no GitHub estiver vazio (sem nenhum commit), bastam os passos 1 e 2, usando <code>main</code> no lugar de <code>master</code> se preferirem manter esse nome padrão.</div>
+
+      <p>Se o passo 1 der erro porque o repositório local já tem um remote <code>origin</code> configurado (por exemplo, de um clone anterior), verifique e corrija com:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Verifica qual URL está configurada</span>
+<span class="tok-kw">git</span> <span class="tok-fn">remote</span> <span class="tok-flag">-v</span>
+
+<span class="tok-comment"># Troca a URL do remote existente</span>
+<span class="tok-kw">git</span> <span class="tok-fn">remote</span> <span class="tok-fn">set-url</span> origin <span class="tok-var">&lt;LINK DO REPOSITÓRIO NO GITHUB&gt;</span></code></pre></div>
 
       <h3>Frente 1: Levantamento de Requisitos</h3>
       <ol class="plain">
