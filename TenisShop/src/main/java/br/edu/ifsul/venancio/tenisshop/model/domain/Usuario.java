@@ -13,14 +13,14 @@ public class Usuario {
     private String nome;
     private String email;
     private String senha;
-    private String perfil;
+    private Perfil perfil;
     private Boolean ativo;
     private LocalDateTime dataCadastro;
 
     public Usuario() {
     }
 
-    public Usuario(Integer id, String nome, String email, String senha, String perfil, Boolean ativo) {
+    public Usuario(Integer id, String nome, String email, String senha, Perfil perfil, Boolean ativo) {
         this.id = id;
         this.nome = nome;
         this.email = email;
@@ -62,11 +62,11 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public String getPerfil() {
+    public Perfil getPerfil() {
         return perfil;
     }
 
-    public void setPerfil(String perfil) {
+    public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
     }
 
