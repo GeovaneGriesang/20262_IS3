@@ -14,7 +14,7 @@ public class ConexaoBanco {
 
     private static final String URL = "jdbc:mysql://localhost:3306/tenisshop_db?useSSL=false&serverTimezone=UTC";
     private static final String USUARIO = "root";
-    private static final String SENHA = "changeme"; // Insira a senha do MySQL do laboratório, se houver
+    private static final String SENHA = ""; // Insira a senha do MySQL do laboratório, se houver
 
     private static Connection conexao = null;
 

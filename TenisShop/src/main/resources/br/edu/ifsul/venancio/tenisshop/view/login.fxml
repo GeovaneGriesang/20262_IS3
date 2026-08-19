@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="320.0" prefWidth="420.0" spacing="24.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.LoginController">
+   <padding>
+      <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+   </padding>
+   <children>
+      <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="TenisShop - Login" />
+      <GridPane hgap="10.0" vgap="12.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" minWidth="70.0" />
+            <ColumnConstraints hgrow="ALWAYS" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+         <children>
+            <Label text="E-mail" />
+            <TextField fx:id="txtEmail" promptText="seu.email@ifsul.edu.br" GridPane.columnIndex="1" />
+            <Label text="Senha" GridPane.rowIndex="1" />
+            <PasswordField fx:id="pwdSenha" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+      <Button defaultButton="true" onAction="#btnLoginAction" style="-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;" text="Entrar" />
+   </children>
+</VBox>
