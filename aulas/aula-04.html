@@ -768,8 +768,8 @@
   <div class="wrap">
     <div class="cover">
       <span class="eyebrow">Aula 04 · 21/08/2026</span>
-      <h1 class="title">Perfis com Enum e Senhas com Hash no TenisShop</h1>
-      <p class="subtitle">Guia completo da Aula 04: por que representar perfis de acesso com Enum em vez de String solta, como nunca guardar senha em texto puro, e a autenticação por hash na UsuarioDAO do TenisShop.</p>
+      <h1 class="title">Classe de Usuário, Níveis de Acesso e Tela de Login no TenisShop</h1>
+      <p class="subtitle">Guia completo da Aula 04: a classe de usuário com perfis tipados por Enum, o planejamento dos níveis de acesso, e uma tela de login em JavaFX com autenticação e validação segura de dados, aplicando os padrões de projeto MVC e DAO no TenisShop.</p>
       <dl class="meta">
         <div><dt>Curso</dt><dd>Tecnólogo em Análise e Desenvolvimento de Sistemas</dd></div>
         <div><dt>Disciplina</dt><dd>Informática e Sociedade III</dd></div>
@@ -789,22 +789,25 @@
         <li><a href="#s3"><span class="n">03</span>Prática Guiada: Criando um Enum e Mesclando pela Branch</a></li>
         <li><a href="#s4"><span class="n">04</span>Planejando os Níveis de Acesso</a></li>
         <li><a href="#s5"><span class="n">05</span>Avanço no Projeto Exemplo TenisShop</a></li>
-        <li><a href="#s6"><span class="n">06</span>Atividade Prática dos Grupos de Extensão</a></li>
-        <li><a href="#s7"><span class="n">07</span>Checklist e Avaliação Processual</a></li>
-        <li><a href="#s8"><span class="n">08</span>Referências e Materiais Complementares</a></li>
+        <li><a href="#s6"><span class="n">06</span>Preparando o pom.xml para Interfaces JavaFX</a></li>
+        <li><a href="#s7"><span class="n">07</span>Construindo a Tela de Login (JavaFX + FXML)</a></li>
+        <li><a href="#s8"><span class="n">08</span>Atividade Prática dos Grupos de Extensão</a></li>
+        <li><a href="#s9"><span class="n">09</span>Checklist e Avaliação Processual</a></li>
+        <li><a href="#s10"><span class="n">10</span>Referências e Materiais Complementares</a></li>
       </ol>
     </nav>
 
     <section id="s1">
       <h2><span class="num">01</span>Visão Geral e Objetivos de Aprendizagem</h2>
-      <p class="lead">A Aula 03 deixou o TenisShop com uma DAO funcional e o grupo já sabe trabalhar com branches. Hoje a arquitetura de <code>Usuario</code> fica mais sólida em dois pontos que qualquer sistema com login precisa resolver desde cedo: representar perfis de acesso de um jeito que o compilador ajuda a proteger, e nunca guardar senha em texto puro no banco. A tela de login em si só chega na Aula 05 (28/08); hoje preparamos a base que ela vai usar.</p>
+      <p class="lead">Esta aula cobre, de uma vez, dois itens que o cronograma da Aula 01 previa em datas separadas: "Desenvolvimento da classe de usuário contemplando perfis e níveis de acesso" (21/08) e "Desenvolvimento da tela de login, autenticação e validação segura de dados" (28/08). Juntamos os dois porque a tela de login não faz sentido sem a classe de usuário pronta, e a classe de usuário sozinha, sem uma tela que a use de verdade, fica abstrata demais. O resultado é uma tela de login em JavaFX funcionando de ponta a ponta, com boas práticas de segurança e dois padrões de projeto explicados: MVC (na tela) e DAO (reforçando o que já foi visto na Aula 02).</p>
       <h3>Objetivos de Aprendizagem</h3>
       <ul>
-        <li>Entender por que um Enum é mais seguro que uma String solta para representar categorias fixas.</li>
+        <li>Entender por que um Enum é mais seguro que uma String solta para representar categorias fixas, como o perfil de acesso.</li>
         <li>Criar o Enum <code>Perfil</code> e atualizar <code>Usuario</code> e <code>UsuarioDAO</code> para usá-lo.</li>
-        <li>Entender o que é uma função de hash e por que ela nunca deve ser revertida para a senha original.</li>
-        <li>Implementar um utilitário de hash com SHA-256 e um método de autenticação na <code>UsuarioDAO</code>.</li>
-        <li>Planejar, por escrito, o que cada perfil pode ou não fazer no sistema.</li>
+        <li>Entender o que é uma função de hash pensada para senhas (BCrypt) e por que ela nunca deve ser revertida ou comparada em texto puro.</li>
+        <li>Reconhecer o padrão MVC numa tela JavaFX real: o que é Model, View e Controller no login do TenisShop.</li>
+        <li>Aplicar validação segura de dados numa tela de login: campos obrigatórios, formato de e-mail, e uma mensagem de erro que não revela qual campo errou.</li>
+        <li>Ver um primeiro exemplo concreto de nível de acesso: um elemento da tela que só aparece para um perfil específico.</li>
       </ul>
     </section>
 
@@ -835,15 +838,18 @@
 
       <h3>Hash: Por que Nunca Guardar Senha em Texto Puro</h3>
       <p>A tabela <code>usuarios</code> criada na Aula 02 guarda a senha como texto puro, na linha <code>VALUES (..., 'admin123', ...)</code>. Isso é uma falha de segurança séria: qualquer pessoa com acesso ao banco (um vazamento, um backup mal guardado, um acesso indevido) lê a senha de todo mundo diretamente. A solução é nunca guardar a senha em si, só o resultado de uma função de hash aplicada a ela.</p>
-      <p>Um hash é uma função de mão única: transforma qualquer texto em uma sequência fixa de caracteres, mas não existe operação inversa que devolva o texto original a partir do hash. Para conferir uma senha digitada, o sistema não descriptografa nada: ele aplica a mesma função de hash na senha digitada e compara o resultado com o hash já guardado no banco.</p>
+      <p>Um hash é uma função de mão única: transforma qualquer texto em uma sequência fixa de caracteres, mas não existe operação inversa que devolva o texto original a partir do hash. Para conferir uma senha digitada, o sistema não descriptografa nada: ele aplica a mesma lógica de hash na senha digitada e confere o resultado contra o hash já guardado no banco.</p>
+
+      <h3>BCrypt: Hash Pensado Especificamente para Senhas</h3>
+      <p>Como esta aula já entrega uma tela de login de verdade (Seção 07), vamos direto para o algoritmo que sistemas reais usam, o <strong>BCrypt</strong>, em vez de um hash genérico como o SHA-256. A diferença central é o <em>salt</em>: um valor aleatório que o BCrypt gera e embute dentro do próprio hash a cada chamada, antes de aplicar o algoritmo.</p>
       <div class="card-grid">
-        <div class="card"><h4><span class="dot"></span>No Cadastro</h4><p>A senha digitada passa pelo <code>SenhaUtil.gerarHash()</code> uma vez; só o hash resultante é gravado na coluna <code>senha</code> do banco. A senha original nunca é armazenada.</p></div>
-        <div class="card"><h4><span class="dot"></span>No Login</h4><p>A senha digitada passa pelo mesmo <code>SenhaUtil.gerarHash()</code>; o resultado é comparado com o hash já salvo no banco. Se forem iguais, a senha está correta, sem nunca descriptografar nada.</p></div>
+        <div class="card"><h4><span class="dot"></span>No Cadastro</h4><p>A senha digitada passa por <code>SenhaUtil.gerarHash()</code>, que gera um <em>salt</em> novo e aleatório a cada chamada; só o hash resultante (salt incluído) é gravado na coluna <code>senha</code>. A mesma senha gera hashes diferentes toda vez, e isso é esperado.</p></div>
+        <div class="card"><h4><span class="dot"></span>No Login</h4><p>A senha digitada passa por <code>SenhaUtil.verificar()</code>, que lê o salt embutido no hash salvo, refaz o cálculo com ele e confere se bate. Por causa do salt, dois hashes da mesma senha nunca são comparados com <code>equals()</code>, só com essa verificação.</p></div>
       </div>
 
       <div class="callout-warn">
-        <strong>SHA-256 puro é didático, não é o que produção usa</strong>
-        <p style="margin:0;">Em sistemas reais, usa-se um algoritmo pensado para senhas (BCrypt, Argon2, PBKDF2) combinado com um <em>salt</em> aleatório por usuário, o que dificulta ataques com tabelas pré-computadas (rainbow tables). O SHA-256 desta aula ilustra o princípio central, nunca guardar a senha em si, usando o que já vem pronto no JDK, sem precisar adicionar uma nova dependência ao <code>pom.xml</code>.</p>
+        <strong>Por que salt importa</strong>
+        <p style="margin:0;">Sem salt, duas pessoas com a mesma senha teriam o mesmo hash salvo no banco, e um atacante com uma tabela pré-computada de hashes comuns (<em>rainbow table</em>) quebraria várias contas de uma vez. Com um salt aleatório por usuário, cada hash é único mesmo para senhas repetidas, e a tabela pré-computada deixa de funcionar. É por isso que BCrypt, Argon2 e PBKDF2 (não o SHA-256 puro) são os algoritmos recomendados para senha.</p>
       </div>
     </section>
 
@@ -889,7 +895,7 @@
 
     <section id="s4">
       <h2><span class="num">04</span>Planejando os Níveis de Acesso</h2>
-      <p>Antes de existir uma tela de login (Aula 05, 28/08), vale decidir por escrito o que cada perfil pode ou não fazer. Isso evita decisões improvisadas na hora de programar os Controllers mais adiante, e é exatamente o que o cronograma chama de "arquitetura de usuários".</p>
+      <p>Antes de programar as telas que vêm depois do login, vale decidir por escrito o que cada perfil pode ou não fazer. A tela de login desta aula (Seção 07) só confere <em>quem</em> está entrando; ela ainda não bloqueia funcionalidades por perfil, isso é trabalho dos Controllers das telas reais, mais adiante no cronograma. Ter a tabela pronta desde já evita decisões improvisadas nessa hora, e é exatamente o que o cronograma chama de "arquitetura de usuários".</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Funcionalidade</th><th>ADMINISTRADOR</th><th>OPERADOR</th></tr></thead>
@@ -902,12 +908,12 @@
           </tbody>
         </table>
       </div>
-      <div class="callout"><strong>Onde registrar:</strong> mantenha essa tabela no <code>README.md</code> ou <code>docs/requisitos.md</code> do grupo, ao lado da lista de funcionalidades levantada na Aula 03. Ela vira a base direta dos Controllers quando o login existir.</div>
+      <div class="callout"><strong>Onde registrar:</strong> mantenha essa tabela no <code>README.md</code> ou <code>docs/requisitos.md</code> do grupo, ao lado da lista de funcionalidades levantada na Aula 03. Ela vira a base direta dos Controllers quando as telas reais existirem.</div>
     </section>
 
     <section id="s5">
       <h2><span class="num">05</span>Avanço no Projeto Exemplo TenisShop</h2>
-      <p>Agora aplique a mesma técnica de branch no repositório de referência: o Enum <code>Perfil</code> substitui a <code>String</code> solta em <code>Usuario</code>, e um novo utilitário de hash prepara a autenticação que a tela de login vai usar na Aula 05.</p>
+      <p>Agora aplique a mesma técnica de branch no repositório de referência: o Enum <code>Perfil</code> substitui a <code>String</code> solta em <code>Usuario</code>, e um novo utilitário de hash com BCrypt prepara a autenticação que a tela de login (Seção 07) vai usar.</p>
 
       <div class="callout"><strong>Até onde ir hoje:</strong> esta seção mostra a versão de referência completa. Para o projeto do próprio grupo, o esperado é aplicar a mesma ideia (Enum para uma categoria fixa e, se o projeto tiver login, hash de senha), não necessariamente reproduzir estas quatro classes inteiras.</div>
 
@@ -922,14 +928,21 @@
 
 <span class="tok-comment">/**
  * Representa os níveis de acesso disponíveis para um Usuario no sistema TenisShop.
+ * Usar um Enum em vez de uma String solta garante, em tempo de compilação,
+ * que só estes dois valores existem; ver a tabela de níveis de acesso na
+ * Aula 04 para o que cada um pode fazer.
  *
  * @author Geovane Griesang
  */</span>
 <span class="tok-kw">public</span> <span class="tok-kw">enum</span> <span class="tok-fn">Perfil</span> {
+
+    <span class="tok-comment">/** Acesso completo: cadastra usuários, configura o sistema, vê relatórios gerenciais. */</span>
     ADMINISTRADOR,
+
+    <span class="tok-comment">/** Acesso operacional: usa as funcionalidades do dia a dia, sem tarefas administrativas. */</span>
     OPERADOR
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="Perfil.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCi8qKgogKiBSZXByZXNlbnRhIG9zIG7DrXZlaXMgZGUgYWNlc3NvIGRpc3BvbsOtdmVpcyBwYXJhIHVtIFVzdWFyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGVudW0gUGVyZmlsIHsKICAgIEFETUlOSVNUUkFET1IsCiAgICBPUEVSQURPUgp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Perfil.java</span></button>
+      <button type="button" class="download-btn" data-filename="Perfil.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCi8qKgogKiBSZXByZXNlbnRhIG9zIG7DrXZlaXMgZGUgYWNlc3NvIGRpc3BvbsOtdmVpcyBwYXJhIHVtIFVzdWFyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqIFVzYXIgdW0gRW51bSBlbSB2ZXogZGUgdW1hIFN0cmluZyBzb2x0YSBnYXJhbnRlLCBlbSB0ZW1wbyBkZSBjb21waWxhw6fDo28sCiAqIHF1ZSBzw7MgZXN0ZXMgZG9pcyB2YWxvcmVzIGV4aXN0ZW07IHZlciBhIHRhYmVsYSBkZSBuw612ZWlzIGRlIGFjZXNzbyBuYQogKiBBdWxhIDA0IHBhcmEgbyBxdWUgY2FkYSB1bSBwb2RlIGZhemVyLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBlbnVtIFBlcmZpbCB7CgogICAgLyoqIEFjZXNzbyBjb21wbGV0bzogY2FkYXN0cmEgdXN1w6FyaW9zLCBjb25maWd1cmEgbyBzaXN0ZW1hLCB2w6ogcmVsYXTDs3Jpb3MgZ2VyZW5jaWFpcy4gKi8KICAgIEFETUlOSVNUUkFET1IsCgogICAgLyoqIEFjZXNzbyBvcGVyYWNpb25hbDogdXNhIGFzIGZ1bmNpb25hbGlkYWRlcyBkbyBkaWEgYSBkaWEsIHNlbSB0YXJlZmFzIGFkbWluaXN0cmF0aXZhcy4gKi8KICAgIE9QRVJBRE9SCn0K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Perfil.java</span></button>
 
       <h3>Usuario.java Atualizado</h3>
       <p>O campo <code>perfil</code>, o construtor e o getter/setter passam a usar o tipo <code>Perfil</code>; o restante da classe continua igual à Aula 02.</p>
@@ -1029,54 +1042,76 @@
 }</code></pre></div>
       <button type="button" class="download-btn" data-filename="Usuario.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCmltcG9ydCBqYXZhLnRpbWUuTG9jYWxEYXRlVGltZTsKCi8qKgogKiBSZXByZXNlbnRhIGEgZW50aWRhZGUgVXN1w6FyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqIENvbnTDqW0gb3MgYXRyaWJ1dG9zLCBjb25zdHJ1dG9yZXMsIGdldHRlcnMgZSBzZXR0ZXJzLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBVc3VhcmlvIHsKICAgIHByaXZhdGUgSW50ZWdlciBpZDsKICAgIHByaXZhdGUgU3RyaW5nIG5vbWU7CiAgICBwcml2YXRlIFN0cmluZyBlbWFpbDsKICAgIHByaXZhdGUgU3RyaW5nIHNlbmhhOwogICAgcHJpdmF0ZSBQZXJmaWwgcGVyZmlsOwogICAgcHJpdmF0ZSBCb29sZWFuIGF0aXZvOwogICAgcHJpdmF0ZSBMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybzsKCiAgICBwdWJsaWMgVXN1YXJpbygpIHsKICAgIH0KCiAgICBwdWJsaWMgVXN1YXJpbyhJbnRlZ2VyIGlkLCBTdHJpbmcgbm9tZSwgU3RyaW5nIGVtYWlsLCBTdHJpbmcgc2VuaGEsIFBlcmZpbCBwZXJmaWwsIEJvb2xlYW4gYXRpdm8pIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICAgICAgdGhpcy5ub21lID0gbm9tZTsKICAgICAgICB0aGlzLmVtYWlsID0gZW1haWw7CiAgICAgICAgdGhpcy5zZW5oYSA9IHNlbmhhOwogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgICAgIHRoaXMuYXRpdm8gPSBhdGl2bzsKICAgIH0KCiAgICAvLyBHZXR0ZXJzIGUgU2V0dGVycwogICAgcHVibGljIEludGVnZXIgZ2V0SWQoKSB7CiAgICAgICAgcmV0dXJuIGlkOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldElkKEludGVnZXIgaWQpIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXROb21lKCkgewogICAgICAgIHJldHVybiBub21lOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldE5vbWUoU3RyaW5nIG5vbWUpIHsKICAgICAgICB0aGlzLm5vbWUgPSBub21lOwogICAgfQoKICAgIHB1YmxpYyBTdHJpbmcgZ2V0RW1haWwoKSB7CiAgICAgICAgcmV0dXJuIGVtYWlsOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldEVtYWlsKFN0cmluZyBlbWFpbCkgewogICAgICAgIHRoaXMuZW1haWwgPSBlbWFpbDsKICAgIH0KCiAgICBwdWJsaWMgU3RyaW5nIGdldFNlbmhhKCkgewogICAgICAgIHJldHVybiBzZW5oYTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRTZW5oYShTdHJpbmcgc2VuaGEpIHsKICAgICAgICB0aGlzLnNlbmhhID0gc2VuaGE7CiAgICB9CgogICAgcHVibGljIFBlcmZpbCBnZXRQZXJmaWwoKSB7CiAgICAgICAgcmV0dXJuIHBlcmZpbDsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRQZXJmaWwoUGVyZmlsIHBlcmZpbCkgewogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgfQoKICAgIHB1YmxpYyBCb29sZWFuIGdldEF0aXZvKCkgewogICAgICAgIHJldHVybiBhdGl2bzsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRBdGl2byhCb29sZWFuIGF0aXZvKSB7CiAgICAgICAgdGhpcy5hdGl2byA9IGF0aXZvOwogICAgfQoKICAgIHB1YmxpYyBMb2NhbERhdGVUaW1lIGdldERhdGFDYWRhc3RybygpIHsKICAgICAgICByZXR1cm4gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldERhdGFDYWRhc3RybyhMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybykgewogICAgICAgIHRoaXMuZGF0YUNhZGFzdHJvID0gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIEBPdmVycmlkZQogICAgcHVibGljIFN0cmluZyB0b1N0cmluZygpIHsKICAgICAgICByZXR1cm4gdGhpcy5ub21lICsgIiAoIiArIHRoaXMucGVyZmlsICsgIikiOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Usuario.java</span></button>
 
+      <h3>Adicionando o jBCrypt ao Projeto</h3>
+      <p>BCrypt não vem pronto no JDK como o SHA-256; é preciso adicionar a biblioteca <a href="https://github.com/jeremyh/jBCrypt" target="_blank" rel="noreferrer">jBCrypt</a> como dependência do Maven, no <code>pom.xml</code>:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">&lt;!-- jBCrypt: hash de senha com salt --&gt;</span>
+&lt;<span class="tok-kw">dependency</span>&gt;
+    &lt;<span class="tok-kw">groupId</span>&gt;org.mindrot&lt;/<span class="tok-kw">groupId</span>&gt;
+    &lt;<span class="tok-kw">artifactId</span>&gt;jbcrypt&lt;/<span class="tok-kw">artifactId</span>&gt;
+    &lt;<span class="tok-kw">version</span>&gt;0.4&lt;/<span class="tok-kw">version</span>&gt;
+&lt;/<span class="tok-kw">dependency</span>&gt;</code></pre></div>
+
       <h3>Utilitário de Hash: SenhaUtil.java</h3>
       <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/util/SenhaUtil.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.util;
 
-<span class="tok-kw">import</span> java.security.<span class="tok-fn">MessageDigest</span>;
-<span class="tok-kw">import</span> java.security.<span class="tok-fn">NoSuchAlgorithmException</span>;
+<span class="tok-kw">import</span> org.mindrot.jbcrypt.<span class="tok-fn">BCrypt</span>;
 
 <span class="tok-comment">/**
- * Classe utilitária para gerar o hash de senhas com o algoritmo SHA-256.
- * Uso didático: sistemas em produção devem usar um algoritmo pensado para
- * senhas (BCrypt, Argon2, PBKDF2) combinado com "salt" por usuário.
+ * Classe utilitária para gerar e conferir o hash de senhas com BCrypt.
+ * O BCrypt embute um "salt" aleatório em cada hash gerado, por isso hashes
+ * diferentes para a mesma senha são normais e esperados; a conferência é
+ * feita com verificar(), nunca comparando dois hashes com equals().
  *
  * @author Geovane Griesang
  */</span>
 <span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">SenhaUtil</span> {
 
     <span class="tok-comment">/**
-     * Gera o hash SHA-256 de uma senha em texto puro, em hexadecimal.
+     * Gera o hash BCrypt de uma senha em texto puro, com um salt novo.
      * @param senhaTextoPuro senha digitada pelo usuário
-     * @return String hash em hexadecimal (64 caracteres)
+     * @return String hash BCrypt, já incluindo o salt, pronto para salvar no banco
      */</span>
     <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-fn">String</span> gerarHash(<span class="tok-fn">String</span> senhaTextoPuro) {
-        <span class="tok-kw">try</span> {
-            <span class="tok-fn">MessageDigest</span> digestor = <span class="tok-fn">MessageDigest</span>.getInstance(<span class="tok-str">&quot;SHA-256&quot;</span>);
-            <span class="tok-kw">byte</span>[] bytesHash = digestor.digest(senhaTextoPuro.getBytes());
+        <span class="tok-kw">return</span> <span class="tok-fn">BCrypt</span>.hashpw(senhaTextoPuro, <span class="tok-fn">BCrypt</span>.gensalt());
+    }
 
-            <span class="tok-fn">StringBuilder</span> hexadecimal = <span class="tok-kw">new</span> <span class="tok-fn">StringBuilder</span>();
-            <span class="tok-kw">for</span> (<span class="tok-kw">byte</span> b : bytesHash) {
-                hexadecimal.append(<span class="tok-fn">String</span>.format(<span class="tok-str">&quot;%02x&quot;</span>, b));
-            }
-            <span class="tok-kw">return</span> hexadecimal.toString();
-        } <span class="tok-kw">catch</span> (<span class="tok-fn">NoSuchAlgorithmException</span> e) {
-            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-fn">RuntimeException</span>(<span class="tok-str">&quot;[ERRO] Algoritmo SHA-256 indisponível.&quot;</span>, e);
-        }
+    <span class="tok-comment">/**
+     * Confere se uma senha em texto puro corresponde a um hash já gerado.
+     * @param senhaTextoPuro senha digitada no login
+     * @param hashArmazenado hash salvo no banco de dados
+     * @return true se a senha confere com o hash
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">boolean</span> verificar(<span class="tok-fn">String</span> senhaTextoPuro, <span class="tok-fn">String</span> hashArmazenado) {
+        <span class="tok-kw">return</span> <span class="tok-fn">BCrypt</span>.checkpw(senhaTextoPuro, hashArmazenado);
+    }
+
+    <span class="tok-comment">/**
+     * Gera e imprime no console um hash válido para a senha informada (ou
+     * "admin123" se nenhuma for passada). Rode esta classe diretamente
+     * (Run File, no NetBeans) para obter um hash pronto para usar num
+     * INSERT ou UPDATE de teste no banco.
+     * @param args primeiro argumento opcional: a senha a ser hasheada
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> main(<span class="tok-fn">String</span>[] args) {
+        <span class="tok-fn">String</span> senha = args.length &gt; 0 ? args[0] : <span class="tok-str">&quot;admin123&quot;</span>;
+        <span class="tok-fn">System</span>.out.println(gerarHash(senha));
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="SenhaUtil.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLnV0aWw7CgppbXBvcnQgamF2YS5zZWN1cml0eS5NZXNzYWdlRGlnZXN0OwppbXBvcnQgamF2YS5zZWN1cml0eS5Ob1N1Y2hBbGdvcml0aG1FeGNlcHRpb247CgovKioKICogQ2xhc3NlIHV0aWxpdMOhcmlhIHBhcmEgZ2VyYXIgbyBoYXNoIGRlIHNlbmhhcyBjb20gbyBhbGdvcml0bW8gU0hBLTI1Ni4KICogVXNvIGRpZMOhdGljbzogc2lzdGVtYXMgZW0gcHJvZHXDp8OjbyBkZXZlbSB1c2FyIHVtIGFsZ29yaXRtbyBwZW5zYWRvIHBhcmEKICogc2VuaGFzIChCQ3J5cHQsIEFyZ29uMiwgUEJLREYyKSBjb21iaW5hZG8gY29tICJzYWx0IiBwb3IgdXN1w6FyaW8uCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGNsYXNzIFNlbmhhVXRpbCB7CgogICAgLyoqCiAgICAgKiBHZXJhIG8gaGFzaCBTSEEtMjU2IGRlIHVtYSBzZW5oYSBlbSB0ZXh0byBwdXJvLCBlbSBoZXhhZGVjaW1hbC4KICAgICAqIEBwYXJhbSBzZW5oYVRleHRvUHVybyBzZW5oYSBkaWdpdGFkYSBwZWxvIHVzdcOhcmlvCiAgICAgKiBAcmV0dXJuIFN0cmluZyBoYXNoIGVtIGhleGFkZWNpbWFsICg2NCBjYXJhY3RlcmVzKQogICAgICovCiAgICBwdWJsaWMgc3RhdGljIFN0cmluZyBnZXJhckhhc2goU3RyaW5nIHNlbmhhVGV4dG9QdXJvKSB7CiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgTWVzc2FnZURpZ2VzdCBkaWdlc3RvciA9IE1lc3NhZ2VEaWdlc3QuZ2V0SW5zdGFuY2UoIlNIQS0yNTYiKTsKICAgICAgICAgICAgYnl0ZVtdIGJ5dGVzSGFzaCA9IGRpZ2VzdG9yLmRpZ2VzdChzZW5oYVRleHRvUHVyby5nZXRCeXRlcygpKTsKCiAgICAgICAgICAgIFN0cmluZ0J1aWxkZXIgaGV4YWRlY2ltYWwgPSBuZXcgU3RyaW5nQnVpbGRlcigpOwogICAgICAgICAgICBmb3IgKGJ5dGUgYiA6IGJ5dGVzSGFzaCkgewogICAgICAgICAgICAgICAgaGV4YWRlY2ltYWwuYXBwZW5kKFN0cmluZy5mb3JtYXQoIiUwMngiLCBiKSk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgcmV0dXJuIGhleGFkZWNpbWFsLnRvU3RyaW5nKCk7CiAgICAgICAgfSBjYXRjaCAoTm9TdWNoQWxnb3JpdGhtRXhjZXB0aW9uIGUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IFJ1bnRpbWVFeGNlcHRpb24oIltFUlJPXSBBbGdvcml0bW8gU0hBLTI1NiBpbmRpc3BvbsOtdmVsLiIsIGUpOwogICAgICAgIH0KICAgIH0KfQo="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar SenhaUtil.java</span></button>
+      <button type="button" class="download-btn" data-filename="SenhaUtil.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLnV0aWw7CgppbXBvcnQgb3JnLm1pbmRyb3QuamJjcnlwdC5CQ3J5cHQ7CgovKioKICogQ2xhc3NlIHV0aWxpdMOhcmlhIHBhcmEgZ2VyYXIgZSBjb25mZXJpciBvIGhhc2ggZGUgc2VuaGFzIGNvbSBCQ3J5cHQuCiAqIE8gQkNyeXB0IGVtYnV0ZSB1bSAic2FsdCIgYWxlYXTDs3JpbyBlbSBjYWRhIGhhc2ggZ2VyYWRvLCBwb3IgaXNzbyBoYXNoZXMKICogZGlmZXJlbnRlcyBwYXJhIGEgbWVzbWEgc2VuaGEgc8OjbyBub3JtYWlzIGUgZXNwZXJhZG9zOyBhIGNvbmZlcsOqbmNpYSDDqQogKiBmZWl0YSBjb20gdmVyaWZpY2FyKCksIG51bmNhIGNvbXBhcmFuZG8gZG9pcyBoYXNoZXMgY29tIGVxdWFscygpLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBTZW5oYVV0aWwgewoKICAgIC8qKgogICAgICogR2VyYSBvIGhhc2ggQkNyeXB0IGRlIHVtYSBzZW5oYSBlbSB0ZXh0byBwdXJvLCBjb20gdW0gc2FsdCBub3ZvLgogICAgICogQHBhcmFtIHNlbmhhVGV4dG9QdXJvIHNlbmhhIGRpZ2l0YWRhIHBlbG8gdXN1w6FyaW8KICAgICAqIEByZXR1cm4gU3RyaW5nIGhhc2ggQkNyeXB0LCBqw6EgaW5jbHVpbmRvIG8gc2FsdCwgcHJvbnRvIHBhcmEgc2FsdmFyIG5vIGJhbmNvCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgU3RyaW5nIGdlcmFySGFzaChTdHJpbmcgc2VuaGFUZXh0b1B1cm8pIHsKICAgICAgICByZXR1cm4gQkNyeXB0Lmhhc2hwdyhzZW5oYVRleHRvUHVybywgQkNyeXB0LmdlbnNhbHQoKSk7CiAgICB9CgogICAgLyoqCiAgICAgKiBDb25mZXJlIHNlIHVtYSBzZW5oYSBlbSB0ZXh0byBwdXJvIGNvcnJlc3BvbmRlIGEgdW0gaGFzaCBqw6EgZ2VyYWRvLgogICAgICogQHBhcmFtIHNlbmhhVGV4dG9QdXJvIHNlbmhhIGRpZ2l0YWRhIG5vIGxvZ2luCiAgICAgKiBAcGFyYW0gaGFzaEFybWF6ZW5hZG8gaGFzaCBzYWx2byBubyBiYW5jbyBkZSBkYWRvcwogICAgICogQHJldHVybiB0cnVlIHNlIGEgc2VuaGEgY29uZmVyZSBjb20gbyBoYXNoCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgYm9vbGVhbiB2ZXJpZmljYXIoU3RyaW5nIHNlbmhhVGV4dG9QdXJvLCBTdHJpbmcgaGFzaEFybWF6ZW5hZG8pIHsKICAgICAgICByZXR1cm4gQkNyeXB0LmNoZWNrcHcoc2VuaGFUZXh0b1B1cm8sIGhhc2hBcm1hemVuYWRvKTsKICAgIH0KCiAgICAvKioKICAgICAqIEdlcmEgZSBpbXByaW1lIG5vIGNvbnNvbGUgdW0gaGFzaCB2w6FsaWRvIHBhcmEgYSBzZW5oYSBpbmZvcm1hZGEgKG91CiAgICAgKiAiYWRtaW4xMjMiIHNlIG5lbmh1bWEgZm9yIHBhc3NhZGEpLiBSb2RlIGVzdGEgY2xhc3NlIGRpcmV0YW1lbnRlCiAgICAgKiAoUnVuIEZpbGUsIG5vIE5ldEJlYW5zKSBwYXJhIG9idGVyIHVtIGhhc2ggcHJvbnRvIHBhcmEgdXNhciBudW0KICAgICAqIElOU0VSVCBvdSBVUERBVEUgZGUgdGVzdGUgbm8gYmFuY28uCiAgICAgKiBAcGFyYW0gYXJncyBwcmltZWlybyBhcmd1bWVudG8gb3BjaW9uYWw6IGEgc2VuaGEgYSBzZXIgaGFzaGVhZGEKICAgICAqLwogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIFN0cmluZyBzZW5oYSA9IGFyZ3MubGVuZ3RoID4gMCA/IGFyZ3NbMF0gOiAiYWRtaW4xMjMiOwogICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbihnZXJhckhhc2goc2VuaGEpKTsKICAgIH0KfQo="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar SenhaUtil.java</span></button>
 
       <h3>Atualizando o Usuário Semente no Banco</h3>
-      <p>A linha inserida na Aula 02 guarda a senha <code>admin123</code> em texto puro. Agora que existe um utilitário de hash, ela precisa ser atualizada para o hash correspondente antes de qualquer teste de autenticação:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">-- Atualiza a senha do usuário semente para o hash SHA-256 de "admin123"</span>
+      <p>A linha inserida na Aula 02 guarda a senha <code>admin123</code> em texto puro. Agora que existe um utilitário de hash, ela precisa ser atualizada antes de qualquer teste de login. Diferente do SHA-256, o BCrypt gera um hash novo (com salt novo) a cada execução, então não existe "o" hash de <code>admin123</code>: rode a classe <code>SenhaUtil</code> diretamente (botão direito → Run File, no NetBeans) para gerar o seu:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">plaintext</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>$2a$10$cJjuXP2UNjwQRV7dZ5EXce2ON7FBZT4WCDmcTgPNS0LkJga33uILi</code></pre></div>
+      <p>Esse valor acima é um exemplo real, gerado rodando <code>SenhaUtil</code> com <code>admin123</code>; o seu, ao rodar de novo, vai ser diferente (o salt é aleatório) e igualmente válido. Use o hash que você mesmo gerar no <code>UPDATE</code>:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">-- Atualiza a senha do usuário semente para um hash BCrypt válido de "admin123"</span>
 <span class="tok-kw">UPDATE</span> usuarios
-<span class="tok-kw">SET</span> senha = <span class="tok-str">'240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'</span>
+<span class="tok-kw">SET</span> senha = <span class="tok-str">'$2a$10$cJjuXP2UNjwQRV7dZ5EXce2ON7FBZT4WCDmcTgPNS0LkJga33uILi'</span>
 <span class="tok-kw">WHERE</span> email = <span class="tok-str">'geovanegriesang@ifsul.edu.br'</span>;</code></pre></div>
-      <div class="callout"><strong>De onde veio esse hash:</strong> é o resultado de <code>SenhaUtil.gerarHash("admin123")</code>. Ao trocar a senha do usuário semente do seu grupo, gere um novo hash com o mesmo método antes de atualizar o banco; nunca escreva a senha em texto puro no <code>INSERT</code> ou <code>UPDATE</code>.</div>
+      <div class="callout"><strong>Confira antes de seguir:</strong> o hash de exemplo acima foi conferido com <code>SenhaUtil.verificar("admin123", hash)</code> antes de entrar nesta aula, e retornou <code>true</code>. Ao trocar a senha do usuário semente do seu grupo, gere e confira um novo hash com o mesmo método; nunca escreva a senha em texto puro no <code>INSERT</code> ou <code>UPDATE</code>.</div>
 
       <h3>UsuarioDAO.java Atualizado: Mapeamento por Enum e Autenticação</h3>
-      <p>O método <code>mapearUsuario</code> agora converte o texto do banco para a constante do Enum com <code>Perfil.valueOf(...)</code>. A classe ganha também o método <code>autenticar</code>, que busca o usuário pelo e-mail e compara hashes, nunca a senha em si:</p>
+      <p>O método <code>mapearUsuario</code> agora converte o texto do banco para a constante do Enum com <code>Perfil.valueOf(...)</code>. A classe ganha também o método <code>autenticar</code>, que busca o usuário pelo e-mail, exige que ele esteja <code>ativo</code> e confere a senha com <code>SenhaUtil.verificar(...)</code>, nunca comparando a senha em si:</p>
       <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/dao/UsuarioDAO.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.dao;
 
@@ -1141,21 +1176,21 @@
     }
 
     <span class="tok-comment">/**
-     * Autentica um usuário comparando o hash da senha digitada com o hash
-     * armazenado no banco; a senha em si nunca é comparada diretamente.
+     * Autentica um usuário conferindo a senha digitada contra o hash BCrypt
+     * armazenado no banco; a senha em si nunca é comparada diretamente, e
+     * usuários inativos não conseguem autenticar mesmo com a senha correta.
      * @param email e-mail digitado no login
      * @param senhaDigitada senha em texto puro digitada no login
-     * @return Usuario autenticado, ou null se e-mail ou senha não conferirem
+     * @return Usuario autenticado, ou null se e-mail, senha ou status não conferirem
      * @throws SQLException caso ocorra falha na consulta
      */</span>
     <span class="tok-kw">public</span> <span class="tok-fn">Usuario</span> autenticar(<span class="tok-fn">String</span> email, <span class="tok-fn">String</span> senhaDigitada) <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
         <span class="tok-fn">Usuario</span> usuario = buscarPorEmail(email);
-        <span class="tok-kw">if</span> (usuario == <span class="tok-kw">null</span>) {
+        <span class="tok-kw">if</span> (usuario == <span class="tok-kw">null</span> || !<span class="tok-fn">Boolean</span>.TRUE.equals(usuario.getAtivo())) {
             <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
         }
 
-        <span class="tok-fn">String</span> hashDigitado = <span class="tok-fn">SenhaUtil</span>.gerarHash(senhaDigitada);
-        <span class="tok-kw">if</span> (hashDigitado.equals(usuario.getSenha())) {
+        <span class="tok-kw">if</span> (<span class="tok-fn">SenhaUtil</span>.verificar(senhaDigitada, usuario.getSenha())) {
             <span class="tok-kw">return</span> usuario;
         }
         <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
@@ -1172,7 +1207,7 @@
         <span class="tok-kw">return</span> usuario;
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="UsuarioDAO.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsKCmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5QZXJmaWw7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5Vc3VhcmlvOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC51dGlsLlNlbmhhVXRpbDsKaW1wb3J0IGphdmEuc3FsLkNvbm5lY3Rpb247CmltcG9ydCBqYXZhLnNxbC5QcmVwYXJlZFN0YXRlbWVudDsKaW1wb3J0IGphdmEuc3FsLlJlc3VsdFNldDsKaW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKaW1wb3J0IGphdmEudXRpbC5BcnJheUxpc3Q7CmltcG9ydCBqYXZhLnV0aWwuTGlzdDsKCi8qKgogKiBDbGFzc2UgcmVzcG9uc8OhdmVsIHBlbG8gYWNlc3NvIGEgZGFkb3MgZGEgZW50aWRhZGUgVXN1YXJpby4KICogQXBsaWNhIG8gcGFkcsOjbyBkZSBwcm9qZXRvIERBTyAoRGF0YSBBY2Nlc3MgT2JqZWN0KS4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgVXN1YXJpb0RBTyB7CgogICAgLyoqCiAgICAgKiBMaXN0YSB0b2RvcyBvcyB1c3XDoXJpb3MgY2FkYXN0cmFkb3Mgbm8gYmFuY28gZGUgZGFkb3MuCiAgICAgKiBAcmV0dXJuIExpc3Q8VXN1YXJpbz4gbGlzdGEgZGUgdXN1w6FyaW9zIGVuY29udHJhZG9zCiAgICAgKiBAdGhyb3dzIFNRTEV4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBuYSBjb25zdWx0YQogICAgICovCiAgICBwdWJsaWMgTGlzdDxVc3VhcmlvPiBsaXN0YXJUb2RvcygpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIExpc3Q8VXN1YXJpbz4gdXN1YXJpb3MgPSBuZXcgQXJyYXlMaXN0PD4oKTsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvIEZST00gdXN1YXJpb3MgT1JERVIgQlkgbm9tZSI7CgogICAgICAgIENvbm5lY3Rpb24gY29uZXhhbyA9IENvbmV4YW9CYW5jby5nZXRDb25leGFvKCk7CiAgICAgICAgdHJ5IChQcmVwYXJlZFN0YXRlbWVudCBzdG10ID0gY29uZXhhby5wcmVwYXJlU3RhdGVtZW50KHNxbCk7CiAgICAgICAgICAgICBSZXN1bHRTZXQgcnMgPSBzdG10LmV4ZWN1dGVRdWVyeSgpKSB7CgogICAgICAgICAgICB3aGlsZSAocnMubmV4dCgpKSB7CiAgICAgICAgICAgICAgICB1c3Vhcmlvcy5hZGQobWFwZWFyVXN1YXJpbyhycykpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIHJldHVybiB1c3VhcmlvczsKICAgIH0KCiAgICAvKioKICAgICAqIEJ1c2NhIHVtIHVzdcOhcmlvIHBlbG8gZS1tYWlsIGNhZGFzdHJhZG8uCiAgICAgKiBAcGFyYW0gZW1haWwgZS1tYWlsIGRvIHVzdcOhcmlvIGJ1c2NhZG8KICAgICAqIEByZXR1cm4gVXN1YXJpbyBlbmNvbnRyYWRvLCBvdSBudWxsIHNlIG7Do28gZXhpc3RpcgogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgY29uc3VsdGEKICAgICAqLwogICAgcHVibGljIFVzdWFyaW8gYnVzY2FyUG9yRW1haWwoU3RyaW5nIGVtYWlsKSB0aHJvd3MgU1FMRXhjZXB0aW9uIHsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvIEZST00gdXN1YXJpb3MgV0hFUkUgZW1haWwgPSA/IjsKCiAgICAgICAgQ29ubmVjdGlvbiBjb25leGFvID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICB0cnkgKFByZXBhcmVkU3RhdGVtZW50IHN0bXQgPSBjb25leGFvLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICBzdG10LnNldFN0cmluZygxLCBlbWFpbCk7CgogICAgICAgICAgICB0cnkgKFJlc3VsdFNldCBycyA9IHN0bXQuZXhlY3V0ZVF1ZXJ5KCkpIHsKICAgICAgICAgICAgICAgIGlmIChycy5uZXh0KCkpIHsKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbWFwZWFyVXN1YXJpbyhycyk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgcmV0dXJuIG51bGw7CiAgICB9CgogICAgLyoqCiAgICAgKiBBdXRlbnRpY2EgdW0gdXN1w6FyaW8gY29tcGFyYW5kbyBvIGhhc2ggZGEgc2VuaGEgZGlnaXRhZGEgY29tIG8gaGFzaAogICAgICogYXJtYXplbmFkbyBubyBiYW5jbzsgYSBzZW5oYSBlbSBzaSBudW5jYSDDqSBjb21wYXJhZGEgZGlyZXRhbWVudGUuCiAgICAgKiBAcGFyYW0gZW1haWwgZS1tYWlsIGRpZ2l0YWRvIG5vIGxvZ2luCiAgICAgKiBAcGFyYW0gc2VuaGFEaWdpdGFkYSBzZW5oYSBlbSB0ZXh0byBwdXJvIGRpZ2l0YWRhIG5vIGxvZ2luCiAgICAgKiBAcmV0dXJuIFVzdWFyaW8gYXV0ZW50aWNhZG8sIG91IG51bGwgc2UgZS1tYWlsIG91IHNlbmhhIG7Do28gY29uZmVyaXJlbQogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgY29uc3VsdGEKICAgICAqLwogICAgcHVibGljIFVzdWFyaW8gYXV0ZW50aWNhcihTdHJpbmcgZW1haWwsIFN0cmluZyBzZW5oYURpZ2l0YWRhKSB0aHJvd3MgU1FMRXhjZXB0aW9uIHsKICAgICAgICBVc3VhcmlvIHVzdWFyaW8gPSBidXNjYXJQb3JFbWFpbChlbWFpbCk7CiAgICAgICAgaWYgKHVzdWFyaW8gPT0gbnVsbCkgewogICAgICAgICAgICByZXR1cm4gbnVsbDsKICAgICAgICB9CgogICAgICAgIFN0cmluZyBoYXNoRGlnaXRhZG8gPSBTZW5oYVV0aWwuZ2VyYXJIYXNoKHNlbmhhRGlnaXRhZGEpOwogICAgICAgIGlmIChoYXNoRGlnaXRhZG8uZXF1YWxzKHVzdWFyaW8uZ2V0U2VuaGEoKSkpIHsKICAgICAgICAgICAgcmV0dXJuIHVzdWFyaW87CiAgICAgICAgfQogICAgICAgIHJldHVybiBudWxsOwogICAgfQoKICAgIHByaXZhdGUgVXN1YXJpbyBtYXBlYXJVc3VhcmlvKFJlc3VsdFNldCBycykgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgVXN1YXJpbyB1c3VhcmlvID0gbmV3IFVzdWFyaW8oKTsKICAgICAgICB1c3VhcmlvLnNldElkKHJzLmdldEludCgiaWQiKSk7CiAgICAgICAgdXN1YXJpby5zZXROb21lKHJzLmdldFN0cmluZygibm9tZSIpKTsKICAgICAgICB1c3VhcmlvLnNldEVtYWlsKHJzLmdldFN0cmluZygiZW1haWwiKSk7CiAgICAgICAgdXN1YXJpby5zZXRTZW5oYShycy5nZXRTdHJpbmcoInNlbmhhIikpOwogICAgICAgIHVzdWFyaW8uc2V0UGVyZmlsKFBlcmZpbC52YWx1ZU9mKHJzLmdldFN0cmluZygicGVyZmlsIikpKTsKICAgICAgICB1c3VhcmlvLnNldEF0aXZvKHJzLmdldEJvb2xlYW4oImF0aXZvIikpOwogICAgICAgIHJldHVybiB1c3VhcmlvOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar UsuarioDAO.java</span></button>
+      <button type="button" class="download-btn" data-filename="UsuarioDAO.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsKCmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5QZXJmaWw7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5Vc3VhcmlvOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC51dGlsLlNlbmhhVXRpbDsKaW1wb3J0IGphdmEuc3FsLkNvbm5lY3Rpb247CmltcG9ydCBqYXZhLnNxbC5QcmVwYXJlZFN0YXRlbWVudDsKaW1wb3J0IGphdmEuc3FsLlJlc3VsdFNldDsKaW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKaW1wb3J0IGphdmEudXRpbC5BcnJheUxpc3Q7CmltcG9ydCBqYXZhLnV0aWwuTGlzdDsKCi8qKgogKiBDbGFzc2UgcmVzcG9uc8OhdmVsIHBlbG8gYWNlc3NvIGEgZGFkb3MgZGEgZW50aWRhZGUgVXN1YXJpby4KICogQXBsaWNhIG8gcGFkcsOjbyBkZSBwcm9qZXRvIERBTyAoRGF0YSBBY2Nlc3MgT2JqZWN0KS4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgVXN1YXJpb0RBTyB7CgogICAgLyoqCiAgICAgKiBMaXN0YSB0b2RvcyBvcyB1c3XDoXJpb3MgY2FkYXN0cmFkb3Mgbm8gYmFuY28gZGUgZGFkb3MuCiAgICAgKiBAcmV0dXJuIExpc3Q8VXN1YXJpbz4gbGlzdGEgZGUgdXN1w6FyaW9zIGVuY29udHJhZG9zCiAgICAgKiBAdGhyb3dzIFNRTEV4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBuYSBjb25zdWx0YQogICAgICovCiAgICBwdWJsaWMgTGlzdDxVc3VhcmlvPiBsaXN0YXJUb2RvcygpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIExpc3Q8VXN1YXJpbz4gdXN1YXJpb3MgPSBuZXcgQXJyYXlMaXN0PD4oKTsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvIEZST00gdXN1YXJpb3MgT1JERVIgQlkgbm9tZSI7CgogICAgICAgIENvbm5lY3Rpb24gY29uZXhhbyA9IENvbmV4YW9CYW5jby5nZXRDb25leGFvKCk7CiAgICAgICAgdHJ5IChQcmVwYXJlZFN0YXRlbWVudCBzdG10ID0gY29uZXhhby5wcmVwYXJlU3RhdGVtZW50KHNxbCk7CiAgICAgICAgICAgICBSZXN1bHRTZXQgcnMgPSBzdG10LmV4ZWN1dGVRdWVyeSgpKSB7CgogICAgICAgICAgICB3aGlsZSAocnMubmV4dCgpKSB7CiAgICAgICAgICAgICAgICB1c3Vhcmlvcy5hZGQobWFwZWFyVXN1YXJpbyhycykpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIHJldHVybiB1c3VhcmlvczsKICAgIH0KCiAgICAvKioKICAgICAqIEJ1c2NhIHVtIHVzdcOhcmlvIHBlbG8gZS1tYWlsIGNhZGFzdHJhZG8uCiAgICAgKiBAcGFyYW0gZW1haWwgZS1tYWlsIGRvIHVzdcOhcmlvIGJ1c2NhZG8KICAgICAqIEByZXR1cm4gVXN1YXJpbyBlbmNvbnRyYWRvLCBvdSBudWxsIHNlIG7Do28gZXhpc3RpcgogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgY29uc3VsdGEKICAgICAqLwogICAgcHVibGljIFVzdWFyaW8gYnVzY2FyUG9yRW1haWwoU3RyaW5nIGVtYWlsKSB0aHJvd3MgU1FMRXhjZXB0aW9uIHsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvIEZST00gdXN1YXJpb3MgV0hFUkUgZW1haWwgPSA/IjsKCiAgICAgICAgQ29ubmVjdGlvbiBjb25leGFvID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICB0cnkgKFByZXBhcmVkU3RhdGVtZW50IHN0bXQgPSBjb25leGFvLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICBzdG10LnNldFN0cmluZygxLCBlbWFpbCk7CgogICAgICAgICAgICB0cnkgKFJlc3VsdFNldCBycyA9IHN0bXQuZXhlY3V0ZVF1ZXJ5KCkpIHsKICAgICAgICAgICAgICAgIGlmIChycy5uZXh0KCkpIHsKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbWFwZWFyVXN1YXJpbyhycyk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgcmV0dXJuIG51bGw7CiAgICB9CgogICAgLyoqCiAgICAgKiBBdXRlbnRpY2EgdW0gdXN1w6FyaW8gY29uZmVyaW5kbyBhIHNlbmhhIGRpZ2l0YWRhIGNvbnRyYSBvIGhhc2ggQkNyeXB0CiAgICAgKiBhcm1hemVuYWRvIG5vIGJhbmNvOyBhIHNlbmhhIGVtIHNpIG51bmNhIMOpIGNvbXBhcmFkYSBkaXJldGFtZW50ZSwgZQogICAgICogdXN1w6FyaW9zIGluYXRpdm9zIG7Do28gY29uc2VndWVtIGF1dGVudGljYXIgbWVzbW8gY29tIGEgc2VuaGEgY29ycmV0YS4KICAgICAqIEBwYXJhbSBlbWFpbCBlLW1haWwgZGlnaXRhZG8gbm8gbG9naW4KICAgICAqIEBwYXJhbSBzZW5oYURpZ2l0YWRhIHNlbmhhIGVtIHRleHRvIHB1cm8gZGlnaXRhZGEgbm8gbG9naW4KICAgICAqIEByZXR1cm4gVXN1YXJpbyBhdXRlbnRpY2Fkbywgb3UgbnVsbCBzZSBlLW1haWwsIHNlbmhhIG91IHN0YXR1cyBuw6NvIGNvbmZlcmlyZW0KICAgICAqIEB0aHJvd3MgU1FMRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIG5hIGNvbnN1bHRhCiAgICAgKi8KICAgIHB1YmxpYyBVc3VhcmlvIGF1dGVudGljYXIoU3RyaW5nIGVtYWlsLCBTdHJpbmcgc2VuaGFEaWdpdGFkYSkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgVXN1YXJpbyB1c3VhcmlvID0gYnVzY2FyUG9yRW1haWwoZW1haWwpOwogICAgICAgIGlmICh1c3VhcmlvID09IG51bGwgfHwgIUJvb2xlYW4uVFJVRS5lcXVhbHModXN1YXJpby5nZXRBdGl2bygpKSkgewogICAgICAgICAgICByZXR1cm4gbnVsbDsKICAgICAgICB9CgogICAgICAgIGlmIChTZW5oYVV0aWwudmVyaWZpY2FyKHNlbmhhRGlnaXRhZGEsIHVzdWFyaW8uZ2V0U2VuaGEoKSkpIHsKICAgICAgICAgICAgcmV0dXJuIHVzdWFyaW87CiAgICAgICAgfQogICAgICAgIHJldHVybiBudWxsOwogICAgfQoKICAgIHByaXZhdGUgVXN1YXJpbyBtYXBlYXJVc3VhcmlvKFJlc3VsdFNldCBycykgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgVXN1YXJpbyB1c3VhcmlvID0gbmV3IFVzdWFyaW8oKTsKICAgICAgICB1c3VhcmlvLnNldElkKHJzLmdldEludCgiaWQiKSk7CiAgICAgICAgdXN1YXJpby5zZXROb21lKHJzLmdldFN0cmluZygibm9tZSIpKTsKICAgICAgICB1c3VhcmlvLnNldEVtYWlsKHJzLmdldFN0cmluZygiZW1haWwiKSk7CiAgICAgICAgdXN1YXJpby5zZXRTZW5oYShycy5nZXRTdHJpbmcoInNlbmhhIikpOwogICAgICAgIHVzdWFyaW8uc2V0UGVyZmlsKFBlcmZpbC52YWx1ZU9mKHJzLmdldFN0cmluZygicGVyZmlsIikpKTsKICAgICAgICB1c3VhcmlvLnNldEF0aXZvKHJzLmdldEJvb2xlYW4oImF0aXZvIikpOwogICAgICAgIHJldHVybiB1c3VhcmlvOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar UsuarioDAO.java</span></button>
 
       <p><strong>Fechando a branch</strong></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">add</span> .
@@ -1198,7 +1233,381 @@
     </section>
 
     <section id="s6">
-      <h2><span class="num">06</span>Atividade Prática dos Grupos de Extensão</h2>
+      <h2><span class="num">06</span>Preparando o pom.xml para Interfaces JavaFX</h2>
+      <p>Até agora, <code>TenisShop.java</code> só imprimia texto no console. A partir daqui ele vai abrir uma janela de verdade, e isso exige mais do que as dependências <code>javafx-controls</code>/<code>javafx-fxml</code> já presentes no <code>pom.xml</code> desde a Aula 02.</p>
+
+      <h3>Por que só as Dependências Não Bastam</h3>
+      <p>As bibliotecas do JavaFX são módulos nativos, específicos para cada sistema operacional. Rodar uma aplicação JavaFX direto com <code>java -jar</code> ou pelo botão padrão de "Run" do NetBeans, sem configurar o <em>module path</em> corretamente, resulta no erro clássico <code>Error: JavaFX runtime components are missing</code>. O <strong>javafx-maven-plugin</strong> resolve isso automaticamente: ele monta o module path certo antes de abrir a aplicação.</p>
+
+      <h3>Adicionando o javafx-maven-plugin</h3>
+      <p>Adicione o plugin na seção <code>&lt;build&gt;</code> do <code>pom.xml</code>, apontando para a classe principal:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;<span class="tok-kw">build</span>&gt;
+    &lt;<span class="tok-kw">plugins</span>&gt;
+        &lt;<span class="tok-kw">plugin</span>&gt;
+            &lt;<span class="tok-kw">groupId</span>&gt;org.openjfx&lt;/<span class="tok-kw">groupId</span>&gt;
+            &lt;<span class="tok-kw">artifactId</span>&gt;javafx-maven-plugin&lt;/<span class="tok-kw">artifactId</span>&gt;
+            &lt;<span class="tok-kw">version</span>&gt;0.0.8&lt;/<span class="tok-kw">version</span>&gt;
+            &lt;<span class="tok-kw">configuration</span>&gt;
+                &lt;<span class="tok-kw">mainClass</span>&gt;br.edu.ifsul.venancio.tenisshop.TenisShop&lt;/<span class="tok-kw">mainClass</span>&gt;
+            &lt;/<span class="tok-kw">configuration</span>&gt;
+        &lt;/<span class="tok-kw">plugin</span>&gt;
+    &lt;/<span class="tok-kw">plugins</span>&gt;
+&lt;/<span class="tok-kw">build</span>&gt;</code></pre></div>
+
+      <h3>Configurando o NetBeans: nbactions.xml</h3>
+      <p>Por padrão, o botão "Executar Projeto" do NetBeans não chama o <code>javafx-maven-plugin</code>. O arquivo <code>nbactions.xml</code>, na raiz do projeto (mesmo nível do <code>pom.xml</code>), ensina o NetBeans a rodar o goal <code>javafx:run</code> em vez disso:</p>
+      <p class="file-path">Local: <code>nbactions.xml</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;?<span class="tok-kw">xml</span> version=<span class="tok-str">&quot;1.0&quot;</span> encoding=<span class="tok-str">&quot;UTF-8&quot;</span>?&gt;
+&lt;<span class="tok-kw">actions</span>&gt;
+    &lt;<span class="tok-kw">action</span>&gt;
+        &lt;<span class="tok-kw">actionName</span>&gt;run&lt;/<span class="tok-kw">actionName</span>&gt;
+        &lt;<span class="tok-kw">packagings</span>&gt;
+            &lt;<span class="tok-kw">packaging</span>&gt;jar&lt;/<span class="tok-kw">packaging</span>&gt;
+        &lt;/<span class="tok-kw">packagings</span>&gt;
+        &lt;<span class="tok-kw">goals</span>&gt;
+            &lt;<span class="tok-kw">goal</span>&gt;clean&lt;/<span class="tok-kw">goal</span>&gt;
+            &lt;<span class="tok-kw">goal</span>&gt;javafx:run&lt;/<span class="tok-kw">goal</span>&gt;
+        &lt;/<span class="tok-kw">goals</span>&gt;
+    &lt;/<span class="tok-kw">action</span>&gt;
+&lt;/<span class="tok-kw">actions</span>&gt;</code></pre></div>
+      <div class="callout"><strong>Depois de criar o arquivo:</strong> clique com o botão direito no projeto, no NetBeans, e escolha <strong>Reload Project</strong> (ou feche e reabra o projeto) para o botão "Run" passar a usar o <code>javafx:run</code>. Sem isso, o NetBeans continua tentando rodar do jeito antigo e a janela não abre.</div>
+    </section>
+
+    <section id="s7">
+      <h2><span class="num">07</span>Construindo a Tela de Login (JavaFX + FXML)</h2>
+      <p>O padrão usado aqui segue de perto o projeto de referência do professor Geison para manter um jeito só de organizar tela e controller entre as turmas: uma classe <code>Application</code> guarda uma única <code>Scene</code> e troca só a "raiz" dela ao mudar de tela, em vez de abrir uma janela nova a cada navegação.</p>
+
+      <h3>Padrão de Projeto: MVC (Model-View-Controller)</h3>
+      <p>A Aula 02 já apresentou o MVC em teoria. Agora ele aparece pela primeira vez em código de verdade, dividido em três papéis bem separados; nenhuma classe faz o trabalho de outra:</p>
+      <div class="card-grid">
+        <div class="card"><h4><span class="dot"></span>Model</h4><p><code>Usuario</code>, <code>Perfil</code> e <code>UsuarioDAO</code>. Guardam os dados e a regra de autenticação. Não sabem que existe uma janela.</p></div>
+        <div class="card"><h4><span class="dot"></span>View</h4><p><code>login.fxml</code> e <code>principal.fxml</code>. Descrevem só a aparência da tela, em XML, sem nenhuma lógica Java dentro.</p></div>
+        <div class="card"><h4><span class="dot"></span>Controller</h4><p><code>LoginController</code> e <code>PrincipalController</code>. Recebem os cliques da View, chamam o Model, e decidem o que a View mostra em seguida.</p></div>
+      </div>
+      <p><code>TenisShop.java</code> não é nenhum dos três: é a "casca" que liga tudo, decidindo qual View aparece a cada momento. Ela deixa de ser uma classe utilitária de teste de conexão (papel que tinha desde a Aula 02) e passa a ser o ponto de entrada real da interface: estende <code>javafx.application.Application</code>, guarda a <code>Scene</code> atual num campo estático, e expõe um método <code>setRoot(String fxml)</code> que qualquer Controller pode chamar para trocar de tela sem abrir uma janela nova.</p>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/TenisShop.java</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop;
+
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.<span class="tok-fn">Usuario</span>;
+<span class="tok-kw">import</span> java.io.<span class="tok-fn">IOException</span>;
+<span class="tok-kw">import</span> javafx.application.<span class="tok-fn">Application</span>;
+<span class="tok-kw">import</span> javafx.fxml.<span class="tok-fn">FXMLLoader</span>;
+<span class="tok-kw">import</span> javafx.scene.<span class="tok-fn">Parent</span>;
+<span class="tok-kw">import</span> javafx.scene.<span class="tok-fn">Scene</span>;
+<span class="tok-kw">import</span> javafx.stage.<span class="tok-fn">Stage</span>;
+
+<span class="tok-comment">/**
+ * Classe principal da aplicação TenisShop: inicializa a interface JavaFX
+ * a partir da tela de login e comanda a navegação entre telas.
+ * Não é o Model nem a View nem o Controller do padrão MVC; é a &quot;casca&quot; que
+ * hospeda uma única Scene e troca só a raiz dela a cada tela, para nunca
+ * abrir mais de uma janela ao mesmo tempo.
+ *
+ * @author Geovane Griesang
+ */</span>
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">TenisShop</span> <span class="tok-kw">extends</span> <span class="tok-fn">Application</span> {
+
+    <span class="tok-comment">// Guarda quem está logado para as telas seguintes consultarem; fica
+    // static porque só existe uma sessão de usuário por vez nesta aplicação.</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-fn">Usuario</span> usuarioLogado;
+
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-fn">Scene</span> scene;
+
+    <span class="tok-flag">@Override</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">void</span> start(<span class="tok-fn">Stage</span> stage) <span class="tok-kw">throws</span> <span class="tok-fn">IOException</span> {
+        scene = <span class="tok-kw">new</span> <span class="tok-fn">Scene</span>(loadFXML(<span class="tok-str">&quot;login&quot;</span>));
+        stage.setTitle(<span class="tok-str">&quot;TenisShop&quot;</span>);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    <span class="tok-comment">/**
+     * Troca a tela atual sem abrir uma janela nova: os Controllers chamam
+     * este método (ex.: TenisShop.setRoot(&quot;principal&quot;)) para navegar.
+     * @param fxml nome do arquivo FXML, sem a extensão (ex.: &quot;login&quot;)
+     * @throws IOException se o FXML não existir ou tiver erro de carga
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> setRoot(<span class="tok-fn">String</span> fxml) <span class="tok-kw">throws</span> <span class="tok-fn">IOException</span> {
+        scene.setRoot(loadFXML(fxml));
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-fn">Parent</span> loadFXML(<span class="tok-fn">String</span> fxml) <span class="tok-kw">throws</span> <span class="tok-fn">IOException</span> {
+        <span class="tok-fn">FXMLLoader</span> fxmlLoader = <span class="tok-kw">new</span> <span class="tok-fn">FXMLLoader</span>(<span class="tok-fn">TenisShop</span>.class.getResource(<span class="tok-str">&quot;view/&quot;</span> + fxml + <span class="tok-str">&quot;.fxml&quot;</span>));
+        <span class="tok-kw">return</span> fxmlLoader.load();
+    }
+
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> main(<span class="tok-fn">String</span>[] args) {
+        launch();
+    }
+}</code></pre></div>
+      <button type="button" class="download-btn" data-filename="TenisShop.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wOwoKaW1wb3J0IGJyLmVkdS5pZnN1bC52ZW5hbmNpby50ZW5pc3Nob3AubW9kZWwuZG9tYWluLlVzdWFyaW87CmltcG9ydCBqYXZhLmlvLklPRXhjZXB0aW9uOwppbXBvcnQgamF2YWZ4LmFwcGxpY2F0aW9uLkFwcGxpY2F0aW9uOwppbXBvcnQgamF2YWZ4LmZ4bWwuRlhNTExvYWRlcjsKaW1wb3J0IGphdmFmeC5zY2VuZS5QYXJlbnQ7CmltcG9ydCBqYXZhZnguc2NlbmUuU2NlbmU7CmltcG9ydCBqYXZhZnguc3RhZ2UuU3RhZ2U7CgovKioKICogQ2xhc3NlIHByaW5jaXBhbCBkYSBhcGxpY2HDp8OjbyBUZW5pc1Nob3A6IGluaWNpYWxpemEgYSBpbnRlcmZhY2UgSmF2YUZYCiAqIGEgcGFydGlyIGRhIHRlbGEgZGUgbG9naW4gZSBjb21hbmRhIGEgbmF2ZWdhw6fDo28gZW50cmUgdGVsYXMuCiAqIE7Do28gw6kgbyBNb2RlbCBuZW0gYSBWaWV3IG5lbSBvIENvbnRyb2xsZXIgZG8gcGFkcsOjbyBNVkM7IMOpIGEgImNhc2NhIiBxdWUKICogaG9zcGVkYSB1bWEgw7puaWNhIFNjZW5lIGUgdHJvY2Egc8OzIGEgcmFpeiBkZWxhIGEgY2FkYSB0ZWxhLCBwYXJhIG51bmNhCiAqIGFicmlyIG1haXMgZGUgdW1hIGphbmVsYSBhbyBtZXNtbyB0ZW1wby4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgVGVuaXNTaG9wIGV4dGVuZHMgQXBwbGljYXRpb24gewoKICAgIC8vIEd1YXJkYSBxdWVtIGVzdMOhIGxvZ2FkbyBwYXJhIGFzIHRlbGFzIHNlZ3VpbnRlcyBjb25zdWx0YXJlbTsgZmljYQogICAgLy8gc3RhdGljIHBvcnF1ZSBzw7MgZXhpc3RlIHVtYSBzZXNzw6NvIGRlIHVzdcOhcmlvIHBvciB2ZXogbmVzdGEgYXBsaWNhw6fDo28uCiAgICBwdWJsaWMgc3RhdGljIFVzdWFyaW8gdXN1YXJpb0xvZ2FkbzsKCiAgICBwcml2YXRlIHN0YXRpYyBTY2VuZSBzY2VuZTsKCiAgICBAT3ZlcnJpZGUKICAgIHB1YmxpYyB2b2lkIHN0YXJ0KFN0YWdlIHN0YWdlKSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIHNjZW5lID0gbmV3IFNjZW5lKGxvYWRGWE1MKCJsb2dpbiIpKTsKICAgICAgICBzdGFnZS5zZXRUaXRsZSgiVGVuaXNTaG9wIik7CiAgICAgICAgc3RhZ2Uuc2V0U2NlbmUoc2NlbmUpOwogICAgICAgIHN0YWdlLnNob3coKTsKICAgIH0KCiAgICAvKioKICAgICAqIFRyb2NhIGEgdGVsYSBhdHVhbCBzZW0gYWJyaXIgdW1hIGphbmVsYSBub3ZhOiBvcyBDb250cm9sbGVycyBjaGFtYW0KICAgICAqIGVzdGUgbcOpdG9kbyAoZXguOiBUZW5pc1Nob3Auc2V0Um9vdCgicHJpbmNpcGFsIikpIHBhcmEgbmF2ZWdhci4KICAgICAqIEBwYXJhbSBmeG1sIG5vbWUgZG8gYXJxdWl2byBGWE1MLCBzZW0gYSBleHRlbnPDo28gKGV4LjogImxvZ2luIikKICAgICAqIEB0aHJvd3MgSU9FeGNlcHRpb24gc2UgbyBGWE1MIG7Do28gZXhpc3RpciBvdSB0aXZlciBlcnJvIGRlIGNhcmdhCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBzZXRSb290KFN0cmluZyBmeG1sKSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIHNjZW5lLnNldFJvb3QobG9hZEZYTUwoZnhtbCkpOwogICAgfQoKICAgIHByaXZhdGUgc3RhdGljIFBhcmVudCBsb2FkRlhNTChTdHJpbmcgZnhtbCkgdGhyb3dzIElPRXhjZXB0aW9uIHsKICAgICAgICBGWE1MTG9hZGVyIGZ4bWxMb2FkZXIgPSBuZXcgRlhNTExvYWRlcihUZW5pc1Nob3AuY2xhc3MuZ2V0UmVzb3VyY2UoInZpZXcvIiArIGZ4bWwgKyAiLmZ4bWwiKSk7CiAgICAgICAgcmV0dXJuIGZ4bWxMb2FkZXIubG9hZCgpOwogICAgfQoKICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBtYWluKFN0cmluZ1tdIGFyZ3MpIHsKICAgICAgICBsYXVuY2goKTsKICAgIH0KfQo="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar TenisShop.java</span></button>
+
+      <div class="callout"><strong>O que mudou:</strong> o teste de conexão via console que essa classe fazia desde a Aula 02 saiu daqui. A partir de agora, a própria tela de login cumpre esse papel: se o MySQL estiver fora do ar, isso aparece como um alerta de erro na hora de tentar entrar (veja "Testando a Tela de Login", mais abaixo).</div>
+
+      <h3>Tela de Login: login.fxml</h3>
+      <p>FXML é um formato declarativo de tela: descreve os componentes visuais em XML, sem lógica dentro dele. O atributo <code>fx:controller</code> liga o arquivo a uma classe Java; cada <code>fx:id</code> expõe um componente para um campo anotado com <code>@FXML</code> nessa classe; e <code>onAction="#metodo"</code> liga um clique a um método do controller.</p>
+      <p class="file-path">Local: <code>src/main/resources/br/edu/ifsul/venancio/tenisshop/view/login.fxml</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;?<span class="tok-kw">xml</span> version=<span class="tok-str">&quot;1.0&quot;</span> encoding=<span class="tok-str">&quot;UTF-8&quot;</span>?&gt;
+
+&lt;?<span class="tok-kw">import</span> javafx.geometry.Insets?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.control.Button?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.control.Label?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.control.PasswordField?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.control.TextField?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.layout.ColumnConstraints?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.layout.GridPane?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.layout.RowConstraints?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.layout.VBox?&gt;
+
+&lt;<span class="tok-kw">VBox</span> alignment=<span class="tok-str">&quot;CENTER&quot;</span> prefHeight=<span class="tok-str">&quot;320.0&quot;</span> prefWidth=<span class="tok-str">&quot;420.0&quot;</span> spacing=<span class="tok-str">&quot;24.0&quot;</span> xmlns=<span class="tok-str">&quot;http://javafx.com/javafx/21&quot;</span> xmlns:fx=<span class="tok-str">&quot;http://javafx.com/fxml/1&quot;</span> fx:controller=<span class="tok-str">&quot;br.edu.ifsul.venancio.tenisshop.view.LoginController&quot;</span>&gt;
+   &lt;<span class="tok-kw">padding</span>&gt;
+      &lt;<span class="tok-kw">Insets</span> bottom=<span class="tok-str">&quot;24.0&quot;</span> left=<span class="tok-str">&quot;24.0&quot;</span> right=<span class="tok-str">&quot;24.0&quot;</span> top=<span class="tok-str">&quot;24.0&quot;</span> /&gt;
+   &lt;/<span class="tok-kw">padding</span>&gt;
+   &lt;<span class="tok-kw">children</span>&gt;
+      &lt;<span class="tok-kw">Label</span> style=<span class="tok-str">&quot;-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;&quot;</span> text=<span class="tok-str">&quot;TenisShop - Login&quot;</span> /&gt;
+      &lt;<span class="tok-kw">GridPane</span> hgap=<span class="tok-str">&quot;10.0&quot;</span> vgap=<span class="tok-str">&quot;12.0&quot;</span>&gt;
+         &lt;<span class="tok-kw">columnConstraints</span>&gt;
+            &lt;<span class="tok-kw">ColumnConstraints</span> hgrow=<span class="tok-str">&quot;NEVER&quot;</span> minWidth=<span class="tok-str">&quot;70.0&quot;</span> /&gt;
+            &lt;<span class="tok-kw">ColumnConstraints</span> hgrow=<span class="tok-str">&quot;ALWAYS&quot;</span> /&gt;
+         &lt;/<span class="tok-kw">columnConstraints</span>&gt;
+         &lt;<span class="tok-kw">rowConstraints</span>&gt;
+            &lt;<span class="tok-kw">RowConstraints</span> /&gt;
+            &lt;<span class="tok-kw">RowConstraints</span> /&gt;
+         &lt;/<span class="tok-kw">rowConstraints</span>&gt;
+         &lt;<span class="tok-kw">children</span>&gt;
+            &lt;<span class="tok-kw">Label</span> text=<span class="tok-str">&quot;E-mail&quot;</span> /&gt;
+            &lt;<span class="tok-kw">TextField</span> fx:id=<span class="tok-str">&quot;txtEmail&quot;</span> promptText=<span class="tok-str">&quot;seu.email@ifsul.edu.br&quot;</span> GridPane.columnIndex=<span class="tok-str">&quot;1&quot;</span> /&gt;
+            &lt;<span class="tok-kw">Label</span> text=<span class="tok-str">&quot;Senha&quot;</span> GridPane.rowIndex=<span class="tok-str">&quot;1&quot;</span> /&gt;
+            &lt;<span class="tok-kw">PasswordField</span> fx:id=<span class="tok-str">&quot;pwdSenha&quot;</span> GridPane.columnIndex=<span class="tok-str">&quot;1&quot;</span> GridPane.rowIndex=<span class="tok-str">&quot;1&quot;</span> /&gt;
+         &lt;/<span class="tok-kw">children</span>&gt;
+      &lt;/<span class="tok-kw">GridPane</span>&gt;
+      &lt;<span class="tok-kw">Button</span> defaultButton=<span class="tok-str">&quot;true&quot;</span> onAction=<span class="tok-str">&quot;#btnLoginAction&quot;</span> style=<span class="tok-str">&quot;-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;&quot;</span> text=<span class="tok-str">&quot;Entrar&quot;</span> /&gt;
+   &lt;/<span class="tok-kw">children</span>&gt;
+&lt;/<span class="tok-kw">VBox</span>&gt;</code></pre></div>
+      <button type="button" class="download-btn" data-filename="login.fxml" data-b64="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KCjw/aW1wb3J0IGphdmFmeC5nZW9tZXRyeS5JbnNldHM/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5CdXR0b24/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5MYWJlbD8+Cjw/aW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLlBhc3N3b3JkRmllbGQ/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5UZXh0RmllbGQ/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUubGF5b3V0LkNvbHVtbkNvbnN0cmFpbnRzPz4KPD9pbXBvcnQgamF2YWZ4LnNjZW5lLmxheW91dC5HcmlkUGFuZT8+Cjw/aW1wb3J0IGphdmFmeC5zY2VuZS5sYXlvdXQuUm93Q29uc3RyYWludHM/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUubGF5b3V0LlZCb3g/PgoKPFZCb3ggYWxpZ25tZW50PSJDRU5URVIiIHByZWZIZWlnaHQ9IjMyMC4wIiBwcmVmV2lkdGg9IjQyMC4wIiBzcGFjaW5nPSIyNC4wIiB4bWxucz0iaHR0cDovL2phdmFmeC5jb20vamF2YWZ4LzIxIiB4bWxuczpmeD0iaHR0cDovL2phdmFmeC5jb20vZnhtbC8xIiBmeDpjb250cm9sbGVyPSJici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXcuTG9naW5Db250cm9sbGVyIj4KICAgPHBhZGRpbmc+CiAgICAgIDxJbnNldHMgYm90dG9tPSIyNC4wIiBsZWZ0PSIyNC4wIiByaWdodD0iMjQuMCIgdG9wPSIyNC4wIiAvPgogICA8L3BhZGRpbmc+CiAgIDxjaGlsZHJlbj4KICAgICAgPExhYmVsIHN0eWxlPSItZngtZm9udC1zaXplOiAyNHB4OyAtZngtZm9udC13ZWlnaHQ6IGJvbGQ7IC1meC10ZXh0LWZpbGw6ICMxZjZiMmM7IiB0ZXh0PSJUZW5pc1Nob3AgLSBMb2dpbiIgLz4KICAgICAgPEdyaWRQYW5lIGhnYXA9IjEwLjAiIHZnYXA9IjEyLjAiPgogICAgICAgICA8Y29sdW1uQ29uc3RyYWludHM+CiAgICAgICAgICAgIDxDb2x1bW5Db25zdHJhaW50cyBoZ3Jvdz0iTkVWRVIiIG1pbldpZHRoPSI3MC4wIiAvPgogICAgICAgICAgICA8Q29sdW1uQ29uc3RyYWludHMgaGdyb3c9IkFMV0FZUyIgLz4KICAgICAgICAgPC9jb2x1bW5Db25zdHJhaW50cz4KICAgICAgICAgPHJvd0NvbnN0cmFpbnRzPgogICAgICAgICAgICA8Um93Q29uc3RyYWludHMgLz4KICAgICAgICAgICAgPFJvd0NvbnN0cmFpbnRzIC8+CiAgICAgICAgIDwvcm93Q29uc3RyYWludHM+CiAgICAgICAgIDxjaGlsZHJlbj4KICAgICAgICAgICAgPExhYmVsIHRleHQ9IkUtbWFpbCIgLz4KICAgICAgICAgICAgPFRleHRGaWVsZCBmeDppZD0idHh0RW1haWwiIHByb21wdFRleHQ9InNldS5lbWFpbEBpZnN1bC5lZHUuYnIiIEdyaWRQYW5lLmNvbHVtbkluZGV4PSIxIiAvPgogICAgICAgICAgICA8TGFiZWwgdGV4dD0iU2VuaGEiIEdyaWRQYW5lLnJvd0luZGV4PSIxIiAvPgogICAgICAgICAgICA8UGFzc3dvcmRGaWVsZCBmeDppZD0icHdkU2VuaGEiIEdyaWRQYW5lLmNvbHVtbkluZGV4PSIxIiBHcmlkUGFuZS5yb3dJbmRleD0iMSIgLz4KICAgICAgICAgPC9jaGlsZHJlbj4KICAgICAgPC9HcmlkUGFuZT4KICAgICAgPEJ1dHRvbiBkZWZhdWx0QnV0dG9uPSJ0cnVlIiBvbkFjdGlvbj0iI2J0bkxvZ2luQWN0aW9uIiBzdHlsZT0iLWZ4LWJhY2tncm91bmQtY29sb3I6ICMyZjllNDE7IC1meC10ZXh0LWZpbGw6IHdoaXRlOyAtZngtZm9udC13ZWlnaHQ6IGJvbGQ7IiB0ZXh0PSJFbnRyYXIiIC8+CiAgIDwvY2hpbGRyZW4+CjwvVkJveD4K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar login.fxml</span></button>
+
+      <h3>Validação Segura de Dados</h3>
+      <p>Antes do código do Controller, vale nomear as quatro decisões de segurança que ele aplica, porque cada uma resolve um problema real e específico:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Decisão</th><th>Problema que evita</th></tr></thead>
+          <tbody>
+            <tr><td>Campos obrigatórios e formato de e-mail verificados <em>antes</em> de consultar o banco</td><td>Consulta desnecessária ao banco para um formulário claramente incompleto.</td></tr>
+            <tr><td><code>PreparedStatement</code> na <code>UsuarioDAO</code> (Aula 03), nunca concatenação de texto</td><td>SQL Injection: um <code>email</code> como <code>' OR '1'='1</code> não altera o comando executado.</td></tr>
+            <tr><td>Senha conferida com <code>SenhaUtil.verificar()</code> (BCrypt), nunca comparada em texto puro</td><td>Vazamento do banco expor senhas de verdade; ver Seção 02.</td></tr>
+            <tr><td>Mensagem única "E-mail ou senha inválidos", nunca dizendo qual dos dois errou</td><td>Enumeração de usuários: alguém descobrir, por tentativa e erro, quais e-mails têm conta no sistema.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>LoginController.java</h3>
+      <p>Valida os campos, chama <code>UsuarioDAO.autenticar(...)</code> (a mesma da Seção 05) e trata os três desfechos possíveis: login certo, login errado, e falha de conexão com o banco (que não é a mesma coisa que "senha errada", e merece uma mensagem diferente).</p>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/view/LoginController.java</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.view;
+
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.<span class="tok-fn">TenisShop</span>;
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.dao.<span class="tok-fn">UsuarioDAO</span>;
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.<span class="tok-fn">Usuario</span>;
+<span class="tok-kw">import</span> java.io.<span class="tok-fn">IOException</span>;
+<span class="tok-kw">import</span> java.sql.<span class="tok-fn">SQLException</span>;
+<span class="tok-kw">import</span> java.util.regex.<span class="tok-fn">Pattern</span>;
+<span class="tok-kw">import</span> javafx.event.<span class="tok-fn">ActionEvent</span>;
+<span class="tok-kw">import</span> javafx.fxml.<span class="tok-fn">FXML</span>;
+<span class="tok-kw">import</span> javafx.scene.control.<span class="tok-fn">Alert</span>;
+<span class="tok-kw">import</span> javafx.scene.control.Alert.<span class="tok-fn">AlertType</span>;
+<span class="tok-kw">import</span> javafx.scene.control.<span class="tok-fn">PasswordField</span>;
+<span class="tok-kw">import</span> javafx.scene.control.<span class="tok-fn">TextField</span>;
+
+<span class="tok-comment">/**
+ * Controller da tela de login do TenisShop (padrão MVC: esta classe é o
+ * Controller, o login.fxml é a View, e Usuario/UsuarioDAO são o Model).
+ * Além de autenticar, aplica duas regras de validação segura de dados:
+ * nunca revelar se foi o e-mail ou a senha que errou (evita que alguém
+ * descubra, por tentativa e erro, quais e-mails têm conta no sistema), e
+ * nunca comparar a senha em texto puro (isso é feito dentro de
+ * UsuarioDAO.autenticar, usando o hash BCrypt).
+ *
+ * @author Geovane Griesang
+ */</span>
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">LoginController</span> {
+
+    <span class="tok-comment">// Verificação simples de formato &quot;algo@algo.algo&quot;; não confirma que o
+    // domínio existe de verdade. Validar e-mail por completo com regex é
+    // notoriamente difícil, então esta checagem só evita erros óbvios de
+    // digitação antes de gastar uma consulta no banco.</span>
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">Pattern</span> <span class="tok-fn">FORMATO_EMAIL</span> = <span class="tok-fn">Pattern</span>.compile(<span class="tok-str">&quot;^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$&quot;</span>);
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-fn">TextField</span> txtEmail;
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-fn">PasswordField</span> pwdSenha;
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> btnLoginAction(<span class="tok-fn">ActionEvent</span> event) <span class="tok-kw">throws</span> <span class="tok-fn">IOException</span> {
+        <span class="tok-kw">if</span> (!validaForm()) {
+            <span class="tok-kw">return</span>;
+        }
+
+        <span class="tok-fn">String</span> email = txtEmail.getText().trim();
+        <span class="tok-fn">String</span> senhaDigitada = pwdSenha.getText();
+
+        <span class="tok-fn">UsuarioDAO</span> usuarioDAO = <span class="tok-kw">new</span> <span class="tok-fn">UsuarioDAO</span>();
+        <span class="tok-kw">try</span> {
+            <span class="tok-fn">Usuario</span> usuarioAutenticado = usuarioDAO.autenticar(email, senhaDigitada);
+
+            <span class="tok-kw">if</span> (usuarioAutenticado != <span class="tok-kw">null</span>) {
+                <span class="tok-fn">TenisShop</span>.usuarioLogado = usuarioAutenticado;
+                <span class="tok-fn">TenisShop</span>.setRoot(<span class="tok-str">&quot;principal&quot;</span>);
+            } <span class="tok-kw">else</span> {
+                <span class="tok-comment">// Mensagem única de propósito: separar &quot;e-mail não
+                // encontrado&quot; de &quot;senha incorreta&quot; permitiria descobrir,
+                // por tentativa e erro, quais e-mails têm cadastro.</span>
+                showAlert(<span class="tok-str">&quot;E-mail ou senha inválidos.&quot;</span>, <span class="tok-fn">AlertType</span>.ERROR);
+            }
+        } <span class="tok-kw">catch</span> (<span class="tok-fn">SQLException</span> e) {
+            showAlert(<span class="tok-str">&quot;Não foi possível conectar ao banco de dados. Verifique se o MySQL está ativo.&quot;</span>, <span class="tok-fn">AlertType</span>.ERROR);
+        }
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-kw">boolean</span> validaForm() {
+        <span class="tok-kw">if</span> (txtEmail.getText().isBlank()) {
+            showAlert(<span class="tok-str">&quot;Preencha o campo E-mail!&quot;</span>, <span class="tok-fn">AlertType</span>.ERROR);
+            txtEmail.requestFocus();
+            <span class="tok-kw">return</span> <span class="tok-kw">false</span>;
+        }
+
+        <span class="tok-kw">if</span> (!<span class="tok-fn">FORMATO_EMAIL</span>.matcher(txtEmail.getText().trim()).matches()) {
+            showAlert(<span class="tok-str">&quot;Digite um e-mail em um formato válido (ex.: nome@dominio.com).&quot;</span>, <span class="tok-fn">AlertType</span>.ERROR);
+            txtEmail.requestFocus();
+            <span class="tok-kw">return</span> <span class="tok-kw">false</span>;
+        }
+
+        <span class="tok-kw">if</span> (pwdSenha.getText().isBlank()) {
+            showAlert(<span class="tok-str">&quot;Preencha o campo Senha!&quot;</span>, <span class="tok-fn">AlertType</span>.ERROR);
+            pwdSenha.requestFocus();
+            <span class="tok-kw">return</span> <span class="tok-kw">false</span>;
+        }
+
+        <span class="tok-kw">return</span> <span class="tok-kw">true</span>;
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> showAlert(<span class="tok-fn">String</span> message, <span class="tok-fn">AlertType</span> alertType) {
+        <span class="tok-fn">Alert</span> alert = <span class="tok-kw">new</span> <span class="tok-fn">Alert</span>(alertType);
+        alert.setTitle(<span class="tok-str">&quot;Login&quot;</span>);
+        alert.setHeaderText(<span class="tok-kw">null</span>);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+}</code></pre></div>
+      <button type="button" class="download-btn" data-filename="LoginController.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXc7CgppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5UZW5pc1Nob3A7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhby5Vc3VhcmlvREFPOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC5kb21haW4uVXN1YXJpbzsKaW1wb3J0IGphdmEuaW8uSU9FeGNlcHRpb247CmltcG9ydCBqYXZhLnNxbC5TUUxFeGNlcHRpb247CmltcG9ydCBqYXZhLnV0aWwucmVnZXguUGF0dGVybjsKaW1wb3J0IGphdmFmeC5ldmVudC5BY3Rpb25FdmVudDsKaW1wb3J0IGphdmFmeC5meG1sLkZYTUw7CmltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5BbGVydDsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkFsZXJ0LkFsZXJ0VHlwZTsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLlBhc3N3b3JkRmllbGQ7CmltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5UZXh0RmllbGQ7CgovKioKICogQ29udHJvbGxlciBkYSB0ZWxhIGRlIGxvZ2luIGRvIFRlbmlzU2hvcCAocGFkcsOjbyBNVkM6IGVzdGEgY2xhc3NlIMOpIG8KICogQ29udHJvbGxlciwgbyBsb2dpbi5meG1sIMOpIGEgVmlldywgZSBVc3VhcmlvL1VzdWFyaW9EQU8gc8OjbyBvIE1vZGVsKS4KICogQWzDqW0gZGUgYXV0ZW50aWNhciwgYXBsaWNhIGR1YXMgcmVncmFzIGRlIHZhbGlkYcOnw6NvIHNlZ3VyYSBkZSBkYWRvczoKICogbnVuY2EgcmV2ZWxhciBzZSBmb2kgbyBlLW1haWwgb3UgYSBzZW5oYSBxdWUgZXJyb3UgKGV2aXRhIHF1ZSBhbGd1w6ltCiAqIGRlc2N1YnJhLCBwb3IgdGVudGF0aXZhIGUgZXJybywgcXVhaXMgZS1tYWlscyB0w6ptIGNvbnRhIG5vIHNpc3RlbWEpLCBlCiAqIG51bmNhIGNvbXBhcmFyIGEgc2VuaGEgZW0gdGV4dG8gcHVybyAoaXNzbyDDqSBmZWl0byBkZW50cm8gZGUKICogVXN1YXJpb0RBTy5hdXRlbnRpY2FyLCB1c2FuZG8gbyBoYXNoIEJDcnlwdCkuCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGNsYXNzIExvZ2luQ29udHJvbGxlciB7CgogICAgLy8gVmVyaWZpY2HDp8OjbyBzaW1wbGVzIGRlIGZvcm1hdG8gImFsZ29AYWxnby5hbGdvIjsgbsOjbyBjb25maXJtYSBxdWUgbwogICAgLy8gZG9tw61uaW8gZXhpc3RlIGRlIHZlcmRhZGUuIFZhbGlkYXIgZS1tYWlsIHBvciBjb21wbGV0byBjb20gcmVnZXggw6kKICAgIC8vIG5vdG9yaWFtZW50ZSBkaWbDrWNpbCwgZW50w6NvIGVzdGEgY2hlY2FnZW0gc8OzIGV2aXRhIGVycm9zIMOzYnZpb3MgZGUKICAgIC8vIGRpZ2l0YcOnw6NvIGFudGVzIGRlIGdhc3RhciB1bWEgY29uc3VsdGEgbm8gYmFuY28uCiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBQYXR0ZXJuIEZPUk1BVE9fRU1BSUwgPSBQYXR0ZXJuLmNvbXBpbGUoIl5bXlxcc0BdK0BbXlxcc0BdK1xcLlteXFxzQF0rJCIpOwoKICAgIEBGWE1MCiAgICBwcml2YXRlIFRleHRGaWVsZCB0eHRFbWFpbDsKCiAgICBARlhNTAogICAgcHJpdmF0ZSBQYXNzd29yZEZpZWxkIHB3ZFNlbmhhOwoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgYnRuTG9naW5BY3Rpb24oQWN0aW9uRXZlbnQgZXZlbnQpIHRocm93cyBJT0V4Y2VwdGlvbiB7CiAgICAgICAgaWYgKCF2YWxpZGFGb3JtKCkpIHsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KCiAgICAgICAgU3RyaW5nIGVtYWlsID0gdHh0RW1haWwuZ2V0VGV4dCgpLnRyaW0oKTsKICAgICAgICBTdHJpbmcgc2VuaGFEaWdpdGFkYSA9IHB3ZFNlbmhhLmdldFRleHQoKTsKCiAgICAgICAgVXN1YXJpb0RBTyB1c3VhcmlvREFPID0gbmV3IFVzdWFyaW9EQU8oKTsKICAgICAgICB0cnkgewogICAgICAgICAgICBVc3VhcmlvIHVzdWFyaW9BdXRlbnRpY2FkbyA9IHVzdWFyaW9EQU8uYXV0ZW50aWNhcihlbWFpbCwgc2VuaGFEaWdpdGFkYSk7CgogICAgICAgICAgICBpZiAodXN1YXJpb0F1dGVudGljYWRvICE9IG51bGwpIHsKICAgICAgICAgICAgICAgIFRlbmlzU2hvcC51c3VhcmlvTG9nYWRvID0gdXN1YXJpb0F1dGVudGljYWRvOwogICAgICAgICAgICAgICAgVGVuaXNTaG9wLnNldFJvb3QoInByaW5jaXBhbCIpOwogICAgICAgICAgICB9IGVsc2UgewogICAgICAgICAgICAgICAgLy8gTWVuc2FnZW0gw7puaWNhIGRlIHByb3DDs3NpdG86IHNlcGFyYXIgImUtbWFpbCBuw6NvCiAgICAgICAgICAgICAgICAvLyBlbmNvbnRyYWRvIiBkZSAic2VuaGEgaW5jb3JyZXRhIiBwZXJtaXRpcmlhIGRlc2NvYnJpciwKICAgICAgICAgICAgICAgIC8vIHBvciB0ZW50YXRpdmEgZSBlcnJvLCBxdWFpcyBlLW1haWxzIHTDqm0gY2FkYXN0cm8uCiAgICAgICAgICAgICAgICBzaG93QWxlcnQoIkUtbWFpbCBvdSBzZW5oYSBpbnbDoWxpZG9zLiIsIEFsZXJ0VHlwZS5FUlJPUik7CiAgICAgICAgICAgIH0KICAgICAgICB9IGNhdGNoIChTUUxFeGNlcHRpb24gZSkgewogICAgICAgICAgICBzaG93QWxlcnQoIk7Do28gZm9pIHBvc3PDrXZlbCBjb25lY3RhciBhbyBiYW5jbyBkZSBkYWRvcy4gVmVyaWZpcXVlIHNlIG8gTXlTUUwgZXN0w6EgYXRpdm8uIiwgQWxlcnRUeXBlLkVSUk9SKTsKICAgICAgICB9CiAgICB9CgogICAgcHJpdmF0ZSBib29sZWFuIHZhbGlkYUZvcm0oKSB7CiAgICAgICAgaWYgKHR4dEVtYWlsLmdldFRleHQoKS5pc0JsYW5rKCkpIHsKICAgICAgICAgICAgc2hvd0FsZXJ0KCJQcmVlbmNoYSBvIGNhbXBvIEUtbWFpbCEiLCBBbGVydFR5cGUuRVJST1IpOwogICAgICAgICAgICB0eHRFbWFpbC5yZXF1ZXN0Rm9jdXMoKTsKICAgICAgICAgICAgcmV0dXJuIGZhbHNlOwogICAgICAgIH0KCiAgICAgICAgaWYgKCFGT1JNQVRPX0VNQUlMLm1hdGNoZXIodHh0RW1haWwuZ2V0VGV4dCgpLnRyaW0oKSkubWF0Y2hlcygpKSB7CiAgICAgICAgICAgIHNob3dBbGVydCgiRGlnaXRlIHVtIGUtbWFpbCBlbSB1bSBmb3JtYXRvIHbDoWxpZG8gKGV4Ljogbm9tZUBkb21pbmlvLmNvbSkuIiwgQWxlcnRUeXBlLkVSUk9SKTsKICAgICAgICAgICAgdHh0RW1haWwucmVxdWVzdEZvY3VzKCk7CiAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICB9CgogICAgICAgIGlmIChwd2RTZW5oYS5nZXRUZXh0KCkuaXNCbGFuaygpKSB7CiAgICAgICAgICAgIHNob3dBbGVydCgiUHJlZW5jaGEgbyBjYW1wbyBTZW5oYSEiLCBBbGVydFR5cGUuRVJST1IpOwogICAgICAgICAgICBwd2RTZW5oYS5yZXF1ZXN0Rm9jdXMoKTsKICAgICAgICAgICAgcmV0dXJuIGZhbHNlOwogICAgICAgIH0KCiAgICAgICAgcmV0dXJuIHRydWU7CiAgICB9CgogICAgcHJpdmF0ZSB2b2lkIHNob3dBbGVydChTdHJpbmcgbWVzc2FnZSwgQWxlcnRUeXBlIGFsZXJ0VHlwZSkgewogICAgICAgIEFsZXJ0IGFsZXJ0ID0gbmV3IEFsZXJ0KGFsZXJ0VHlwZSk7CiAgICAgICAgYWxlcnQuc2V0VGl0bGUoIkxvZ2luIik7CiAgICAgICAgYWxlcnQuc2V0SGVhZGVyVGV4dChudWxsKTsKICAgICAgICBhbGVydC5zZXRDb250ZW50VGV4dChtZXNzYWdlKTsKICAgICAgICBhbGVydC5zaG93QW5kV2FpdCgpOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar LoginController.java</span></button>
+
+      <h3>Tela Provisória Pós-Login: principal.fxml e PrincipalController.java</h3>
+      <p>Esta tela não é uma tela real do TenisShop, é só a confirmação visual de que o login funcionou: mostra o nome e o perfil de quem entrou, e um botão para sair. As telas de cadastro de verdade chegam a partir de 23/10, conforme o cronograma da Aula 01. Ela também traz o primeiro exemplo concreto de <strong>nível de acesso</strong>: um rótulo "Área administrativa" que só fica visível para quem tem o perfil <code>ADMINISTRADOR</code>.</p>
+      <p class="file-path">Local: <code>src/main/resources/br/edu/ifsul/venancio/tenisshop/view/principal.fxml</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;?<span class="tok-kw">xml</span> version=<span class="tok-str">&quot;1.0&quot;</span> encoding=<span class="tok-str">&quot;UTF-8&quot;</span>?&gt;
+
+&lt;?<span class="tok-kw">import</span> javafx.geometry.Insets?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.control.Button?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.control.Label?&gt;
+&lt;?<span class="tok-kw">import</span> javafx.scene.layout.VBox?&gt;
+
+&lt;<span class="tok-kw">VBox</span> alignment=<span class="tok-str">&quot;CENTER&quot;</span> prefHeight=<span class="tok-str">&quot;360.0&quot;</span> prefWidth=<span class="tok-str">&quot;420.0&quot;</span> spacing=<span class="tok-str">&quot;16.0&quot;</span> xmlns=<span class="tok-str">&quot;http://javafx.com/javafx/21&quot;</span> xmlns:fx=<span class="tok-str">&quot;http://javafx.com/fxml/1&quot;</span> fx:controller=<span class="tok-str">&quot;br.edu.ifsul.venancio.tenisshop.view.PrincipalController&quot;</span>&gt;
+   &lt;<span class="tok-kw">padding</span>&gt;
+      &lt;<span class="tok-kw">Insets</span> bottom=<span class="tok-str">&quot;24.0&quot;</span> left=<span class="tok-str">&quot;24.0&quot;</span> right=<span class="tok-str">&quot;24.0&quot;</span> top=<span class="tok-str">&quot;24.0&quot;</span> /&gt;
+   &lt;/<span class="tok-kw">padding</span>&gt;
+   &lt;<span class="tok-kw">children</span>&gt;
+      &lt;<span class="tok-kw">Label</span> fx:id=<span class="tok-str">&quot;lblBoasVindas&quot;</span> style=<span class="tok-str">&quot;-fx-font-size: 20px; -fx-font-weight: bold;&quot;</span> text=<span class="tok-str">&quot;Bem-vindo!&quot;</span> /&gt;
+      &lt;<span class="tok-kw">Label</span> fx:id=<span class="tok-str">&quot;lblPerfil&quot;</span> text=<span class="tok-str">&quot;Perfil:&quot;</span> /&gt;
+      &lt;<span class="tok-kw">Label</span> fx:id=<span class="tok-str">&quot;lblAreaAdmin&quot;</span> managed=<span class="tok-str">&quot;false&quot;</span> style=<span class="tok-str">&quot;-fx-text-fill: #1f6b2c; -fx-font-weight: bold;&quot;</span> text=<span class="tok-str">&quot;Área administrativa (exemplo de nível de acesso)&quot;</span> visible=<span class="tok-str">&quot;false&quot;</span> /&gt;
+      &lt;<span class="tok-kw">Button</span> onAction=<span class="tok-str">&quot;#sair&quot;</span> text=<span class="tok-str">&quot;Sair&quot;</span> /&gt;
+   &lt;/<span class="tok-kw">children</span>&gt;
+&lt;/<span class="tok-kw">VBox</span>&gt;</code></pre></div>
+      <button type="button" class="download-btn" data-filename="principal.fxml" data-b64="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KCjw/aW1wb3J0IGphdmFmeC5nZW9tZXRyeS5JbnNldHM/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5CdXR0b24/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5MYWJlbD8+Cjw/aW1wb3J0IGphdmFmeC5zY2VuZS5sYXlvdXQuVkJveD8+Cgo8VkJveCBhbGlnbm1lbnQ9IkNFTlRFUiIgcHJlZkhlaWdodD0iMzYwLjAiIHByZWZXaWR0aD0iNDIwLjAiIHNwYWNpbmc9IjE2LjAiIHhtbG5zPSJodHRwOi8vamF2YWZ4LmNvbS9qYXZhZngvMjEiIHhtbG5zOmZ4PSJodHRwOi8vamF2YWZ4LmNvbS9meG1sLzEiIGZ4OmNvbnRyb2xsZXI9ImJyLmVkdS5pZnN1bC52ZW5hbmNpby50ZW5pc3Nob3Audmlldy5QcmluY2lwYWxDb250cm9sbGVyIj4KICAgPHBhZGRpbmc+CiAgICAgIDxJbnNldHMgYm90dG9tPSIyNC4wIiBsZWZ0PSIyNC4wIiByaWdodD0iMjQuMCIgdG9wPSIyNC4wIiAvPgogICA8L3BhZGRpbmc+CiAgIDxjaGlsZHJlbj4KICAgICAgPExhYmVsIGZ4OmlkPSJsYmxCb2FzVmluZGFzIiBzdHlsZT0iLWZ4LWZvbnQtc2l6ZTogMjBweDsgLWZ4LWZvbnQtd2VpZ2h0OiBib2xkOyIgdGV4dD0iQmVtLXZpbmRvISIgLz4KICAgICAgPExhYmVsIGZ4OmlkPSJsYmxQZXJmaWwiIHRleHQ9IlBlcmZpbDoiIC8+CiAgICAgIDxMYWJlbCBmeDppZD0ibGJsQXJlYUFkbWluIiBtYW5hZ2VkPSJmYWxzZSIgc3R5bGU9Ii1meC10ZXh0LWZpbGw6ICMxZjZiMmM7IC1meC1mb250LXdlaWdodDogYm9sZDsiIHRleHQ9IsOBcmVhIGFkbWluaXN0cmF0aXZhIChleGVtcGxvIGRlIG7DrXZlbCBkZSBhY2Vzc28pIiB2aXNpYmxlPSJmYWxzZSIgLz4KICAgICAgPEJ1dHRvbiBvbkFjdGlvbj0iI3NhaXIiIHRleHQ9IlNhaXIiIC8+CiAgIDwvY2hpbGRyZW4+CjwvVkJveD4K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar principal.fxml</span></button>
+
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.view;
+
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.<span class="tok-fn">TenisShop</span>;
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.<span class="tok-fn">Perfil</span>;
+<span class="tok-kw">import</span> java.io.<span class="tok-fn">IOException</span>;
+<span class="tok-kw">import</span> javafx.event.<span class="tok-fn">ActionEvent</span>;
+<span class="tok-kw">import</span> javafx.fxml.<span class="tok-fn">FXML</span>;
+<span class="tok-kw">import</span> javafx.scene.control.<span class="tok-fn">Label</span>;
+
+<span class="tok-comment">/**
+ * Controller da tela inicial exibida após o login no TenisShop.
+ * Tela provisória: as telas reais de cadastro chegam a partir de 23/10/2026,
+ * conforme o cronograma da Aula 01; por enquanto ela confirma que o login
+ * está funcionando e dá o primeiro exemplo real de nível de acesso, um
+ * elemento da tela que só aparece para o perfil ADMINISTRADOR.
+ *
+ * @author Geovane Griesang
+ */</span>
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">PrincipalController</span> {
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-fn">Label</span> lblBoasVindas;
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-fn">Label</span> lblPerfil;
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-fn">Label</span> lblAreaAdmin;
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> initialize() {
+        <span class="tok-kw">if</span> (<span class="tok-fn">TenisShop</span>.usuarioLogado != <span class="tok-kw">null</span>) {
+            lblBoasVindas.setText(<span class="tok-str">&quot;Bem-vindo, &quot;</span> + <span class="tok-fn">TenisShop</span>.usuarioLogado.getNome() + <span class="tok-str">&quot;!&quot;</span>);
+            lblPerfil.setText(<span class="tok-str">&quot;Perfil: &quot;</span> + <span class="tok-fn">TenisShop</span>.usuarioLogado.getPerfil());
+
+            <span class="tok-comment">// Nível de acesso em ação: o Enum decide o que aparece na tela.
+            // As telas reais (Controllers futuros) repetem essa mesma ideia
+            // para esconder botões e menus inteiros por perfil.</span>
+            <span class="tok-kw">boolean</span> ehAdministrador = <span class="tok-fn">TenisShop</span>.usuarioLogado.getPerfil() == <span class="tok-fn">Perfil</span>.ADMINISTRADOR;
+            lblAreaAdmin.setVisible(ehAdministrador);
+            lblAreaAdmin.setManaged(ehAdministrador);
+        }
+    }
+
+    <span class="tok-flag">@FXML</span>
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> sair(<span class="tok-fn">ActionEvent</span> event) <span class="tok-kw">throws</span> <span class="tok-fn">IOException</span> {
+        <span class="tok-fn">TenisShop</span>.usuarioLogado = <span class="tok-kw">null</span>;
+        <span class="tok-fn">TenisShop</span>.setRoot(<span class="tok-str">&quot;login&quot;</span>);
+    }
+}</code></pre></div>
+      <button type="button" class="download-btn" data-filename="PrincipalController.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXc7CgppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5UZW5pc1Nob3A7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5QZXJmaWw7CmltcG9ydCBqYXZhLmlvLklPRXhjZXB0aW9uOwppbXBvcnQgamF2YWZ4LmV2ZW50LkFjdGlvbkV2ZW50OwppbXBvcnQgamF2YWZ4LmZ4bWwuRlhNTDsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkxhYmVsOwoKLyoqCiAqIENvbnRyb2xsZXIgZGEgdGVsYSBpbmljaWFsIGV4aWJpZGEgYXDDs3MgbyBsb2dpbiBubyBUZW5pc1Nob3AuCiAqIFRlbGEgcHJvdmlzw7NyaWE6IGFzIHRlbGFzIHJlYWlzIGRlIGNhZGFzdHJvIGNoZWdhbSBhIHBhcnRpciBkZSAyMy8xMC8yMDI2LAogKiBjb25mb3JtZSBvIGNyb25vZ3JhbWEgZGEgQXVsYSAwMTsgcG9yIGVucXVhbnRvIGVsYSBjb25maXJtYSBxdWUgbyBsb2dpbgogKiBlc3TDoSBmdW5jaW9uYW5kbyBlIGTDoSBvIHByaW1laXJvIGV4ZW1wbG8gcmVhbCBkZSBuw612ZWwgZGUgYWNlc3NvLCB1bQogKiBlbGVtZW50byBkYSB0ZWxhIHF1ZSBzw7MgYXBhcmVjZSBwYXJhIG8gcGVyZmlsIEFETUlOSVNUUkFET1IuCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGNsYXNzIFByaW5jaXBhbENvbnRyb2xsZXIgewoKICAgIEBGWE1MCiAgICBwcml2YXRlIExhYmVsIGxibEJvYXNWaW5kYXM7CgogICAgQEZYTUwKICAgIHByaXZhdGUgTGFiZWwgbGJsUGVyZmlsOwoKICAgIEBGWE1MCiAgICBwcml2YXRlIExhYmVsIGxibEFyZWFBZG1pbjsKCiAgICBARlhNTAogICAgcHJpdmF0ZSB2b2lkIGluaXRpYWxpemUoKSB7CiAgICAgICAgaWYgKFRlbmlzU2hvcC51c3VhcmlvTG9nYWRvICE9IG51bGwpIHsKICAgICAgICAgICAgbGJsQm9hc1ZpbmRhcy5zZXRUZXh0KCJCZW0tdmluZG8sICIgKyBUZW5pc1Nob3AudXN1YXJpb0xvZ2Fkby5nZXROb21lKCkgKyAiISIpOwogICAgICAgICAgICBsYmxQZXJmaWwuc2V0VGV4dCgiUGVyZmlsOiAiICsgVGVuaXNTaG9wLnVzdWFyaW9Mb2dhZG8uZ2V0UGVyZmlsKCkpOwoKICAgICAgICAgICAgLy8gTsOtdmVsIGRlIGFjZXNzbyBlbSBhw6fDo286IG8gRW51bSBkZWNpZGUgbyBxdWUgYXBhcmVjZSBuYSB0ZWxhLgogICAgICAgICAgICAvLyBBcyB0ZWxhcyByZWFpcyAoQ29udHJvbGxlcnMgZnV0dXJvcykgcmVwZXRlbSBlc3NhIG1lc21hIGlkZWlhCiAgICAgICAgICAgIC8vIHBhcmEgZXNjb25kZXIgYm90w7VlcyBlIG1lbnVzIGludGVpcm9zIHBvciBwZXJmaWwuCiAgICAgICAgICAgIGJvb2xlYW4gZWhBZG1pbmlzdHJhZG9yID0gVGVuaXNTaG9wLnVzdWFyaW9Mb2dhZG8uZ2V0UGVyZmlsKCkgPT0gUGVyZmlsLkFETUlOSVNUUkFET1I7CiAgICAgICAgICAgIGxibEFyZWFBZG1pbi5zZXRWaXNpYmxlKGVoQWRtaW5pc3RyYWRvcik7CiAgICAgICAgICAgIGxibEFyZWFBZG1pbi5zZXRNYW5hZ2VkKGVoQWRtaW5pc3RyYWRvcik7CiAgICAgICAgfQogICAgfQoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgc2FpcihBY3Rpb25FdmVudCBldmVudCkgdGhyb3dzIElPRXhjZXB0aW9uIHsKICAgICAgICBUZW5pc1Nob3AudXN1YXJpb0xvZ2FkbyA9IG51bGw7CiAgICAgICAgVGVuaXNTaG9wLnNldFJvb3QoImxvZ2luIik7CiAgICB9Cn0K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar PrincipalController.java</span></button>
+
+      <h3>Estrutura Final de Pastas</h3>
+      <div class="code-block"><div class="code-head"><span class="code-lang">plaintext</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">src/main/java/br.edu.ifsul.venancio.tenisshop/</span>
+<span class="tree-guide">├── </span><span class="tok-fn">TenisShop.java</span>
+<span class="tree-guide">├── </span><span class="tok-kw">model/</span>
+<span class="tree-guide">│   ├── </span><span class="tok-kw">domain/</span> <span class="tok-comment">(Usuario, Categoria, Perfil)</span>
+<span class="tree-guide">│   ├── </span><span class="tok-kw">dao/</span> <span class="tok-comment">(ConexaoBanco, UsuarioDAO)</span>
+<span class="tree-guide">│   └── </span><span class="tok-kw">util/</span> <span class="tok-comment">(SenhaUtil)</span>
+<span class="tree-guide">└── </span><span class="tok-kw">view/</span>
+<span class="tree-guide">    ├── </span><span class="tok-fn">LoginController.java</span>
+<span class="tree-guide">    └── </span><span class="tok-fn">PrincipalController.java</span>
+
+<span class="tok-kw">src/main/resources/br.edu.ifsul.venancio.tenisshop/</span>
+<span class="tree-guide">└── </span><span class="tok-kw">view/</span>
+<span class="tree-guide">    ├── </span><span class="tok-fn">login.fxml</span>
+<span class="tree-guide">    └── </span><span class="tok-fn">principal.fxml</span></code></pre></div>
+
+      <h3>Testando a Tela de Login</h3>
+      <ol class="plain">
+        <li>Confirme que o MySQL está ativo e que a tabela <code>usuarios</code> tem a senha do usuário semente já em hash BCrypt (Seção 05).</li>
+        <li>No NetBeans, com o <code>nbactions.xml</code> recarregado (Seção 06), clique em <strong>Run Project</strong>; ou, pelo terminal, rode <code>mvn javafx:run</code> na pasta do projeto.</li>
+        <li>Teste um e-mail em formato inválido (ex.: <code>teste</code>, sem <code>@</code>): deve aparecer o alerta de formato, sem consultar o banco.</li>
+        <li>Teste um login errado (e-mail correto com senha errada, ou e-mail que não existe): deve aparecer sempre o mesmo alerta "E-mail ou senha inválidos.", sem entrar e sem dizer qual dos dois campos errou.</li>
+        <li>Teste o login do usuário semente (perfil ADMINISTRADOR) com a senha correta: deve abrir a tela provisória com "Bem-vindo", o perfil, e o rótulo "Área administrativa" visível.</li>
+        <li>Se quiser confirmar o nível de acesso na prática: cadastre outro usuário semente com perfil <code>OPERADOR</code> (INSERT direto no banco, com um hash gerado pela <code>SenhaUtil</code>) e entre com ele; o rótulo "Área administrativa" não deve aparecer.</li>
+        <li>Clique em <strong>Sair</strong> e confirme que volta para a tela de login.</li>
+      </ol>
+      <div class="callout"><strong>Credenciais do usuário semente:</strong> e-mail <code>geovanegriesang@ifsul.edu.br</code>, senha <code>admin123</code> (a senha em texto puro; o que está salvo no banco é o hash BCrypt gerado na Seção 05).</div>
+    </section>
+
+    <section id="s8">
+      <h2><span class="num">08</span>Atividade Prática dos Grupos de Extensão</h2>
       <p>Aplique as mesmas duas técnicas na entidade central do projeto do grupo. Mesmo que o domínio não tenha "perfil de usuário" no sentido literal, a técnica do Enum serve para qualquer atributo de categorias fixas (status, tipo, situação); a técnica de hash só se aplica de fato se o projeto do grupo tiver login.</p>
 
       <h3>Passo a Passo Obrigatório no Laboratório</h3>
@@ -1208,6 +1617,8 @@
         <li>Preencha a tabela de níveis de acesso da Seção 04 para o projeto do grupo, mesmo que a implementação do controle de acesso só chegue mais adiante.</li>
         <li>Faça merge da branch para a <code>main</code> e envie (<code>push</code>) ao GitHub.</li>
       </ol>
+
+      <div class="callout"><strong>Opcional, se sobrar tempo:</strong> monte a mesma estrutura de tela de login (Application + FXML + Controller) da Seção 07 no projeto do grupo. Não é obrigatório hoje; se não der tempo, ela também se encaixa naturalmente quando as telas reais do grupo começarem a ser construídas, a partir de 23/10 no cronograma da Aula 01.</div>
 
       <div class="callout-warn">
         <strong>Regras de ouro do laboratório (seguem valendo)</strong>
@@ -1219,26 +1630,30 @@
       </div>
     </section>
 
-    <section id="s7">
-      <h2><span class="num">07</span>Checklist e Critérios para Avaliação Processual</h2>
-      <p>Estes itens compõem a avaliação processual contínua (30% da nota final) referente à Aula 04. Verifique antes do término da aula:</p>
+    <section id="s9">
+      <h2><span class="num">09</span>Checklist e Critérios para Avaliação Processual</h2>
+      <p>Estes itens compõem a avaliação processual contínua (30% da nota final) referente à Aula 04, que cobre os dois itens do cronograma citados na Seção 01. Verifique antes do término da aula:</p>
       <ul class="checklist">
         <li>Enum criado para pelo menos um atributo de categorias fixas da entidade central do projeto do grupo.</li>
-        <li>Se aplicável ao projeto do grupo: senha armazenada como hash, nunca em texto puro.</li>
+        <li>Se aplicável ao projeto do grupo: senha armazenada como hash (BCrypt), nunca em texto puro.</li>
         <li>Tabela de níveis de acesso por perfil registrada no repositório.</li>
         <li>Branch mesclada para a <code>main</code> sem marcadores de conflito esquecidos no código.</li>
         <li>Repositório sincronizado (<code>git push</code>) com sucesso na branch <code>main</code>.</li>
+        <li>Tela de login do TenisShop testada e funcionando (Seção 07 "Testando"): e-mail em formato inválido é barrado, login errado mostra sempre a mesma mensagem, login certo entra, usuário inativo não entra.</li>
+        <li>Consegue explicar, com as próprias palavras, os papéis de Model, View e Controller na tela de login.</li>
         <li>Credenciais temporárias e Personal Access Token limpos nos terminais do laboratório.</li>
       </ul>
     </section>
 
-    <section id="s8">
-      <h2><span class="num">08</span>Referências e Materiais Complementares</h2>
+    <section id="s10">
+      <h2><span class="num">10</span>Referências e Materiais Complementares</h2>
       <ul class="refs">
         <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
         <li><span class="ref-kind">Livro</span>RANGEL, Pablo; CARVALHO JUNIOR, José Gomes de. <strong>Sistemas Orientados a Objetos: teoria e prática com UML e Java</strong>. Rio de Janeiro: Brasport, 2021.</li>
         <li><span class="ref-kind">Livro</span>NOGUEIRA, Marcelo. <strong>Engenharia de Software: métodos orientados a objetos e ágeis</strong>. Joinville, SC: Clube de Autores, 2018.</li>
         <li><span class="ref-kind">Documentação</span>Documentação Oficial do Git. Disponível em: <a href="https://git-scm.com/doc" target="_blank" rel="noreferrer">git-scm.com/doc</a>.</li>
+        <li><span class="ref-kind">Documentação</span>Documentação Oficial do JavaFX. Disponível em: <a href="https://openjfx.io" target="_blank" rel="noreferrer">openjfx.io</a>.</li>
+        <li><span class="ref-kind">Biblioteca</span>jBCrypt. Disponível em: <a href="https://github.com/jeremyh/jBCrypt" target="_blank" rel="noreferrer">github.com/jeremyh/jBCrypt</a>.</li>
       </ul>
     </section>
   </div>

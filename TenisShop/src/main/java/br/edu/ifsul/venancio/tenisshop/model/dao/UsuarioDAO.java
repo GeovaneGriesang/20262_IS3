@@ -61,21 +61,21 @@ public class UsuarioDAO {
     }
 
     /**
-     * Autentica um usuário comparando o hash da senha digitada com o hash
-     * armazenado no banco; a senha em si nunca é comparada diretamente.
+     * Autentica um usuário conferindo a senha digitada contra o hash BCrypt
+     * armazenado no banco; a senha em si nunca é comparada diretamente, e
+     * usuários inativos não conseguem autenticar mesmo com a senha correta.
      * @param email e-mail digitado no login
      * @param senhaDigitada senha em texto puro digitada no login
-     * @return Usuario autenticado, ou null se e-mail ou senha não conferirem
+     * @return Usuario autenticado, ou null se e-mail, senha ou status não conferirem
      * @throws SQLException caso ocorra falha na consulta
      */
     public Usuario autenticar(String email, String senhaDigitada) throws SQLException {
         Usuario usuario = buscarPorEmail(email);
-        if (usuario == null) {
+        if (usuario == null || !Boolean.TRUE.equals(usuario.getAtivo())) {
             return null;
         }
 
-        String hashDigitado = SenhaUtil.gerarHash(senhaDigitada);
-        if (hashDigitado.equals(usuario.getSenha())) {
+        if (SenhaUtil.verificar(senhaDigitada, usuario.getSenha())) {
             return usuario;
         }
         return null;
