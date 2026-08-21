@@ -1,4 +1,4 @@
-<title>Informática e Sociedade III: Registro de Aulas</title>
+<title>Aula 07: Informática e Sociedade III</title>
 <style>
   :root {
     --bg: #fafafa;
@@ -732,36 +732,20 @@
     nav.toc ol { columns: 1; }
     .wrap, .wrap-header, .wrap-wide { padding: 0 16px; }
   }
-
-  .lesson-grid { margin-top: 22px; }
-  .lesson-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    text-decoration: none;
-    color: var(--text);
-    transition: border-color 0.15s ease, transform 0.15s ease;
-  }
-  .lesson-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .lesson-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .lesson-card .eyebrow { margin: 0; }
-  .lesson-card h4 { margin: 2px 0 0; font-size: 1rem; font-weight: 700; line-height: 1.35; text-wrap: balance; }
-  .lesson-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
-  .lesson-note { font-size: 0.82rem; color: var(--text-faint); margin: 18px 0 0; }
 </style>
 
 <header class="site">
   <div class="wrap-header topbar">
     <div class="topbar-left">
-      <span class="topbar-text" style="border-left:none;padding-left:0;">IFSul · Câmpus Venâncio Aires · Tecnólogo em Análise e Desenvolvimento de Sistemas</span>
+      <a class="back-link" href="../index.html">← Índice</a>
+      <span class="topbar-text">IFSul · Câmpus Venâncio Aires · Tecnólogo em Análise e Desenvolvimento de Sistemas</span>
     </div>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema">
       <span id="themeIcon">🌙</span><span id="themeLabel">Escuro</span>
     </button>
   </div>
   <div class="wrap-header mainbar">
-    <a class="brand" href="https://github.com/GeovaneGriesang/20262_IS3" target="_blank" rel="noreferrer">
+    <a class="brand" href="../index.html">
       <svg width="30" height="40.6" viewBox="0 0 61.2 82.8" aria-hidden="true">
         <rect x="21.6" y="0" width="18" height="18" rx="1.8" fill="#2f9e41"></rect>
         <rect x="43.2" y="0" width="18" height="18" rx="1.8" fill="#2f9e41"></rect>
@@ -776,16 +760,16 @@
       </svg>
       <span class="brand-name">Informática e Sociedade III</span>
     </a>
-    <span class="doc-badge">Índice</span>
+    <span class="doc-badge">Aula 07</span>
   </div>
 </header>
 
 <main>
   <div class="wrap">
     <div class="cover">
-      <span class="eyebrow">2026/2 · Câmpus Venâncio Aires</span>
-      <h1 class="title">Informática e Sociedade III: Registro de Aulas</h1>
-      <p class="subtitle">Acompanhamento das aulas da disciplina: plano de ensino, cronograma e as atividades práticas desenvolvidas em cada encontro.</p>
+      <span class="eyebrow">Aula 07 · 08 a 11/09/2026</span>
+      <h1 class="title">Semana da MOVACI: Apresentação Pública dos Projetos</h1>
+      <p class="subtitle">Guia da Aula 07: a semana da Mostra Venâncio-airense de Cultura e Inovação (MOVACI). Terça e sexta são dias remotos (preparação e retorno); quarta e quinta são os dois dias de apresentação pública dos projetos, avaliativos, valendo 20% da nota final.</p>
       <dl class="meta">
         <div><dt>Curso</dt><dd>Tecnólogo em Análise e Desenvolvimento de Sistemas</dd></div>
         <div><dt>Disciplina</dt><dd>Informática e Sociedade III</dd></div>
@@ -795,65 +779,102 @@
       </dl>
     </div>
 
-    <section id="lista-aulas">
-      <h2>Aulas</h2>
-      <div class="card-grid lesson-grid">
-        <a class="card lesson-card" href="aulas/aula-01.html">
-          <span class="eyebrow">Aula 01 · 31/07/2026</span>
-          <h4>Apresentação da Disciplina, Plano de Ensino e Combinados de Extensão</h4>
-          <p>Ementa, objetivos, grupos de extensão e cronograma do semestre.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-02.html">
-          <span class="eyebrow">Aula 02 · 07/08/2026</span>
-          <h4>Prática com Git, GitHub e Configuração do Ambiente (NetBeans 28, JavaFX, MySQL)</h4>
-          <p>Fluxo de Git/GitHub e criação do projeto de referência TenisShop.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-03.html">
-          <span class="eyebrow">Aula 03 · 14/08/2026</span>
-          <h4>Branches no Git e Início da Camada de Dados do TenisShop</h4>
-          <p>Trabalho com branches e merge, levantamento de requisitos com a entidade parceira e a primeira DAO do TenisShop.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-04.html">
-          <span class="eyebrow">Aula 04 · 21/08/2026</span>
-          <h4>Perfis com Enum e Senhas com Hash no TenisShop</h4>
-          <p>Perfis de acesso tipados com Enum, hash de senha com BCrypt, tela de login e módulo completo de autenticação (troca de senha, autocadastro, recuperação por e-mail).</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-05.html">
-          <span class="eyebrow">Aula 05 · 28/08/2026</span>
-          <h4>Semana de Trabalho Remoto: Evolução dos Projetos</h4>
-          <p>Sem aula presencial (professor acompanha os JIFs em Pelotas): cada grupo avança de forma assíncrona no próprio projeto.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-06.html">
-          <span class="eyebrow">Aula 06 · 04/09/2026</span>
-          <h4>Concorrência Otimista e Auditoria no TenisShop</h4>
-          <p>Coluna de versão para evitar sobrescritas concorrentes, tela de listar/editar usuários e uma trilha de auditoria completa das ações do sistema.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-07.html">
-          <span class="eyebrow">Aula 07 · 08 a 11/09/2026</span>
-          <h4>Semana da MOVACI: Apresentação Pública dos Projetos</h4>
-          <p>Dois dias remotos (terça e sexta) em volta dos dois dias de apresentação pública dos projetos na MOVACI (quarta e quinta), avaliativa em 20% da nota final.</p>
-        </a>
-      </div>
-      <p class="lesson-note">As próximas aulas serão adicionadas aqui conforme o cronograma do semestre.</p>
+    <div class="callout-warn"><strong>Semana avaliativa e fora do laboratório:</strong> não há aula tradicional no laboratório de informática. Terça (08/09) e sexta (11/09) são dias remotos; quarta (09/09) e quinta (10/09) são os dias de apresentação pública na MOVACI, no local definido pela instituição para o evento — confira local e horário exatos com o professor pelo Moodle, já que variam conforme a organização do evento.</div>
+
+    <div class="callout"><strong>Antes de começar:</strong> confira o <a href="aula-06.html#s12">checklist da Aula 06</a> e, de forma geral, o estado atual do projeto do grupo no GitHub. A aula de hoje não introduz conceito técnico novo: é a apresentação pública do que já foi construído até aqui.</div>
+
+    <nav class="toc" aria-label="Índice">
+      <h2>Índice</h2>
+      <ol>
+        <li><a href="#s1"><span class="n">01</span>Visão Geral desta Semana</a></li>
+        <li><a href="#s2"><span class="n">02</span>Terça-feira (08/09): Preparação Remota</a></li>
+        <li><a href="#s3"><span class="n">03</span>Quarta e Quinta (09 e 10/09): A Apresentação na MOVACI</a></li>
+        <li><a href="#s4"><span class="n">04</span>Convidando a Entidade Parceira, Familiares e Amigos</a></li>
+        <li><a href="#s5"><span class="n">05</span>Sexta-feira (11/09): Retorno e Reflexão Remota</a></li>
+        <li><a href="#s6"><span class="n">06</span>Checklist e Critérios de Avaliação (20%)</a></li>
+        <li><a href="#s7"><span class="n">07</span>Referências e Materiais Complementares</a></li>
+      </ol>
+    </nav>
+
+    <section id="s1">
+      <h2><span class="num">01</span>Visão Geral desta Semana</h2>
+      <p class="lead">Esta é a semana da MOVACI — Mostra Venâncio-airense de Cultura e Inovação —, o evento público em que a turma apresenta os projetos de extensão desenvolvidos ao longo do semestre. É a primeira grande entrega do curso desde o início do semestre, e vale <strong>20% da nota final</strong>.</p>
+      <p>A semana tem uma estrutura diferente do restante do calendário: dois dias remotos (terça e sexta) em volta de dois dias presenciais avaliativos (quarta e quinta), em vez do encontro único de sexta-feira ao qual a turma está acostumada.</p>
+      <h3>O que Cada Grupo Deve Apresentar</h3>
+      <ul>
+        <li><strong>O projeto de software</strong>: qual problema da entidade parceira ele resolve, e como.</li>
+        <li><strong>O progresso já desenvolvido</strong>: o que já está funcionando de verdade no sistema até esta semana — não é preciso (nem esperado) um sistema pronto, mas sim mostrar o que foi construído com honestidade sobre o que ainda falta.</li>
+        <li><strong>Um convite</strong>: à entidade parceira, para participar e ver o andamento do projeto que ela ajudou a definir; e à família e amigos de cada estudante, já que a MOVACI é um evento aberto à comunidade (ver Seção 04).</li>
+      </ul>
+      <div class="callout">Local, horário e formato exatos da MOVACI são definidos pela organização institucional do evento, não por esta disciplina — confirme os detalhes práticos (onde montar, que horas chegar, o que é fornecido pela instituição) com o professor pelo Moodle antes de quarta-feira.</div>
     </section>
 
-    <section id="projetos">
-      <h2>Projetos dos Grupos de Extensão</h2>
-      <p>Cada grupo de extensão trabalha diretamente na solução de uma entidade parceira. O professor mantém um <a href="https://docs.google.com/spreadsheets/d/1ZVwaor7WajiBjiVqEbYyo9GOGTYRomAc/edit?usp=sharing&amp;ouid=108313237397001891529&amp;rtpof=true&amp;sd=true" target="_blank" rel="noreferrer">painel geral de acompanhamento</a> com o progresso de todos os grupos. Cada grupo também tem sua própria planilha, acessível clicando no tema do projeto na tabela abaixo.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Grupo</th><th>Entidade Parceira</th><th>Tema do Projeto</th><th>Integrantes</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><strong>Grupo 01</strong></td><td>Escola Monte das Tabocas</td><td><a href="https://docs.google.com/spreadsheets/d/13Qjz9kxcIabn4WLDAkRdxMDTqmgKrpO3O6j89VpTDG0/edit?usp=sharing" target="_blank" rel="noreferrer">Controle e Registro de Acesso</a></td><td>Gabriel Becker, Teillor Kloh, Iago da Silva, Leonardo Harres</td></tr>
-            <tr><td><strong>Grupo 02</strong></td><td>Prefeitura Municipal de Venâncio Aires</td><td><a href="https://docs.google.com/spreadsheets/d/1B_t2i0Ra5wXEX6swglVz76ZDY4gly4n0tiRaSjSJL-Y/edit?usp=sharing" target="_blank" rel="noreferrer">Gestão de Riscos LGPD (Prefeitura Segura)</a></td><td>Carlos Ripplinger, Gabrielly Caetano, João Beckenkamp, Pedro Landim</td></tr>
-            <tr><td><strong>Grupo 03</strong></td><td>CTG Chaleira Preta</td><td><a href="https://docs.google.com/spreadsheets/d/1NgiHjV1kv48GgZe2IJaiGTUYPHknkLqDyov2KlzUR6g/edit?usp=sharing" target="_blank" rel="noreferrer">GESTCHÊ – Gestão Financeira e de Sócios</a></td><td>Leonardo Schuler</td></tr>
-            <tr><td><strong>Grupo 04</strong></td><td>Sec. de Educação de Venâncio Aires</td><td><a href="https://docs.google.com/spreadsheets/d/1cqtreMQWl05YffHlp6MhJ3LMheRV_f_V_ZDg09sIVoA/edit?usp=sharing" target="_blank" rel="noreferrer">Ordens de Serviço das Escolas</a></td><td>Érick Henrique, Gabriel Reginatto, Sandro Sehnem, Raul Alves, Marlos do Amaral</td></tr>
-            <tr><td><strong>Grupo 05</strong></td><td>Prefeitura Municipal de Venâncio Aires</td><td><a href="https://docs.google.com/spreadsheets/d/1CbJX0RBnuijJv3hwRMIiBduDIDKtbXhTiRVvF7l7MYo/edit?usp=sharing" target="_blank" rel="noreferrer">Gestão Documental (Acervo VA)</a></td><td>Maqueli Rasquinha, Luciano Ferreira, Rodrigo da Silva, Fernanda de Queiroz</td></tr>
-          </tbody>
-        </table>
+    <section id="s2">
+      <h2><span class="num">02</span>Terça-feira (08/09): Preparação Remota</h2>
+      <p>Último dia útil antes da apresentação — o momento de garantir que tudo funciona e que todo mundo sabe o que vai fazer, sem depender de resolver problemas de última hora na quarta de manhã.</p>
+      <h3>Checklist de Preparação</h3>
+      <ol class="plain">
+        <li>Clone o repositório do grupo do zero (numa pasta separada, ou peça para outro integrante testar) e confirme que o projeto compila e roda sem passos manuais esquecidos — é exatamente para isso que o <code>SchemaInitializer</code> e os scripts <code>sql/V*.sql</code> existem desde a Aula 04.</li>
+        <li>Combinem entre o grupo quem apresenta cada parte: quem explica o problema da entidade, quem faz a demonstração ao vivo do sistema, quem responde perguntas técnicas.</li>
+        <li>Preparem uma explicação curta (1 a 2 minutos) do problema da entidade parceira e de como o software ajuda a resolvê-lo — quem visita a MOVACI não conhece o contexto do projeto, então essa introdução curta é o que dá sentido ao resto da apresentação.</li>
+        <li>Revisem o que vão mostrar ao vivo: qual fluxo do sistema demonstrar, com quais dados de exemplo, para não improvisar na hora.</li>
+        <li>Confirmem que o convite à entidade parceira já foi enviado (ver Seção 04) — se ainda não foi, esta é a última chance antes do evento.</li>
+      </ol>
+      <div class="callout-warn">Se o projeto do grupo depende de um banco de dados MySQL local, testem a apresentação no <strong>mesmo computador ou notebook</strong> que será usado na MOVACI, não só no computador de casa — imprevistos de ambiente (senha do MySQL diferente, JDK não instalado) são mais fáceis de resolver na terça do que na quarta de manhã.</div>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">03</span>Quarta e Quinta (09 e 10/09): A Apresentação na MOVACI</h2>
+      <p>Os dois dias de apresentação pública. A presença e a participação da equipe nos dois dias fazem parte da avaliação — não é uma apresentação única repetida, e sim dois dias de mostra aberta à comunidade, com públicos e horários de visita diferentes em cada um.</p>
+      <h3>O que Esperar</h3>
+      <div class="card-grid">
+        <div class="card"><h4><span class="dot"></span>Apresentação do Projeto</h4><p>Explicar a entidade parceira, o problema atendido e a solução proposta para quem passar pelo espaço do grupo — visitantes, outros professores, avaliadores.</p></div>
+        <div class="card"><h4><span class="dot"></span>Demonstração ao Vivo</h4><p>Mostrar o sistema rodando de verdade, com o progresso de desenvolvimento alcançado até esta semana — as telas e funcionalidades já construídas ao longo do semestre.</p></div>
+        <div class="card"><h4><span class="dot"></span>Conversa com a Entidade</h4><p>Se a entidade parceira comparecer, é a oportunidade de ouvir a reação dela ao que já foi construído e alinhar expectativas para o restante do semestre.</p></div>
       </div>
+      <p>Vale a pena rever, antes de cada apresentação individual, o checklist da Seção 02 — principalmente a parte de testar o sistema no computador que será usado no evento.</p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">04</span>Convidando a Entidade Parceira, Familiares e Amigos</h2>
+      <h3>Entidade Parceira</h3>
+      <p>A entidade é a razão de existir do projeto — quem melhor para avaliar se o software está no caminho certo do que quem vive o problema todos os dias? Convide com antecedência (idealmente antes da terça-feira), explicando com clareza: o que é a MOVACI, em que dias e que tipo de participação é esperada (só visitar, ou também conversar com a equipe sobre o andamento).</p>
+      <h3>Família e Amigos</h3>
+      <p>A MOVACI é um evento aberto à comunidade — cada estudante pode (e é incentivado a) convidar família e amigos para conhecer o que está sendo desenvolvido ao longo do curso. Além do valor pessoal de mostrar o próprio trabalho, mais público significa mais gente vendo — e potencialmente usando — o resultado do trabalho de extensão da turma.</p>
+      <div class="callout">Um convite funciona melhor quando explica o contexto: para quem nunca ouviu falar da disciplina, vale explicar em uma frase o que é a MOVACI e por que aquele projeto específico existe (qual entidade ele atende e qual problema resolve).</div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">05</span>Sexta-feira (11/09): Retorno e Reflexão Remota</h2>
+      <p>Depois de dois dias de apresentação, vale registrar o que aconteceu enquanto ainda está fresco, em vez de deixar para depois.</p>
+      <ol class="plain">
+        <li>Registrem, em texto, o feedback recebido — da entidade parceira, de visitantes, de avaliadores — mesmo que seja só uma lista de observações soltas no <code>README.md</code> ou em <code>docs/</code> do repositório do grupo.</li>
+        <li>Se tiraram fotos ou capturas de tela da apresentação, organizem e guardem — são material útil para a apresentação final do semestre (27/11, ver a legenda de avaliação da Seção 06 desta aula).</li>
+        <li>A partir do feedback recebido, ajustem (se for o caso) a lista de prioridades do que falta desenvolver, e registrem isso também.</li>
+        <li>Façam commit e push de qualquer atualização de documentação decorrente da MOVACI.</li>
+      </ol>
+    </section>
+
+    <section id="s6">
+      <h2><span class="num">06</span>Checklist e Critérios de Avaliação (20%)</h2>
+      <p>Estes itens compõem a avaliação da MOVACI (20% da nota final, distinta da avaliação processual contínua de 30% já em andamento desde a Aula 01):</p>
+      <ul class="checklist">
+        <li>Presença e participação ativa da equipe nos dois dias de apresentação (09 e 10/09).</li>
+        <li>Apresentação clara do projeto: qual problema da entidade parceira ele resolve e como.</li>
+        <li>Demonstração do progresso de desenvolvimento já alcançado — o sistema rodando, não só slides ou descrição verbal.</li>
+        <li>Entidade parceira convidada formalmente, com antecedência.</li>
+        <li>Retorno remoto de sexta-feira registrado no repositório do grupo (feedback recebido e próximos passos).</li>
+      </ul>
+    </section>
+
+    <section id="s7">
+      <h2><span class="num">07</span>Referências e Materiais Complementares</h2>
+      <ul class="refs">
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-01.html">Aula 01</a> — plano de ensino, cronograma completo e mapeamento das entidades parceiras.</li>
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-05.html">Aula 05</a> — semana de trabalho remoto anterior, mesmo formato de dias sem encontro presencial.</li>
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-06.html">Aula 06</a> — último conteúdo técnico entregue antes desta semana.</li>
+        <li><span class="ref-kind">Canal oficial</span>Moodle da disciplina, para os detalhes práticos do evento (local, horário, o que é fornecido pela instituição). Disponível em: <a href="https://apnp.ifsul.edu.br/course/view.php?id=40249" target="_blank" rel="noreferrer">apnp.ifsul.edu.br/course/view.php?id=40249</a>.</li>
+      </ul>
     </section>
   </div>
 </main>

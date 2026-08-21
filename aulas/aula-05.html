@@ -1,4 +1,4 @@
-<title>Informática e Sociedade III: Registro de Aulas</title>
+<title>Aula 05: Informática e Sociedade III</title>
 <style>
   :root {
     --bg: #fafafa;
@@ -732,36 +732,20 @@
     nav.toc ol { columns: 1; }
     .wrap, .wrap-header, .wrap-wide { padding: 0 16px; }
   }
-
-  .lesson-grid { margin-top: 22px; }
-  .lesson-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    text-decoration: none;
-    color: var(--text);
-    transition: border-color 0.15s ease, transform 0.15s ease;
-  }
-  .lesson-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .lesson-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .lesson-card .eyebrow { margin: 0; }
-  .lesson-card h4 { margin: 2px 0 0; font-size: 1rem; font-weight: 700; line-height: 1.35; text-wrap: balance; }
-  .lesson-card p { margin: 0; font-size: 0.85rem; color: var(--text-muted); }
-  .lesson-note { font-size: 0.82rem; color: var(--text-faint); margin: 18px 0 0; }
 </style>
 
 <header class="site">
   <div class="wrap-header topbar">
     <div class="topbar-left">
-      <span class="topbar-text" style="border-left:none;padding-left:0;">IFSul · Câmpus Venâncio Aires · Tecnólogo em Análise e Desenvolvimento de Sistemas</span>
+      <a class="back-link" href="../index.html">← Índice</a>
+      <span class="topbar-text">IFSul · Câmpus Venâncio Aires · Tecnólogo em Análise e Desenvolvimento de Sistemas</span>
     </div>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema">
       <span id="themeIcon">🌙</span><span id="themeLabel">Escuro</span>
     </button>
   </div>
   <div class="wrap-header mainbar">
-    <a class="brand" href="https://github.com/GeovaneGriesang/20262_IS3" target="_blank" rel="noreferrer">
+    <a class="brand" href="../index.html">
       <svg width="30" height="40.6" viewBox="0 0 61.2 82.8" aria-hidden="true">
         <rect x="21.6" y="0" width="18" height="18" rx="1.8" fill="#2f9e41"></rect>
         <rect x="43.2" y="0" width="18" height="18" rx="1.8" fill="#2f9e41"></rect>
@@ -776,16 +760,16 @@
       </svg>
       <span class="brand-name">Informática e Sociedade III</span>
     </a>
-    <span class="doc-badge">Índice</span>
+    <span class="doc-badge">Aula 05</span>
   </div>
 </header>
 
 <main>
   <div class="wrap">
     <div class="cover">
-      <span class="eyebrow">2026/2 · Câmpus Venâncio Aires</span>
-      <h1 class="title">Informática e Sociedade III: Registro de Aulas</h1>
-      <p class="subtitle">Acompanhamento das aulas da disciplina: plano de ensino, cronograma e as atividades práticas desenvolvidas em cada encontro.</p>
+      <span class="eyebrow">Aula 05 · 28/08/2026</span>
+      <h1 class="title">Semana de Trabalho Remoto: Evolução dos Projetos com as Entidades Parceiras</h1>
+      <p class="subtitle">Guia da Aula 05: nesta semana não há encontro presencial no laboratório — o professor acompanha a equipe de estudantes nas finais dos Jogos dos Institutos Federais (JIFs) do IFSul, em Pelotas. Cada grupo avança de forma assíncrona no próprio projeto, escolhendo entre as frentes de trabalho abaixo conforme o estágio em que está.</p>
       <dl class="meta">
         <div><dt>Curso</dt><dd>Tecnólogo em Análise e Desenvolvimento de Sistemas</dd></div>
         <div><dt>Disciplina</dt><dd>Informática e Sociedade III</dd></div>
@@ -795,65 +779,104 @@
       </dl>
     </div>
 
-    <section id="lista-aulas">
-      <h2>Aulas</h2>
-      <div class="card-grid lesson-grid">
-        <a class="card lesson-card" href="aulas/aula-01.html">
-          <span class="eyebrow">Aula 01 · 31/07/2026</span>
-          <h4>Apresentação da Disciplina, Plano de Ensino e Combinados de Extensão</h4>
-          <p>Ementa, objetivos, grupos de extensão e cronograma do semestre.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-02.html">
-          <span class="eyebrow">Aula 02 · 07/08/2026</span>
-          <h4>Prática com Git, GitHub e Configuração do Ambiente (NetBeans 28, JavaFX, MySQL)</h4>
-          <p>Fluxo de Git/GitHub e criação do projeto de referência TenisShop.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-03.html">
-          <span class="eyebrow">Aula 03 · 14/08/2026</span>
-          <h4>Branches no Git e Início da Camada de Dados do TenisShop</h4>
-          <p>Trabalho com branches e merge, levantamento de requisitos com a entidade parceira e a primeira DAO do TenisShop.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-04.html">
-          <span class="eyebrow">Aula 04 · 21/08/2026</span>
-          <h4>Perfis com Enum e Senhas com Hash no TenisShop</h4>
-          <p>Perfis de acesso tipados com Enum, hash de senha com BCrypt, tela de login e módulo completo de autenticação (troca de senha, autocadastro, recuperação por e-mail).</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-05.html">
-          <span class="eyebrow">Aula 05 · 28/08/2026</span>
-          <h4>Semana de Trabalho Remoto: Evolução dos Projetos</h4>
-          <p>Sem aula presencial (professor acompanha os JIFs em Pelotas): cada grupo avança de forma assíncrona no próprio projeto.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-06.html">
-          <span class="eyebrow">Aula 06 · 04/09/2026</span>
-          <h4>Concorrência Otimista e Auditoria no TenisShop</h4>
-          <p>Coluna de versão para evitar sobrescritas concorrentes, tela de listar/editar usuários e uma trilha de auditoria completa das ações do sistema.</p>
-        </a>
-        <a class="card lesson-card" href="aulas/aula-07.html">
-          <span class="eyebrow">Aula 07 · 08 a 11/09/2026</span>
-          <h4>Semana da MOVACI: Apresentação Pública dos Projetos</h4>
-          <p>Dois dias remotos (terça e sexta) em volta dos dois dias de apresentação pública dos projetos na MOVACI (quarta e quinta), avaliativa em 20% da nota final.</p>
-        </a>
-      </div>
-      <p class="lesson-note">As próximas aulas serão adicionadas aqui conforme o cronograma do semestre.</p>
+    <div class="callout-warn"><strong>Aula sem encontro presencial:</strong> o professor está em Pelotas/RS acompanhando a delegação de estudantes do IFSul nas finais dos Jogos dos Institutos Federais (JIFs). Não há aula no laboratório nesta data — o trabalho desta semana é assíncrono, cada grupo no seu próprio ritmo, com suporte à distância pelo Moodle (ver Seção 03).</div>
+
+    <div class="callout"><strong>Antes de começar:</strong> confira o <a href="aula-04.html#s14">checklist da Aula 04</a> — Enum de perfis mesclado, tela de login testada, e (se o grupo já aplicou) senha forte e troca obrigatória funcionando. A aula de hoje não introduz conceito novo: é tempo protegido de agenda para o grupo avançar no que já foi ensinado.</div>
+
+    <nav class="toc" aria-label="Índice">
+      <h2>Índice</h2>
+      <ol>
+        <li><a href="#s1"><span class="n">01</span>Visão Geral e Objetivos desta Semana</a></li>
+        <li><a href="#s2"><span class="n">02</span>Frentes de Trabalho: Escolha Conforme o Estágio do Grupo</a></li>
+        <li><a href="#s3"><span class="n">03</span>Suporte à Distância e Regras do Trabalho Remoto</a></li>
+        <li><a href="#s4"><span class="n">04</span>Checklist e Critérios para Avaliação Processual</a></li>
+        <li><a href="#s5"><span class="n">05</span>Referências e Materiais Complementares</a></li>
+      </ol>
+    </nav>
+
+    <section id="s1">
+      <h2><span class="num">01</span>Visão Geral e Objetivos desta Semana</h2>
+      <p class="lead">Nesta semana, a disciplina não tem encontro presencial: o professor acompanha a delegação de estudantes do IFSul nas finais dos Jogos dos Institutos Federais (JIFs), em Pelotas/RS. Em vez de pausar o semestre, esta aula transforma a semana em tempo protegido de agenda para cada grupo avançar no próprio projeto, no seu próprio ritmo.</p>
+      <p>Trabalho remoto e assíncrono não é uma situação de exceção rara no mercado: é como boa parte das equipes de desenvolvimento de software funciona no dia a dia, coordenando por commits, mensagens e documentação em vez de estar sempre na mesma sala. A Aula 05 é, também, uma primeira prática guiada disso — com commits pequenos e bem descritos, cada pessoa do grupo consegue entender o que mudou mesmo sem ter visto acontecer ao vivo.</p>
+      <h3>Objetivos de Aprendizagem</h3>
+      <ul>
+        <li>Avançar o projeto do grupo de forma autônoma, sem supervisão direta em tempo real.</li>
+        <li>Praticar o fluxo de Git/GitHub como principal ferramenta de coordenação remota da equipe.</li>
+        <li>Aplicar, no projeto de cada grupo, técnicas já ensinadas (Enum, hash de senha, MVC, DAO e, opcionalmente, os recursos de autenticação da Aula 04).</li>
+        <li>Registrar dúvidas e bloqueios de forma assíncrona, sem travar o progresso enquanto espera resposta.</li>
+      </ul>
+      <div class="callout"><strong>O que muda em relação às aulas anteriores:</strong> não há um "Passo a Passo" único que a turma toda segue junto. A Seção 02 apresenta várias frentes de trabalho possíveis — cada grupo escolhe a que faz mais sentido para o estágio atual do seu projeto.</div>
     </section>
 
-    <section id="projetos">
-      <h2>Projetos dos Grupos de Extensão</h2>
-      <p>Cada grupo de extensão trabalha diretamente na solução de uma entidade parceira. O professor mantém um <a href="https://docs.google.com/spreadsheets/d/1ZVwaor7WajiBjiVqEbYyo9GOGTYRomAc/edit?usp=sharing&amp;ouid=108313237397001891529&amp;rtpof=true&amp;sd=true" target="_blank" rel="noreferrer">painel geral de acompanhamento</a> com o progresso de todos os grupos. Cada grupo também tem sua própria planilha, acessível clicando no tema do projeto na tabela abaixo.</p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Grupo</th><th>Entidade Parceira</th><th>Tema do Projeto</th><th>Integrantes</th></tr>
-          </thead>
-          <tbody>
-            <tr><td><strong>Grupo 01</strong></td><td>Escola Monte das Tabocas</td><td><a href="https://docs.google.com/spreadsheets/d/13Qjz9kxcIabn4WLDAkRdxMDTqmgKrpO3O6j89VpTDG0/edit?usp=sharing" target="_blank" rel="noreferrer">Controle e Registro de Acesso</a></td><td>Gabriel Becker, Teillor Kloh, Iago da Silva, Leonardo Harres</td></tr>
-            <tr><td><strong>Grupo 02</strong></td><td>Prefeitura Municipal de Venâncio Aires</td><td><a href="https://docs.google.com/spreadsheets/d/1B_t2i0Ra5wXEX6swglVz76ZDY4gly4n0tiRaSjSJL-Y/edit?usp=sharing" target="_blank" rel="noreferrer">Gestão de Riscos LGPD (Prefeitura Segura)</a></td><td>Carlos Ripplinger, Gabrielly Caetano, João Beckenkamp, Pedro Landim</td></tr>
-            <tr><td><strong>Grupo 03</strong></td><td>CTG Chaleira Preta</td><td><a href="https://docs.google.com/spreadsheets/d/1NgiHjV1kv48GgZe2IJaiGTUYPHknkLqDyov2KlzUR6g/edit?usp=sharing" target="_blank" rel="noreferrer">GESTCHÊ – Gestão Financeira e de Sócios</a></td><td>Leonardo Schuler</td></tr>
-            <tr><td><strong>Grupo 04</strong></td><td>Sec. de Educação de Venâncio Aires</td><td><a href="https://docs.google.com/spreadsheets/d/1cqtreMQWl05YffHlp6MhJ3LMheRV_f_V_ZDg09sIVoA/edit?usp=sharing" target="_blank" rel="noreferrer">Ordens de Serviço das Escolas</a></td><td>Érick Henrique, Gabriel Reginatto, Sandro Sehnem, Raul Alves, Marlos do Amaral</td></tr>
-            <tr><td><strong>Grupo 05</strong></td><td>Prefeitura Municipal de Venâncio Aires</td><td><a href="https://docs.google.com/spreadsheets/d/1CbJX0RBnuijJv3hwRMIiBduDIDKtbXhTiRVvF7l7MYo/edit?usp=sharing" target="_blank" rel="noreferrer">Gestão Documental (Acervo VA)</a></td><td>Maqueli Rasquinha, Luciano Ferreira, Rodrigo da Silva, Fernanda de Queiroz</td></tr>
-          </tbody>
-        </table>
+    <section id="s2">
+      <h2><span class="num">02</span>Frentes de Trabalho: Escolha Conforme o Estágio do Grupo</h2>
+      <p>Os grupos estão em pontos diferentes do projeto. Reveja o repositório do grupo, decida com a equipe (mesmo que por mensagem, à distância) qual frente abaixo é a prioridade da semana, e dividam entre si quem toca cada parte.</p>
+
+      <div class="card-grid">
+        <div class="card"><h4><span class="dot"></span>Avançar o CRUD da entidade central</h4><p>Se a camada de domínio e DAO do sistema do grupo ainda está incompleta, este é o momento de seguir o padrão de <code>UsuarioDAO</code> (Aulas 02 e 04) e implementar <code>inserir</code>, <code>listarTodos</code>, <code>atualizar</code> e <code>excluir</code> para a entidade principal da parceria com a entidade.</p></div>
+        <div class="card"><h4><span class="dot"></span>Aplicar autenticação e senha forte</h4><p>Se o sistema do grupo já tem (ou vai ter) conceito de usuário e login, vale trazer as ideias da Aula 04 para o projeto próprio: perfis por Enum, hash BCrypt, e — se fizer sentido para a entidade parceira — troca de senha, medidor de força e/ou recuperação por e-mail.</p></div>
+        <div class="card"><h4><span class="dot"></span>Construir as telas JavaFX</h4><p>Para grupos com o Model e o DAO já prontos, é hora de avançar a View: telas de listagem, cadastro e edição em FXML, com o Controller ligando tudo — reaproveitando o padrão MVC visto na tela de login (Aula 04, Seção 07).</p></div>
+        <div class="card"><h4><span class="dot"></span>Documentação e alinhamento com a entidade</h4><p>Atualizar o <code>README.md</code> do repositório, revisar a lista de requisitos (Aula 03, Seção 02) e, se surgiram dúvidas sobre o que a entidade parceira precisa, registrar as perguntas para a próxima conversa — presencial ou remota — com ela.</p></div>
+        <div class="card"><h4><span class="dot"></span>Scripts SQL versionados</h4><p>Se o schema do banco do grupo já mudou várias vezes só por comandos manuais no MySQL Workbench, aproveite para organizar isso como scripts numerados (<code>V1</code>, <code>V2</code>...), seguindo o padrão da Aula 04, Seção 12.</p></div>
       </div>
+
+      <h3>Rotina Sugerida (adapte à realidade do grupo)</h3>
+      <ol class="plain">
+        <li>Antes de começar: <code>git pull origin main</code>, para garantir que está trabalhando sobre a versão mais recente do projeto.</li>
+        <li>Combine com o grupo (mensagem, chamada de vídeo, o que for viável) quem mexe em qual parte, para não duplicar trabalho nem gerar conflitos de merge grandes.</li>
+        <li>Trabalhe em uma branch <code>feature/...</code> para cada funcionalidade, como já vem sendo feito desde a Aula 03.</li>
+        <li>Faça commits pequenos e frequentes, com mensagens no padrão Conventional Commits (Aula 02, Seção 03) — são eles que vão contar a história da semana para o resto do grupo e para o professor.</li>
+        <li>Ao final de cada sessão de trabalho, mesmo que a funcionalidade não esteja 100% pronta: <code>push</code> para o GitHub. Código que só existe na sua máquina não existe para o grupo.</li>
+      </ol>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">03</span>Suporte à Distância e Regras do Trabalho Remoto</h2>
+      <p>Sem aula presencial, o suporte do professor acontece de forma assíncrona. Isso muda um pouco como pedir (e esperar) ajuda.</p>
+
+      <h3>Como Pedir Ajuda</h3>
+      <ol class="plain">
+        <li>Publique a dúvida no <a href="https://apnp.ifsul.edu.br/course/view.php?id=40249" target="_blank" rel="noreferrer">Moodle da disciplina</a>, no fórum ou espaço indicado para a Aula 05.</li>
+        <li>Descreva o problema de um jeito que alguém sem estar vendo sua tela consiga entender: o que você tentou fazer, o comando ou trecho de código, e a mensagem de erro completa (print ou texto colado, não só "não funciona").</li>
+        <li>Enquanto espera resposta, siga para outra frente da Seção 02 em vez de travar esperando — como em qualquer equipe remota, é normal ter mais de uma tarefa em andamento.</li>
+      </ol>
+      <div class="callout">O professor volta a acompanhar o Moodle com regularidade a partir do fim da semana dos JIFs; dúvidas urgentes de bloqueio total (ex.: "não consigo nem abrir o projeto") têm prioridade de resposta.</div>
+
+      <h3>Regras de Ouro do Trabalho Remoto (adaptadas das regras de laboratório)</h3>
+      <div class="callout-warn">
+        <ol class="plain">
+          <li>Se for usar um computador que não é o seu (biblioteca, casa de um colega, laboratório de outra disciplina): confira a identidade do Git antes de commitar (<code>git config user.name</code> / <code>user.email</code>), como na Aula 02, Seção 02.</li>
+          <li>Nunca deixe credenciais (senha do MySQL, Personal Access Token do GitHub, <code>email.properties</code> da Aula 04) salvas num computador que não é seu, nem as envie por mensagem de texto ou e-mail sem necessidade.</li>
+          <li>Antes de encerrar cada sessão de trabalho, confirme que o <code>push</code> foi concluído — não há garantia de que o próximo acesso será na mesma máquina.</li>
+          <li>Se o grupo trabalhar em paralelo, avise no grupo/chat quando começar e quando terminar uma tarefa, para reduzir a chance de dois integrantes mexerem na mesma parte do código ao mesmo tempo.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">04</span>Checklist e Critérios para Avaliação Processual</h2>
+      <p>A avaliação processual contínua não pausa nesta semana — ela só passa a ser verificada pelo histórico do repositório, em vez de observação direta em sala. Verifique estes itens antes do fim da semana:</p>
+      <ul class="checklist">
+        <li>Pelo menos um <code>commit</code> por integrante do grupo, com mensagem descritiva no padrão Conventional Commits.</li>
+        <li>Todo o trabalho da semana enviado (<code>push</code>) para a branch <code>main</code> do repositório do grupo — nada ficou parado só numa máquina local.</li>
+        <li>Nenhuma branch de funcionalidade (<code>feature/...</code>) esquecida sem merge, se o trabalho nela já estiver pronto.</li>
+        <li>Se houve algum bloqueio, ele foi registrado no Moodle (mesmo que a resposta ainda não tenha chegado) — bloqueio não registrado não pode ser considerado na avaliação.</li>
+        <li>O grupo consegue explicar, na próxima aula presencial, o que cada commit da semana fez e por quê.</li>
+        <li>Nenhuma credencial (senha de banco, Personal Access Token, <code>email.properties</code>) foi commitada por engano — confira com <code>git status</code> e <code>git log</code> antes de considerar a semana concluída.</li>
+      </ul>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">05</span>Referências e Materiais Complementares</h2>
+      <p>Esta semana não introduz conteúdo novo — os materiais de referência são os das aulas já dadas, especialmente para quem for revisar um conceito antes de aplicá-lo no projeto próprio:</p>
+      <ul class="refs">
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-01.html">Aula 01</a> — plano de ensino, cronograma e mapeamento das entidades parceiras.</li>
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-02.html">Aula 02</a> — Git, GitHub, configuração do projeto e criação do TenisShop.</li>
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-03.html">Aula 03</a> — branches, merge, resolução de conflitos e primeira DAO.</li>
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-04.html">Aula 04</a> — Enum, hash de senha, MVC, tela de login e (opcional) todo o módulo de autenticação.</li>
+        <li><span class="ref-kind">Documentação</span>Documentação Oficial do Git. Disponível em: <a href="https://git-scm.com/doc" target="_blank" rel="noreferrer">git-scm.com/doc</a>.</li>
+        <li><span class="ref-kind">Documentação</span>Documentação Oficial do JavaFX. Disponível em: <a href="https://openjfx.io" target="_blank" rel="noreferrer">openjfx.io</a>.</li>
+      </ul>
     </section>
   </div>
 </main>

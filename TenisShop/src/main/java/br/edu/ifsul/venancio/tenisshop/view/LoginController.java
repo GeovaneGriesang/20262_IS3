@@ -1,7 +1,10 @@
 package br.edu.ifsul.venancio.tenisshop.view;
 
 import br.edu.ifsul.venancio.tenisshop.TenisShop;
+import br.edu.ifsul.venancio.tenisshop.model.dao.AuditoriaDAO;
+import br.edu.ifsul.venancio.tenisshop.model.dao.ConfiguracaoSistemaDAO;
 import br.edu.ifsul.venancio.tenisshop.model.dao.UsuarioDAO;
+import br.edu.ifsul.venancio.tenisshop.model.domain.AcaoAuditoria;
 import br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -10,6 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -39,6 +43,24 @@ public class LoginController {
     private PasswordField pwdSenha;
 
     @FXML
+    private Hyperlink lnkCadastrar;
+
+    @FXML
+    private void initialize() {
+        // O link de autocadastro só aparece se a configuração do sistema
+        // permitir; se a consulta falhar (banco fora do ar), o link fica
+        // escondido por padrão — mais seguro esconder na dúvida.
+        boolean permitido = false;
+        try {
+            permitido = Boolean.TRUE.equals(new ConfiguracaoSistemaDAO().buscar().getPermitirAutocadastro());
+        } catch (SQLException e) {
+            System.err.println("[ERRO] Não foi possível consultar a configuração de autocadastro: " + e.getMessage());
+        }
+        lnkCadastrar.setVisible(permitido);
+        lnkCadastrar.setManaged(permitido);
+    }
+
+    @FXML
     private void btnLoginAction(ActionEvent event) throws IOException {
         if (!validaForm()) {
             return;
@@ -53,8 +75,24 @@ public class LoginController {
 
             if (usuarioAutenticado != null) {
                 TenisShop.usuarioLogado = usuarioAutenticado;
-                TenisShop.setRoot("principal");
+                new AuditoriaDAO().registrar(usuarioAutenticado.getId(), AcaoAuditoria.LOGIN_SUCESSO,
+                        "USUARIO", usuarioAutenticado.getId(), null);
+
+                // Senha definida por um admin (ou a semente do sistema)
+                // ainda não foi trocada: bloqueia o acesso até a troca.
+                if (Boolean.TRUE.equals(usuarioAutenticado.getDeveTrocarSenha())) {
+                    TenisShop.setRoot("alterar-senha");
+                } else {
+                    TenisShop.setRoot("principal");
+                }
             } else {
+                // Mesmo registro de auditoria do sucesso, só com usuarioId
+                // nulo e o e-mail tentado no detalhe: mantém as duas
+                // respostas simétricas em custo, sem reabrir o mesmo
+                // side-channel de tempo que UsuarioDAO.autenticar já fecha.
+                new AuditoriaDAO().registrar(null, AcaoAuditoria.LOGIN_FALHA,
+                        null, null, "Tentativa de login com e-mail: " + email);
+
                 // Mensagem única de propósito: separar "e-mail não
                 // encontrado" de "senha incorreta" permitiria descobrir,
                 // por tentativa e erro, quais e-mails têm cadastro.
@@ -63,6 +101,16 @@ public class LoginController {
         } catch (SQLException e) {
             showAlert("Não foi possível conectar ao banco de dados. Verifique se o MySQL está ativo.", AlertType.ERROR);
         }
+    }
+
+    @FXML
+    private void irParaEsqueciSenha(ActionEvent event) throws IOException {
+        TenisShop.setRoot("esqueci-senha");
+    }
+
+    @FXML
+    private void irParaCadastro(ActionEvent event) throws IOException {
+        TenisShop.setRoot("cadastro");
     }
 
     private boolean validaForm() {

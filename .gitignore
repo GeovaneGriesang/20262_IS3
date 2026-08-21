@@ -1,1 +1,6 @@
 /TenisShop/target/
+
+# Credenciais SMTP reais (recuperação de senha, Aula 04) - nunca versionar.
+# Copie TenisShop/src/main/resources/email.properties.example para
+# email.properties e preencha localmente; só o .example é commitado.
+/TenisShop/src/main/resources/email.properties

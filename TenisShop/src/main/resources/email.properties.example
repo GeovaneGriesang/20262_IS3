@@ -1,0 +1,16 @@
+# Modelo de configuração SMTP para o envio de e-mails de recuperação de
+# senha (Aula 04). Copie este arquivo para "email.properties" (mesma
+# pasta) e preencha com suas credenciais reais - "email.properties" está
+# no .gitignore e NUNCA deve ser commitado.
+#
+# Exemplo usando Gmail: crie uma "senha de app" em
+# https://myaccount.google.com/apppasswords (exige verificação em duas
+# etapas ativada na conta) e use essa senha de app abaixo, não a senha
+# normal da conta.
+
+smtp.host=smtp.gmail.com
+smtp.port=587
+smtp.starttls=true
+smtp.usuario=seu.email@gmail.com
+smtp.senha=sua-senha-de-app-aqui
+smtp.from=seu.email@gmail.com

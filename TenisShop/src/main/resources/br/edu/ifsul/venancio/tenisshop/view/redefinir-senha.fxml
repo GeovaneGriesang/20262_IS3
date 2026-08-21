@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="520.0" prefWidth="420.0" spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.RedefinirSenhaController">
+   <padding>
+      <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+   </padding>
+   <children>
+      <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="Redefinir Senha" />
+      <Label style="-fx-text-fill: #525252;" text="Cole abaixo o código que enviamos por e-mail (válido por 30 minutos) e defina sua nova senha." wrapText="true" />
+      <VBox spacing="4.0">
+         <children>
+            <Label text="E-mail" />
+            <TextField fx:id="txtEmail" promptText="seu.email@ifsul.edu.br" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Código recebido por e-mail" />
+            <TextField fx:id="txtToken" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Nova senha" />
+            <PasswordField fx:id="pwdNovaSenha" />
+            <Label fx:id="lblForcaSenha" style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Força: —" />
+            <Label style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Entre 8 e 72 caracteres, com maiúscula, minúscula, número e símbolo." wrapText="true" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Confirmar nova senha" />
+            <PasswordField fx:id="pwdConfirmarSenha" />
+         </children>
+      </VBox>
+      <Button fx:id="btnRedefinir" disable="true" defaultButton="true" onAction="#btnRedefinirAction" style="-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;" text="Redefinir Senha" />
+      <Hyperlink onAction="#irParaLogin" text="Voltar ao login" />
+   </children>
+</VBox>

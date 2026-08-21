@@ -16,6 +16,8 @@ public class Usuario {
     private Perfil perfil;
     private Boolean ativo;
     private LocalDateTime dataCadastro;
+    private Boolean deveTrocarSenha;
+    private Integer versao;
 
     public Usuario() {
     }
@@ -84,6 +86,22 @@ public class Usuario {
 
     public void setDataCadastro(LocalDateTime dataCadastro) {
         this.dataCadastro = dataCadastro;
+    }
+
+    public Boolean getDeveTrocarSenha() {
+        return deveTrocarSenha;
+    }
+
+    public void setDeveTrocarSenha(Boolean deveTrocarSenha) {
+        this.deveTrocarSenha = deveTrocarSenha;
+    }
+
+    public Integer getVersao() {
+        return versao;
+    }
+
+    public void setVersao(Integer versao) {
+        this.versao = versao;
     }
 
     @Override
