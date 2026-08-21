@@ -779,7 +779,7 @@
       </dl>
     </div>
 
-    <div class="callout"><strong>Antes de começar:</strong> confira o <a href="aula-04.html#s14">checklist da Aula 04</a>: módulo de autenticação completo, banco de dados aplicado automaticamente pelo <code>SchemaInitializer</code>. A aula de hoje acrescenta duas capacidades novas ao mesmo <code>UsuarioDAO</code> e à mesma trilha de escrita já existente.</div>
+    <div class="callout"><strong>Antes de começar:</strong> confira se o trabalho da Aula 04 está concluído: módulo de autenticação completo, banco de dados aplicado automaticamente pelo <code>SchemaInitializer</code>. A aula de hoje acrescenta duas capacidades novas ao mesmo <code>UsuarioDAO</code> e à mesma trilha de escrita já existente.</div>
 
     <nav class="toc" aria-label="Índice">
       <h2>Índice</h2>
@@ -794,9 +794,7 @@
         <li><a href="#s8"><span class="n">08</span>Modelando a Auditoria: Enum, Tabela e DAO</a></li>
         <li><a href="#s9"><span class="n">09</span>Instrumentando os Pontos de Escrita do Sistema</a></li>
         <li><a href="#s10"><span class="n">10</span>Tela de Auditoria (Somente Leitura)</a></li>
-        <li><a href="#s11"><span class="n">11</span>Atividade Prática dos Grupos de Extensão</a></li>
-        <li><a href="#s12"><span class="n">12</span>Checklist e Critérios para Avaliação Processual</a></li>
-        <li><a href="#s13"><span class="n">13</span>Referências e Materiais Complementares</a></li>
+        <li><a href="#s11"><span class="n">11</span>Referências e Materiais Complementares</a></li>
       </ol>
     </nav>
 
@@ -2619,49 +2617,7 @@
     </section>
 
     <section id="s11">
-      <h2><span class="num">11</span>Atividade Prática dos Grupos de Extensão</h2>
-      <p>Aplique as duas técnicas desta aula na entidade central do projeto do grupo, sempre que fizer sentido para o contexto real da entidade parceira.</p>
-      <h3>Passo a Passo Obrigatório no Laboratório</h3>
-      <ol class="plain">
-        <li>Se a entidade central do grupo já tem uma tela de edição (ou está prestes a ganhar uma), adicione uma coluna <code>versao</code> e aplique o mesmo padrão <code>UPDATE ... WHERE id = ? AND versao = ?</code> desta aula.</li>
-        <li>Adicione uma tabela de auditoria mínima ao projeto do grupo, cobrindo pelo menos criação e edição da entidade central, e login (sucesso e falha).</li>
-        <li>Registre as duas mudanças de schema como scripts <code>.sql</code> versionados, seguindo a convenção já usada desde a Aula 04.</li>
-        <li>Faça merge das branches para a <code>main</code> e envie (<code>push</code>) ao GitHub.</li>
-      </ol>
-      <div class="callout"><strong>Nem todo projeto precisa das duas coisas com a mesma prioridade:</strong> se o sistema do grupo só tem um único operador usando por vez, o controle de concorrência é menos urgente que a auditoria (ou vice-versa). Priorizem o que a entidade parceira realmente precisa, não é obrigatório implementar tudo com o mesmo peso.</div>
-      <div class="callout-warn">
-        <strong>Regras de ouro do laboratório (seguem valendo)</strong>
-        <ol class="plain">
-          <li>Chegou no computador da escola? A primeira ação é <code>git pull origin main</code>.</li>
-          <li>Vai criar uma branch? Avise o grupo para ninguém duplicar o mesmo trabalho.</li>
-          <li>Ao sair, confirme que fez <code>push</code> e removeu credenciais e Personal Access Token do laboratório.</li>
-        </ol>
-      </div>
-    </section>
-
-    <section id="s12">
-      <h2><span class="num">12</span>Checklist e Critérios para Avaliação Processual</h2>
-      <p>Estes itens compõem a avaliação processual contínua (30% da nota final) referente à Aula 06. Verifique antes do término da aula:</p>
-      <ul class="checklist">
-        <li>Coluna <code>versao</code> criada em <code>usuarios</code>, incrementada a cada <code>UPDATE</code> bem-sucedido.</li>
-        <li>Conflito de versão reproduzido na prática (duas edições sobrepostas do mesmo usuário) e a mensagem de conflito confirmada, com a tela recarregando os dados atuais em vez de perder a tentativa de quem editou por último.</li>
-        <li>Tela "Listar/Editar Usuários" funcionando ponta a ponta: lista carrega, seleção habilita o botão Editar, edição salva corretamente quando não há conflito.</li>
-        <li>Tabela <code>auditoria</code> criada e populada pelos 8 pontos de escrita instrumentados (cadastro e edição de usuário, troca de senha própria e via recuperação, login com sucesso e com falha, autocadastro, alteração de configuração do sistema).</li>
-        <li>Editar um usuário mostra na auditoria exatamente quais campos mudaram e o valor antigo/novo de cada um (ex.: <code>nome: "Carlos" -&gt; "Carlos Silva"</code>), não uma frase genérica.</li>
-        <li>Desativar um usuário (ativo: Sim → Não) aparece como <code>USUARIO_DESATIVADO</code> na auditoria; reativar aparece como <code>USUARIO_REATIVADO</code>; nenhum dos dois cai no <code>USUARIO_ATUALIZADO</code> genérico.</li>
-        <li>Mudar a configuração de autocadastro mostra o valor antigo e o novo (ex.: <code>permitir_autocadastro: Não -&gt; Sim</code>), não só o valor novo.</li>
-        <li>Em nenhum evento de auditoria, em nenhuma circunstância, aparece a senha (nem em texto puro, nem como hash); confira isso especificamente na troca de senha.</li>
-        <li>Rodando a aplicação num banco já existente com o schema da versão anterior desta aula (coluna <code>detalhe</code> ainda <code>VARCHAR(255)</code>), o <code>SchemaInitializer</code> amplia a coluna sozinho, sem apagar nenhum registro de auditoria já existente.</li>
-        <li>Consegue explicar, com as próprias palavras, a diferença entre o padrão Memento clássico (GoF) e a versão simplificada usada nesta aula.</li>
-        <li>Tela de Auditoria mostra os eventos mais recentes primeiro, com "Quem" e "Entidade" corretos, inclusive "-" nos casos em que não há usuário associado (login com falha).</li>
-        <li>Rodando a aplicação num banco já existente (não vazio) da Aula 04, o <code>SchemaInitializer</code> aplica sozinho as duas mudanças novas (<code>versao</code> e <code>auditoria</code>) sem apagar nenhum dado já existente.</li>
-        <li>Consegue explicar, com as próprias palavras, por que bloqueio otimista foi escolhido no lugar de bloqueio pessimista para este projeto.</li>
-        <li>Credenciais temporárias e Personal Access Token limpos nos terminais do laboratório.</li>
-      </ul>
-    </section>
-
-    <section id="s13">
-      <h2><span class="num">13</span>Referências e Materiais Complementares</h2>
+      <h2><span class="num">11</span>Referências e Materiais Complementares</h2>
       <ul class="refs">
         <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
         <li><span class="ref-kind">Livro</span>RANGEL, Pablo; CARVALHO JUNIOR, José Gomes de. <strong>Sistemas Orientados a Objetos: teoria e prática com UML e Java</strong>. Rio de Janeiro: Brasport, 2021.</li>

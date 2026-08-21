@@ -779,7 +779,7 @@
       </dl>
     </div>
 
-    <div class="callout"><strong>Antes de começar:</strong> confira o <a href="aula-03.html#s7">checklist da Aula 03</a>, branch mesclada, <code>UsuarioDAO</code> funcionando e lista de requisitos registrada. A aula de hoje refina a arquitetura de <code>Usuario</code> construída até aqui.</div>
+    <div class="callout"><strong>Antes de começar:</strong> confira se o trabalho da Aula 03 está concluído, branch mesclada, <code>UsuarioDAO</code> funcionando e lista de requisitos registrada. A aula de hoje refina a arquitetura de <code>Usuario</code> construída até aqui.</div>
 
     <nav class="toc" aria-label="Índice">
       <h2>Índice</h2>
@@ -796,9 +796,7 @@
         <li><a href="#s10"><span class="n">10</span>Autocadastro Público e Configurações do Sistema</a></li>
         <li><a href="#s11"><span class="n">11</span>Recuperação de Senha por E-mail</a></li>
         <li><a href="#s12"><span class="n">12</span>Evolução do Banco de Dados: Scripts e Bootstrap Automático</a></li>
-        <li><a href="#s13"><span class="n">13</span>Atividade Prática dos Grupos de Extensão</a></li>
-        <li><a href="#s14"><span class="n">14</span>Checklist e Avaliação Processual</a></li>
-        <li><a href="#s15"><span class="n">15</span>Referências e Materiais Complementares</a></li>
+        <li><a href="#s13"><span class="n">13</span>Referências e Materiais Complementares</a></li>
       </ol>
     </nav>
 
@@ -4829,54 +4827,7 @@ smtp.from=seu.email@gmail.com</code></pre></div>
     </section>
 
     <section id="s13">
-      <h2><span class="num">13</span>Atividade Prática dos Grupos de Extensão</h2>
-      <p>Aplique as mesmas duas técnicas na entidade central do projeto do grupo. Mesmo que o domínio não tenha "perfil de usuário" no sentido literal, a técnica do Enum serve para qualquer atributo de categorias fixas (status, tipo, situação); a técnica de hash só se aplica de fato se o projeto do grupo tiver login.</p>
-
-      <h3>Passo a Passo Obrigatório no Laboratório</h3>
-      <ol class="plain">
-        <li>Identifique um atributo de categorias fixas na entidade central do grupo (por exemplo, status de uma ordem de serviço, tipo de ocorrência, situação de um sócio) e transforme-o em Enum, dentro de uma branch <code>feature/...</code>.</li>
-        <li>Se o projeto do grupo tiver conceito de usuário e login, aplique também o hash de senha com a mesma técnica de <code>SenhaUtil</code>.</li>
-        <li>Preencha a tabela de níveis de acesso da Seção 04 para o projeto do grupo, mesmo que a implementação do controle de acesso só chegue mais adiante.</li>
-        <li>Faça merge da branch para a <code>main</code> e envie (<code>push</code>) ao GitHub.</li>
-      </ol>
-
-      <div class="callout"><strong>Se o projeto do grupo já tem login funcionando:</strong> vale muito a pena replicar, mesmo que aos poucos, as ideias das Seções 08 a 12 no projeto de vocês: troca de senha, senha forte com medidor, e principalmente a tela de configurações com autocadastro (ou não) só é relevante se a entidade parceira precisar que vários funcionários tenham conta própria no sistema. Priorizem o que faz sentido pro contexto real de cada entidade, não é preciso implementar tudo.</div>
-
-      <div class="callout"><strong>Opcional, se sobrar tempo:</strong> monte a mesma estrutura de tela de login (Application + FXML + Controller) da Seção 07 no projeto do grupo. Não é obrigatório hoje; se não der tempo, ela também se encaixa naturalmente quando as telas reais do grupo começarem a ser construídas, a partir de 23/10 no cronograma da Aula 01.</div>
-
-      <div class="callout-warn">
-        <strong>Regras de ouro do laboratório (seguem valendo)</strong>
-        <ol class="plain">
-          <li>Chegou no computador da escola? A primeira ação é <code>git pull origin main</code>.</li>
-          <li>Vai criar uma branch? Avise o grupo para ninguém duplicar o mesmo trabalho.</li>
-          <li>Ao sair, confirme que fez <code>push</code> e removeu credenciais e Personal Access Token do laboratório.</li>
-        </ol>
-      </div>
-    </section>
-
-    <section id="s14">
-      <h2><span class="num">14</span>Checklist e Critérios para Avaliação Processual</h2>
-      <p>Estes itens compõem a avaliação processual contínua (30% da nota final) referente à Aula 04, que cobre os dois itens do cronograma citados na Seção 01. Verifique antes do término da aula:</p>
-      <ul class="checklist">
-        <li>Enum criado para pelo menos um atributo de categorias fixas da entidade central do projeto do grupo.</li>
-        <li>Se aplicável ao projeto do grupo: senha armazenada como hash (BCrypt), nunca em texto puro.</li>
-        <li>Tabela de níveis de acesso por perfil registrada no repositório.</li>
-        <li>Branch mesclada para a <code>main</code> sem marcadores de conflito esquecidos no código.</li>
-        <li>Repositório sincronizado (<code>git push</code>) com sucesso na branch <code>main</code>.</li>
-        <li>Tela de login do TenisShop testada e funcionando (Seção 07 "Testando"): e-mail em formato inválido é barrado, login errado mostra sempre a mesma mensagem, login certo entra, usuário inativo não entra.</li>
-        <li>Consegue explicar, com as próprias palavras, os papéis de Model, View e Controller na tela de login.</li>
-        <li>Medidor de força testado nas 4 telas que coletam senha nova (alterar senha, cadastrar usuário, autocadastro, redefinir senha): mostra fraca/média/forte corretamente e o botão de salvar só libera com senha forte.</li>
-        <li>Usuário criado pela tela administrativa com "forçar troca" marcado é obrigado a definir uma nova senha no primeiro login, antes de acessar qualquer outra tela.</li>
-        <li>Autocadastro testado com a configuração ligada e desligada: desligada, o link "Cadastrar-se" some do login e a tela recusa acesso direto; ligada, toda conta criada nasce com perfil Operador, nunca Administrador.</li>
-        <li>Fluxo de recuperação de senha testado ponta a ponta: e-mail chega com o código, o código expira depois de 30 minutos, e um código já usado não funciona de novo.</li>
-        <li><code>email.properties</code> com as credenciais reais de SMTP confirmado como <strong>não commitado</strong> (<code>git status</code> não deve listá-lo; só <code>email.properties.example</code> vai para o repositório).</li>
-        <li>Rodando a aplicação num banco de dados vazio (schema nem criado), o <code>SchemaInitializer</code> monta o schema sozinho e o login com <code>admin@tenisshop.com</code> / <code>IFSul_15anos</code> funciona, exigindo troca de senha no primeiro acesso.</li>
-        <li>Credenciais temporárias e Personal Access Token limpos nos terminais do laboratório.</li>
-      </ul>
-    </section>
-
-    <section id="s15">
-      <h2><span class="num">15</span>Referências e Materiais Complementares</h2>
+      <h2><span class="num">13</span>Referências e Materiais Complementares</h2>
       <ul class="refs">
         <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
         <li><span class="ref-kind">Livro</span>RANGEL, Pablo; CARVALHO JUNIOR, José Gomes de. <strong>Sistemas Orientados a Objetos: teoria e prática com UML e Java</strong>. Rio de Janeiro: Brasport, 2021.</li>

@@ -789,9 +789,7 @@
         <li><a href="#s3"><span class="n">03</span>Entendendo os Conceitos sem Complicação</a></li>
         <li><a href="#s4"><span class="n">04</span>Prática Guiada: Configuração Inicial do Projeto</a></li>
         <li><a href="#s5"><span class="n">05</span>Avanço no Projeto Exemplo TenisShop</a></li>
-        <li><a href="#s6"><span class="n">06</span>Atividade Prática dos Grupos de Extensão</a></li>
-        <li><a href="#s7"><span class="n">07</span>Checklist e Avaliação Processual</a></li>
-        <li><a href="#s8"><span class="n">08</span>Referências e Materiais Complementares</a></li>
+        <li><a href="#s6"><span class="n">06</span>Referências e Materiais Complementares</a></li>
       </ol>
     </nav>
 
@@ -1010,7 +1008,7 @@
     <section id="s5">
       <h2><span class="num">05</span>Avanço no Projeto Exemplo TenisShop</h2>
       <p>O TenisShop é construído em aula, ao vivo, junto com a turma: o professor cria cada peça no NetBeans 28 enquanto projeta, e cada grupo repete o mesmo passo a passo no <strong>seu próprio projeto</strong>, com o nome, pacote e domínio da sua entidade parceira (não é uma cópia nem um clone do repositório do TenisShop). Vamos acompanhar essa construção, desde a criação do projeto Maven até a primeira versão publicada no repositório da disciplina.</p>
-      <div class="callout"><strong>Até onde ir hoje:</strong> o TenisShop é o exemplo de referência que o professor evolui ao longo de todo o semestre, seguindo o cronograma da Aula 01. Nesta aula, o requisito de entrega dos grupos é a criação do projeto Maven e do <code>pom.xml</code> (ver checklist da Seção 07); o banco de dados, a <code>ConexaoBanco</code> e as demais camadas mostradas a seguir chegam aos projetos dos grupos nas datas já previstas no cronograma (Script SQL em 18/09, Camada de Conexão em 02/10).</div>
+      <div class="callout"><strong>Até onde ir hoje:</strong> o TenisShop é o exemplo de referência que o professor evolui ao longo de todo o semestre, seguindo o cronograma da Aula 01. Nesta aula, o requisito de entrega dos grupos é a criação do projeto Maven e do <code>pom.xml</code>; o banco de dados, a <code>ConexaoBanco</code> e as demais camadas mostradas a seguir chegam aos projetos dos grupos nas datas já previstas no cronograma (Script SQL em 18/09, Camada de Conexão em 02/10).</div>
 
       <h3>Passo a Passo: Criação do Projeto Maven no NetBeans 28</h3>
       <ol class="plain">
@@ -1305,52 +1303,7 @@
     </section>
 
     <section id="s6">
-      <h2><span class="num">06</span>Atividade Prática dos Grupos de Extensão</h2>
-      <p>Cada grupo de extensão trabalhará diretamente na solução da entidade parceira configurada na Unidade I/II do Plano de Ensino. A lista de grupos, entidades parceiras e links de acompanhamento está centralizada na <a href="../index.html#projetos">página inicial da disciplina (seção Projetos)</a>.</p>
-
-      <h3>Passo a Passo Obrigatório para os Grupos no Laboratório</h3>
-      <ol class="plain">
-        <li><strong>Criação do repositório organizado:</strong> o líder ou um integrante do grupo deve criar o repositório no GitHub com a nomenclatura padrão <code>20262_IS3_GrupoXX_NomeDoProjeto</code> (ex.: <code>20262_IS3_Grupo03_GestChe</code>).</li>
-        <li><strong>Inclusão de colaboradores:</strong> convide todos os colegas do grupo em <em>Settings → Collaborators</em>. É obrigatório adicionar o usuário do professor (<code>GeovaneGriesang</code>) como colaborador, para acompanhamento continuado.</li>
-        <li>
-          <strong>Criação da documentação do repositório (README.md):</strong> o repositório precisa conter uma descrição clara para a comunidade externa e para avaliação:
-          <div class="code-block"><div class="code-head"><span class="code-lang">markdown</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code># Projeto: [Nome do Software]
-
-## Contexto e Entidade Parceira
-Atendimento à demanda de extensão da **[Nome da Entidade]**, no município de Venâncio Aires/RS.
-
-## Integrantes do Grupo
-* Estudante 1
-* Estudante 2
-* Estudante 3
-
-## Tecnologias Utilizadas
-* Java 25 / JavaFX
-* NetBeans 28
-* MySQL
-* Git / GitHub
-
-## Como Executar o Projeto
-(Instruções serão atualizadas ao longo do semestre)</code></pre></div>
-        </li>
-      </ol>
-    </section>
-
-    <section id="s7">
-      <h2><span class="num">07</span>Checklist e Critérios para Avaliação Processual</h2>
-      <p>Para garantir que o grupo concluiu satisfatoriamente as atividades previstas na Aula 02 (que compõem a avaliação processual contínua de <strong>30% da nota final</strong>), verifique os pontos abaixo antes do término da aula:</p>
-      <ul class="checklist">
-        <li>Repositório criado no GitHub com nome padronizado.</li>
-        <li>Arquivo <code>.gitignore</code> devidamente configurado e commitado (sem subida da pasta <code>build</code> ou <code>nbproject/private</code>).</li>
-        <li>Arquivo <code>README.md</code> inicial preenchido com a entidade parceira e nome dos integrantes.</li>
-        <li>Professor adicionado como colaborador do repositório.</li>
-        <li>Projeto NetBeans 28 / JavaFX criado, versionado e sincronizado (<code>git push</code>) com sucesso na branch padrão <code>main</code>.</li>
-        <li>Credenciais temporárias limpas nos terminais do laboratório.</li>
-      </ul>
-    </section>
-
-    <section id="s8">
-      <h2><span class="num">08</span>Referências e Materiais Complementares</h2>
+      <h2><span class="num">06</span>Referências e Materiais Complementares</h2>
       <ul class="refs">
         <li><span class="ref-kind">Livro</span>DEITEL, P. J.; DEITEL, H. M. <strong>Java: como programar</strong>. 10. ed. São Paulo, SP: Pearson, 2017.</li>
         <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
