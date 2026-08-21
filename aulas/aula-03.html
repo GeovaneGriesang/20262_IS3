@@ -779,7 +779,7 @@
       </dl>
     </div>
 
-    <div class="callout"><strong>Antes de começar:</strong> confira se os itens do <a href="aula-02.html#s7">checklist da Aula 02</a> estão concluídos, repositório criado, <code>.gitignore</code> commitado, projeto Maven versionado e sincronizado com o GitHub. A aula de hoje parte desse ponto.</div>
+    <div class="callout"><strong>Antes de começar:</strong> confira se o trabalho da Aula 02 está concluído, repositório criado, <code>.gitignore</code> commitado, projeto Maven versionado e sincronizado com o GitHub. A aula de hoje parte desse ponto.</div>
 
     <nav class="toc" aria-label="Índice">
       <h2>Índice</h2>
@@ -789,9 +789,7 @@
         <li><a href="#s3"><span class="n">03</span>Branches no Git: Trabalho Paralelo sem Pisar no Colega</a></li>
         <li><a href="#s4"><span class="n">04</span>Prática Guiada: Criando, Mesclando e Resolvendo Conflitos</a></li>
         <li><a href="#s5"><span class="n">05</span>Avanço no Projeto Exemplo TenisShop: Camada DAO</a></li>
-        <li><a href="#s6"><span class="n">06</span>Atividade Prática dos Grupos de Extensão</a></li>
-        <li><a href="#s7"><span class="n">07</span>Checklist e Avaliação Processual</a></li>
-        <li><a href="#s8"><span class="n">08</span>Referências e Materiais Complementares</a></li>
+        <li><a href="#s6"><span class="n">06</span>Referências e Materiais Complementares</a></li>
       </ol>
     </nav>
 
@@ -1035,77 +1033,7 @@
     </section>
 
     <section id="s6">
-      <h2><span class="num">06</span>Atividade Prática dos Grupos de Extensão</h2>
-      <p>A lista de grupos, entidades parceiras e planilhas de acompanhamento é a mesma publicada na <a href="../index.html#projetos">página inicial da disciplina (seção Projetos)</a>. Hoje o trabalho de cada grupo tem duas frentes, que podem ser divididas entre os integrantes.</p>
-
-      <h3>Publicando o Projeto do Grupo no Repositório do GitHub (Passo Obrigatório)</h3>
-      <p>Depois de criar o projeto que vocês estão desenvolvendo junto à entidade (com o <code>git init</code> feito na Aula 02) e de criar o repositório vazio no GitHub (Seção 06 da Aula 02), é necessário subir esse projeto para o repositório remoto:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># 1. Conectar o repositório local ao repositório remoto no GitHub</span>
-<span class="tok-kw">git</span> <span class="tok-fn">remote</span> <span class="tok-fn">add</span> origin <span class="tok-var">&lt;LINK DO REPOSITÓRIO NO GITHUB&gt;</span>
-
-<span class="tok-comment"># 2. Enviar o branch local (master) para o remoto</span>
-<span class="tok-kw">git</span> <span class="tok-fn">push</span> <span class="tok-flag">-u</span> origin master
-
-<span class="tok-comment"># 3. Buscar o branch main que já existia no GitHub (criado com README ao criar o repositório)</span>
-<span class="tok-kw">git</span> <span class="tok-fn">fetch</span> origin main:refs/remotes/origin/main
-
-<span class="tok-comment"># 4. Criar um branch local "main" rastreando o main remoto</span>
-<span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-flag">-b</span> main origin/main
-
-<span class="tok-comment"># 5. Mesclar o conteúdo do master (todo o projeto) dentro do main</span>
-<span class="tok-kw">git</span> <span class="tok-fn">merge</span> master <span class="tok-flag">-m</span> <span class="tok-str">"merge: unifica main com conteudo do master"</span> <span class="tok-flag">--allow-unrelated-histories</span>
-
-<span class="tok-comment"># 6. Enviar o main atualizado (com todo o projeto) para o GitHub</span>
-<span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
-      <div class="callout"><strong>Observação:</strong> os passos 3–5 só são necessários se o repositório no GitHub já tinha um branch <code>main</code> com um README criado na hora de gerar o repositório, diferente do <code>master</code> local. Se o repositório no GitHub estiver vazio (sem nenhum commit), bastam os passos 1 e 2, usando <code>main</code> no lugar de <code>master</code> se preferirem manter esse nome padrão.</div>
-
-      <p>Se o passo 1 der erro porque o repositório local já tem um remote <code>origin</code> configurado (por exemplo, de um clone anterior), verifique e corrija com:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Verifica qual URL está configurada</span>
-<span class="tok-kw">git</span> <span class="tok-fn">remote</span> <span class="tok-flag">-v</span>
-
-<span class="tok-comment"># Troca a URL do remote existente</span>
-<span class="tok-kw">git</span> <span class="tok-fn">remote</span> <span class="tok-fn">set-url</span> origin <span class="tok-var">&lt;LINK DO REPOSITÓRIO NO GITHUB&gt;</span></code></pre></div>
-
-      <h3>Frente 1: Levantamento de Requisitos</h3>
-      <ol class="plain">
-        <li>Conduza (ou revise, se já tiver ocorrido) a conversa com a entidade parceira usando o roteiro da Seção 02.</li>
-        <li>Registre a lista inicial de funcionalidades no <code>README.md</code> ou em <code>docs/requisitos.md</code> do repositório do grupo.</li>
-        <li>Faça commit e push dessa documentação direto na <code>main</code>; documentação não precisa de branch separada.</li>
-      </ol>
-
-      <h3>Frente 2: Primeira Branch de Funcionalidade</h3>
-      <ol class="plain">
-        <li>Escolha, junto com o grupo, a entidade de domínio central do projeto (equivalente ao <code>Usuario</code> do TenisShop).</li>
-        <li>Crie uma branch <code>feature/&lt;entidade&gt;-dao</code> e implemente ao menos um método de DAO, como listar todos os registros, seguindo o exemplo da Seção 05.</li>
-        <li>Faça merge da branch para a <code>main</code> localmente, resolvendo qualquer conflito conforme a Seção 03.</li>
-        <li>Envie (<code>push</code>) a <code>main</code> atualizada ao GitHub.</li>
-      </ol>
-
-      <div class="callout-warn">
-        <strong>Regras de ouro do laboratório (seguem valendo)</strong>
-        <ol class="plain">
-          <li>Chegou no computador da escola? A primeira ação é <code>git pull origin main</code>.</li>
-          <li>Vai criar uma branch? Avise o grupo para ninguém duplicar o mesmo trabalho.</li>
-          <li>Ao sair, confirme que fez <code>push</code> e removeu credenciais e Personal Access Token do laboratório.</li>
-        </ol>
-      </div>
-    </section>
-
-    <section id="s7">
-      <h2><span class="num">07</span>Checklist e Critérios para Avaliação Processual</h2>
-      <p>Estes itens compõem a avaliação processual contínua (30% da nota final) referente à Aula 03. Verifique antes do término da aula:</p>
-      <ul class="checklist">
-        <li>Lista inicial de requisitos da entidade parceira registrada no repositório (<code>README.md</code> ou <code>docs/requisitos.md</code>).</li>
-        <li>Branch de funcionalidade criada com nome padronizado (<code>feature/...</code>).</li>
-        <li>Pelo menos um método de DAO implementado para a entidade central do projeto do grupo.</li>
-        <li>Merge da branch para a <code>main</code> concluído, sem marcadores de conflito esquecidos no código.</li>
-        <li>Repositório sincronizado (<code>git push</code>) com sucesso na branch <code>main</code>.</li>
-        <li>Credenciais temporárias e Personal Access Token limpos nos terminais do laboratório.</li>
-      </ul>
-    </section>
-
-    <section id="s8">
-      <h2><span class="num">08</span>Referências e Materiais Complementares</h2>
+      <h2><span class="num">06</span>Referências e Materiais Complementares</h2>
       <ul class="refs">
         <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
         <li><span class="ref-kind">Livro</span>RANGEL, Pablo; CARVALHO JUNIOR, José Gomes de. <strong>Sistemas Orientados a Objetos: teoria e prática com UML e Java</strong>. Rio de Janeiro: Brasport, 2021.</li>
