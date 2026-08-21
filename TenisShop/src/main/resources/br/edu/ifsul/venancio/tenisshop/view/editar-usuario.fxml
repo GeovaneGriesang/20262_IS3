@@ -15,7 +15,7 @@
    </padding>
    <children>
       <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="Editar Usuário" />
-      <Label style="-fx-text-fill: #525252;" text="A senha não é alterada aqui — isso é feito na tela &quot;Alterar Senha&quot;, pelo próprio usuário." wrapText="true" />
+      <Label style="-fx-text-fill: #525252;" text="A senha não é alterada aqui: isso é feito na tela &quot;Alterar Senha&quot;, pelo próprio usuário." wrapText="true" />
       <VBox spacing="4.0">
          <children>
             <Label text="Nome completo" />

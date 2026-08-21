@@ -12,7 +12,7 @@ import java.util.Base64;
  * pessoas, de baixa entropia), aqui o token já nasce aleatório e de alta
  * entropia (gerado por SecureRandom), então não precisa de um hash lento
  * e salgado: um SHA-256 comum é suficiente e, por ser determinístico,
- * permite buscar o token no banco com "WHERE token_hash = ?" — algo que
+ * permite buscar o token no banco com "WHERE token_hash = ?"; algo que
  * um hash BCrypt (salgado, diferente a cada chamada) não permite.
  *
  * @author Geovane Griesang

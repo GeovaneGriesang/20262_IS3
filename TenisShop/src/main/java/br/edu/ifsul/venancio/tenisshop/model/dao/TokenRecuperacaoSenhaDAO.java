@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * Classe responsável pelo acesso a dados dos tokens de recuperação de
  * senha. Só o hash SHA-256 do token (nunca o token em texto puro) passa
- * por esta classe — ver TokenUtil.
+ * por esta classe (ver TokenUtil).
  *
  * @author Geovane Griesang
  */
@@ -42,7 +42,7 @@ public class TokenRecuperacaoSenhaDAO {
      * Invalida qualquer token de recuperação ainda válido de um usuário.
      * Chamado tanto ao criar um token novo (só o mais recente deve
      * funcionar) quanto sempre que a senha do usuário muda por qualquer
-     * outro caminho (UsuarioDAO.alterarSenha) — sem isso, um token antigo
+     * outro caminho (UsuarioDAO.alterarSenha); sem isso, um token antigo
      * ainda dentro do prazo de validade continuaria funcionando mesmo
      * depois da pessoa já ter trocado a senha por conta própria.
      * @param usuarioId id do usuário cujos tokens serão invalidados
@@ -59,7 +59,7 @@ public class TokenRecuperacaoSenhaDAO {
     /**
      * Busca um token válido (ainda não usado e ainda não expirado) pelo
      * seu hash. Uma única consulta já garante as duas regras de segurança
-     * (uso único e expiração) — se não achar nada, o token não pode ser
+     * (uso único e expiração); se não achar nada, o token não pode ser
      * aceito, seja porque não existe, já foi usado, ou já expirou.
      * @param tokenHash hash SHA-256 do token digitado pelo usuário
      * @return TokenRecuperacaoSenha token válido encontrado, ou null

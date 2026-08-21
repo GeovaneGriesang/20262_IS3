@@ -145,11 +145,11 @@ public class SchemaInitializer {
 
     /**
      * Amplia auditoria.detalhe para VARCHAR(500) se ainda estiver no
-     * tamanho antigo, VARCHAR(255) — o histórico de campo a campo (Aula
+     * tamanho antigo, VARCHAR(255): o histórico de campo a campo (Aula
      * 06) precisa de mais espaço que a frase curta genérica de antes.
      * Diferente de adicionarColunaVersaoSeNaoExistir, aqui a checagem não
      * é "a coluna existe?" (ela sempre existiu), e sim "a coluna já está
-     * do tamanho certo?" — outra pergunta comum ao evoluir um schema aos
+     * do tamanho certo?", outra pergunta comum ao evoluir um schema aos
      * poucos, e outra forma de consultar INFORMATION_SCHEMA para
      * responder isso sem risco de rodar o ALTER à toa toda vez.
      */
@@ -161,7 +161,7 @@ public class SchemaInitializer {
         try (Statement stmt = conexao.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (!rs.next()) {
-                return; // tabela auditoria ainda não existia antes desta chamada — já nasce no tamanho certo
+                return; // tabela auditoria ainda não existia antes desta chamada; já nasce no tamanho certo
             }
             tamanhoAtual = rs.getInt(1);
         }
@@ -189,7 +189,7 @@ public class SchemaInitializer {
             return;
         }
 
-        // O hash é calculado agora, na hora de semear — nunca colado pronto
+        // O hash é calculado agora, na hora de semear, nunca colado pronto
         // num script SQL. Como o BCrypt gera um salt novo a cada chamada,
         // um hash fixo salvo em texto ficaria "desatualizado" e não bateria
         // mais com uma nova geração; calculando em runtime, a única coisa

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Representa um evento registrado na trilha de auditoria do sistema:
  * quem fez, o quê, em qual registro e quando. nomeUsuario não é uma
- * coluna própria da tabela auditoria — vem de um LEFT JOIN com usuarios
+ * coluna própria da tabela auditoria: vem de um LEFT JOIN com usuarios
  * em AuditoriaDAO.listarTodos(), só para a tela não precisar de uma
  * segunda consulta para mostrar o nome de quem agiu.
  *

@@ -26,7 +26,7 @@ import javafx.scene.control.TextField;
 /**
  * Controller da tela administrativa de cadastro de usuários. É a única
  * tela do sistema em que o perfil de acesso pode ser escolhido livremente
- * (inclusive ADMINISTRADOR) — o autocadastro público (CadastroController)
+ * (inclusive ADMINISTRADOR); o autocadastro público (CadastroController)
  * nunca oferece essa opção, sempre cria OPERADOR.
  *
  * @author Geovane Griesang
@@ -60,7 +60,7 @@ public class CadastrarUsuarioController {
     private void initialize() throws IOException {
         // Guarda dupla: o botão de acesso a esta tela já só aparece para
         // administradores em principal.fxml, mas o Controller confere de
-        // novo antes de mostrar qualquer coisa — nunca confiar só na UI.
+        // novo antes de mostrar qualquer coisa; nunca confiar só na UI.
         if (TenisShop.usuarioLogado == null || TenisShop.usuarioLogado.getPerfil() != Perfil.ADMINISTRADOR) {
             TenisShop.setRoot("principal");
             return;
@@ -122,7 +122,7 @@ public class CadastrarUsuarioController {
                     "USUARIO", novoUsuario.getId(), "Usuário \"" + novoUsuario.getNome() + "\" criado com perfil " + novoUsuario.getPerfil() + ".");
 
             showAlert("Usuário \"" + novoUsuario.getNome() + "\" cadastrado com sucesso!\n\n"
-                    + "Anote a senha temporária agora — ela não pode ser recuperada depois:\n"
+                    + "Anote a senha temporária agora, ela não pode ser recuperada depois:\n"
                     + pwdSenhaTemporaria.getText(), AlertType.INFORMATION);
             TenisShop.setRoot("principal");
         } catch (SQLException e) {

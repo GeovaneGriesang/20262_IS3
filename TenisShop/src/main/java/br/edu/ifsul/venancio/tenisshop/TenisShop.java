@@ -2,6 +2,7 @@ package br.edu.ifsul.venancio.tenisshop;
 
 import br.edu.ifsul.venancio.tenisshop.model.dao.SchemaInitializer;
 import br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
+import br.edu.ifsul.venancio.tenisshop.model.util.EmailUtil;
 import java.io.IOException;
 import java.sql.SQLException;
 import javafx.application.Application;
@@ -10,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -40,6 +42,13 @@ public class TenisShop extends Application {
     public void start(Stage stage) throws IOException {
         TenisShop.stage = stage;
 
+        // Várias resoluções do mesmo ícone: o sistema operacional escolhe
+        // sozinho a mais adequada para cada contexto (barra de tarefas,
+        // Alt+Tab, cantinho da janela), sem esticar nem borrar a imagem.
+        for (int tamanho : new int[] {16, 32, 48, 64, 128, 256}) {
+            stage.getIcons().add(new Image(TenisShop.class.getResourceAsStream("icon-" + tamanho + ".png")));
+        }
+
         try {
             // Roda antes de qualquer tela: cria tabelas/colunas que ainda
             // não existem e semeia o primeiro administrador, se o banco
@@ -55,6 +64,22 @@ public class TenisShop extends Application {
             return;
         }
 
+        // Aviso único, no início: não bloqueia o uso do resto do sistema,
+        // só avisa que a recuperação de senha por e-mail não vai
+        // funcionar. É seguro mostrar isso aqui (mesmo aviso para
+        // qualquer pessoa, antes de qualquer tela de login) porque não
+        // depende de qual e-mail alguém digitou; ver o Javadoc de
+        // EmailUtil.estaConfigurado() para o motivo dessa distinção.
+        if (!EmailUtil.estaConfigurado()) {
+            Alert aviso = new Alert(AlertType.WARNING);
+            aviso.setTitle("TenisShop");
+            aviso.setHeaderText(null);
+            aviso.setContentText("O envio de e-mail não está configurado (arquivo email.properties ausente ou incompleto).\n\n"
+                    + "A recuperação de senha por e-mail não vai funcionar até isso ser configurado; o restante do sistema funciona normalmente.\n\n"
+                    + "Veja src/main/resources/email.properties.example para o modelo.");
+            aviso.showAndWait();
+        }
+
         scene = new Scene(loadFXML("login"));
         stage.setTitle("TenisShop");
         stage.setScene(scene);
@@ -67,7 +92,7 @@ public class TenisShop extends Application {
      * este método (ex.: TenisShop.setRoot("principal")) para navegar.
      * Cada tela tem seu próprio prefWidth/prefHeight no FXML, e o
      * sizeToScene() garante que a janela sempre reajusta para o tamanho
-     * preferido da tela nova — sem ele, a janela ficaria travada no
+     * preferido da tela nova; sem ele, a janela ficaria travada no
      * tamanho da tela anterior, cortando botões de telas maiores.
      * @param fxml nome do arquivo FXML, sem a extensão (ex.: "login")
      * @throws IOException se o FXML não existir ou tiver erro de carga

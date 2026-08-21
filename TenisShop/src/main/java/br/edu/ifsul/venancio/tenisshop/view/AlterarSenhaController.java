@@ -22,7 +22,7 @@ import javafx.scene.layout.VBox;
  * Controller da tela de troca de senha. Atende dois casos com a mesma
  * tela: a troca voluntária (usuário já logado decide trocar a senha) e a
  * troca obrigatória de primeiro acesso (usuarioLogado.getDeveTrocarSenha()
- * é true logo após o login) — neste segundo caso, o campo de senha atual
+ * é true logo após o login); neste segundo caso, o campo de senha atual
  * some, porque o usuário já provou quem é ao autenticar nesta mesma
  * sessão, e o botão Cancelar some, porque a troca não pode ser adiada.
  *

@@ -8,8 +8,8 @@ import java.sql.SQLException;
 
 /**
  * Classe responsável pelo acesso a dados da configuração global do sistema.
- * Sempre existe exatamente uma linha (id = 1) nesta tabela — ver
- * SchemaInitializer, que garante isso na inicialização da aplicação.
+ * Sempre existe exatamente uma linha (id = 1) nesta tabela (ver
+ * SchemaInitializer, que garante isso na inicialização da aplicação).
  *
  * @author Geovane Griesang
  */

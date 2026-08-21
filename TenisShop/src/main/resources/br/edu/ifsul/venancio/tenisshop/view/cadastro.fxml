@@ -30,7 +30,7 @@
          <children>
             <Label text="Senha" />
             <PasswordField fx:id="pwdSenha" />
-            <Label fx:id="lblForcaSenha" style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Força: —" />
+            <Label fx:id="lblForcaSenha" style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Força: -" />
             <Label style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Entre 8 e 72 caracteres, com maiúscula, minúscula, número e símbolo." wrapText="true" />
          </children>
       </VBox>
@@ -41,6 +41,6 @@
          </children>
       </VBox>
       <Button fx:id="btnCadastrar" disable="true" defaultButton="true" onAction="#btnCadastrarAction" style="-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;" text="Criar Conta" />
-      <Hyperlink onAction="#irParaLogin" text="Já tenho conta — voltar ao login" />
+      <Hyperlink onAction="#irParaLogin" text="Já tenho conta, voltar ao login" />
    </children>
 </VBox>

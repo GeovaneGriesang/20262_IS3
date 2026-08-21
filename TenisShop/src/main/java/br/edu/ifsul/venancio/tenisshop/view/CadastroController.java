@@ -24,7 +24,7 @@ import javafx.scene.control.TextField;
 /**
  * Controller do autocadastro público. Deliberadamente NÃO existe nenhum
  * campo de perfil aqui: toda conta criada por esta tela nasce como
- * Perfil.OPERADOR, fixo no código — só a tela administrativa
+ * Perfil.OPERADOR, fixo no código; só a tela administrativa
  * (CadastrarUsuarioController) pode criar um Administrador. A tela é
  * bloqueada duas vezes contra a configuração "permitir autocadastro": o
  * link para chegar aqui já some no login quando está desligada, e o
@@ -113,7 +113,7 @@ public class CadastroController {
         try {
             // Diferente do login (que nunca revela se um e-mail existe),
             // um formulário público de cadastro dizer "este e-mail já
-            // está em uso" é o padrão esperado em qualquer site — a
+            // está em uso" é o padrão esperado em qualquer site; a
             // alternativa (fingir sucesso) só confunde quem já tem conta.
             if (usuarioDAO.existeEmail(email)) {
                 showAlert("Já existe uma conta cadastrada com este e-mail.", AlertType.ERROR);
