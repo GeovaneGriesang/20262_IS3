@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="440.0" prefWidth="420.0" spacing="14.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.AlterarSenhaController">
+   <padding>
+      <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+   </padding>
+   <children>
+      <Label fx:id="lblTitulo" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="Alterar Senha" wrapText="true" />
+      <Label fx:id="lblExplicacao" style="-fx-text-fill: #525252;" text="Defina uma nova senha para sua conta." wrapText="true" />
+      <VBox fx:id="boxSenhaAtual" spacing="4.0">
+         <children>
+            <Label text="Senha atual" />
+            <PasswordField fx:id="pwdSenhaAtual" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Nova senha" />
+            <PasswordField fx:id="pwdNovaSenha" />
+            <Label fx:id="lblForcaSenha" style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Força: —" />
+            <Label style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Entre 8 e 72 caracteres, com maiúscula, minúscula, número e símbolo." wrapText="true" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Confirmar nova senha" />
+            <PasswordField fx:id="pwdConfirmarSenha" />
+         </children>
+      </VBox>
+      <HBox alignment="CENTER" spacing="12.0">
+         <children>
+            <Button fx:id="btnCancelar" onAction="#btnCancelarAction" text="Cancelar" />
+            <Button fx:id="btnSalvar" disable="true" onAction="#btnSalvarAction" style="-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;" text="Salvar Nova Senha" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="480.0" prefWidth="620.0" spacing="14.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.ListarUsuariosController">
+   <padding>
+      <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+   </padding>
+   <children>
+      <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="Usuários Cadastrados" />
+      <TableView fx:id="tblUsuarios" prefHeight="360.0" prefWidth="580.0">
+         <columns>
+            <TableColumn fx:id="colNome" prefWidth="180.0" text="Nome" />
+            <TableColumn fx:id="colEmail" prefWidth="220.0" text="E-mail" />
+            <TableColumn fx:id="colPerfil" prefWidth="100.0" text="Perfil" />
+            <TableColumn fx:id="colAtivo" prefWidth="70.0" text="Ativo" />
+         </columns>
+      </TableView>
+      <HBox alignment="CENTER" spacing="12.0">
+         <children>
+            <Button onAction="#irParaPrincipal" text="Voltar" />
+            <Button fx:id="btnEditar" disable="true" onAction="#btnEditarAction" style="-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;" text="Editar" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

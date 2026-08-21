@@ -2,15 +2,17 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="320.0" prefWidth="420.0" spacing="24.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.LoginController">
+<VBox alignment="CENTER" prefHeight="360.0" prefWidth="420.0" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.LoginController">
    <padding>
       <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
    </padding>
@@ -33,5 +35,11 @@
          </children>
       </GridPane>
       <Button defaultButton="true" onAction="#btnLoginAction" style="-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;" text="Entrar" />
+      <HBox alignment="CENTER" spacing="18.0">
+         <children>
+            <Hyperlink onAction="#irParaEsqueciSenha" text="Esqueci minha senha?" />
+            <Hyperlink fx:id="lnkCadastrar" onAction="#irParaCadastro" text="Cadastrar-se" />
+         </children>
+      </HBox>
    </children>
 </VBox>

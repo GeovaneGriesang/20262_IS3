@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="540.0" prefWidth="920.0" spacing="14.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.AuditoriaController">
+   <padding>
+      <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+   </padding>
+   <children>
+      <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="Auditoria do Sistema" />
+      <Label style="-fx-text-fill: #525252;" text="Registro somente leitura de ações realizadas no sistema, da mais recente para a mais antiga — incluindo, para cada edição, exatamente quais campos mudaram e para que valor." wrapText="true" />
+      <TableView fx:id="tblAuditoria" prefHeight="400.0" prefWidth="880.0">
+         <columns>
+            <TableColumn fx:id="colDataHora" prefWidth="130.0" text="Quando" />
+            <TableColumn fx:id="colUsuario" prefWidth="130.0" text="Quem" />
+            <TableColumn fx:id="colAcao" prefWidth="170.0" text="Ação" />
+            <TableColumn fx:id="colEntidade" prefWidth="90.0" text="Entidade" />
+            <TableColumn fx:id="colDetalhe" prefWidth="350.0" text="Detalhes" />
+         </columns>
+      </TableView>
+      <Button onAction="#irParaPrincipal" text="Voltar" />
+   </children>
+</VBox>

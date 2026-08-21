@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" prefHeight="560.0" prefWidth="440.0" spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.CadastrarUsuarioController">
+   <padding>
+      <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+   </padding>
+   <children>
+      <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="Cadastrar Usuário" />
+      <Label style="-fx-text-fill: #525252;" text="Tela administrativa: aqui é possível definir o perfil de acesso do novo usuário." wrapText="true" />
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Nome completo" />
+            <TextField fx:id="txtNome" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="E-mail" />
+            <TextField fx:id="txtEmail" promptText="usuario@ifsul.edu.br" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Perfil de acesso" />
+            <ComboBox fx:id="cmbPerfil" maxWidth="Infinity" />
+         </children>
+      </VBox>
+      <VBox spacing="4.0">
+         <children>
+            <Label text="Senha temporária" />
+            <PasswordField fx:id="pwdSenhaTemporaria" />
+            <Label fx:id="lblForcaSenha" style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Força: —" />
+            <Label style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Entre 8 e 72 caracteres, com maiúscula, minúscula, número e símbolo." wrapText="true" />
+         </children>
+      </VBox>
+      <CheckBox fx:id="chkForcarTrocaSenha" selected="true" text="Exigir troca de senha no primeiro acesso" />
+      <HBox alignment="CENTER" spacing="12.0">
+         <children>
+            <Button onAction="#btnCancelarAction" text="Cancelar" />
+            <Button fx:id="btnCadastrar" disable="true" onAction="#btnCadastrarAction" style="-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;" text="Cadastrar Usuário" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

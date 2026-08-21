@@ -5,14 +5,23 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="360.0" prefWidth="420.0" spacing="16.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.PrincipalController">
+<VBox alignment="CENTER" prefHeight="500.0" prefWidth="420.0" spacing="14.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ifsul.venancio.tenisshop.view.PrincipalController">
    <padding>
       <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
    </padding>
    <children>
       <Label fx:id="lblBoasVindas" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Bem-vindo!" />
       <Label fx:id="lblPerfil" text="Perfil:" />
-      <Label fx:id="lblAreaAdmin" managed="false" style="-fx-text-fill: #1f6b2c; -fx-font-weight: bold;" text="Área administrativa (exemplo de nível de acesso)" visible="false" />
+      <Button onAction="#irParaAlterarSenha" text="Alterar minha senha" />
+      <VBox fx:id="boxAreaAdmin" alignment="CENTER" managed="false" spacing="8.0" visible="false">
+         <children>
+            <Label style="-fx-text-fill: #1f6b2c; -fx-font-weight: bold;" text="Área administrativa" />
+            <Button onAction="#irParaCadastrarUsuario" text="Cadastrar Usuário" />
+            <Button onAction="#irParaListarUsuarios" text="Listar/Editar Usuários" />
+            <Button onAction="#irParaConfiguracoesSistema" text="Configurações do Sistema" />
+            <Button onAction="#irParaAuditoria" text="Auditoria" />
+         </children>
+      </VBox>
       <Button onAction="#sair" text="Sair" />
    </children>
 </VBox>

@@ -6,6 +6,7 @@ import java.io.IOException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 /**
  * Controller da tela inicial exibida após o login no TenisShop.
@@ -25,7 +26,7 @@ public class PrincipalController {
     private Label lblPerfil;
 
     @FXML
-    private Label lblAreaAdmin;
+    private VBox boxAreaAdmin;
 
     @FXML
     private void initialize() {
@@ -34,12 +35,38 @@ public class PrincipalController {
             lblPerfil.setText("Perfil: " + TenisShop.usuarioLogado.getPerfil());
 
             // Nível de acesso em ação: o Enum decide o que aparece na tela.
-            // As telas reais (Controllers futuros) repetem essa mesma ideia
-            // para esconder botões e menus inteiros por perfil.
+            // As telas administrativas (CadastrarUsuarioController,
+            // ConfiguracoesSistemaController) repetem essa mesma checagem
+            // por conta própria, para não confiar só em um botão escondido.
             boolean ehAdministrador = TenisShop.usuarioLogado.getPerfil() == Perfil.ADMINISTRADOR;
-            lblAreaAdmin.setVisible(ehAdministrador);
-            lblAreaAdmin.setManaged(ehAdministrador);
+            boxAreaAdmin.setVisible(ehAdministrador);
+            boxAreaAdmin.setManaged(ehAdministrador);
         }
+    }
+
+    @FXML
+    private void irParaAlterarSenha(ActionEvent event) throws IOException {
+        TenisShop.setRoot("alterar-senha");
+    }
+
+    @FXML
+    private void irParaCadastrarUsuario(ActionEvent event) throws IOException {
+        TenisShop.setRoot("cadastrar-usuario");
+    }
+
+    @FXML
+    private void irParaListarUsuarios(ActionEvent event) throws IOException {
+        TenisShop.setRoot("listar-usuarios");
+    }
+
+    @FXML
+    private void irParaConfiguracoesSistema(ActionEvent event) throws IOException {
+        TenisShop.setRoot("configuracoes-sistema");
+    }
+
+    @FXML
+    private void irParaAuditoria(ActionEvent event) throws IOException {
+        TenisShop.setRoot("auditoria");
     }
 
     @FXML
