@@ -20,7 +20,7 @@ public class UsuarioDAO {
 
     // Hash "de mentira", calculado uma única vez, usado só para gastar o
     // mesmo tempo de um BCrypt.checkpw() de verdade quando o e-mail nem
-    // existe (ver autenticar()) — sem isso, uma resposta rápida demais já
+    // existe (ver autenticar()); sem isso, uma resposta rápida demais já
     // denunciaria que o e-mail não tem conta, mesmo com a mensagem de
     // erro sendo idêntica nos dois casos.
     private static final String HASH_FICTICIO = SenhaUtil.gerarHash("senha-usada-so-para-igualar-o-tempo-de-resposta");
@@ -75,7 +75,7 @@ public class UsuarioDAO {
      * assim mesmo (contra um hash fixo, sem relação com o e-mail
      * digitado): o BCrypt é lento de propósito, então pular essa conta
      * faria a resposta voltar visivelmente mais rápido para e-mails sem
-     * conta — um jeito de descobrir quais e-mails têm cadastro só
+     * conta, um jeito de descobrir quais e-mails têm cadastro só
      * cronometrando a resposta, mesmo com a mensagem de erro sendo
      * idêntica nos dois casos (ver LoginController).
      * @param email e-mail digitado no login
@@ -141,7 +141,7 @@ public class UsuarioDAO {
 
     /**
      * Insere um novo usuário no banco de dados. A senha já deve chegar
-     * como hash BCrypt (gerado com SenhaUtil.gerarHash) — este método
+     * como hash BCrypt (gerado com SenhaUtil.gerarHash); este método
      * nunca hasheia nem valida a senha, só persiste o que recebeu.
      * @param usuario usuário a inserir; após a chamada, usuario.getId() é preenchido com o id gerado
      * @throws SQLException caso ocorra falha na inserção
@@ -172,7 +172,7 @@ public class UsuarioDAO {
      * define se ele deverá trocá-la novamente no próximo login. Usado
      * tanto pela troca de senha comum quanto pela redefinição via token.
      * Qualquer token de recuperação ainda válido do usuário é invalidado
-     * junto — sem isso, um token antigo (de um e-mail de recuperação
+     * junto; sem isso, um token antigo (de um e-mail de recuperação
      * anterior) continuaria funcionando mesmo depois da senha já ter
      * mudado por outro caminho, dentro da janela de 30 minutos.
      * @param usuarioId id do usuário
@@ -195,8 +195,8 @@ public class UsuarioDAO {
     }
 
     /**
-     * Atualiza os dados cadastrais (nome, e-mail, perfil, ativo — nunca a
-     * senha, que só é trocada por alterarSenha) de um usuário existente,
+     * Atualiza os dados cadastrais (nome, e-mail, perfil, ativo, mas nunca
+     * a senha, que só é trocada por alterarSenha) de um usuário existente,
      * usando controle de concorrência otimista: o UPDATE só é aplicado se
      * a versão informada em usuario.getVersao() ainda for a versão atual
      * no banco, e a versão é incrementada junto. Se outra atualização já

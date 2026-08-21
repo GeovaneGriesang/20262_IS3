@@ -30,7 +30,7 @@ import javafx.scene.control.TextField;
  * retorna false, e esta tela recarrega os dados em vez de sobrescrever
  * silenciosamente o que a outra pessoa salvou.
  *
- * O campo usuarioEditado nunca é modificado depois de carregado — ele
+ * O campo usuarioEditado nunca é modificado depois de carregado; ele
  * funciona como o "retrato" (memento) do estado anterior, usado só para
  * comparação em AuditoriaUtil.descreverAlteracoesUsuario(). Os dados
  * novos do formulário vão para um objeto Usuario separado, montado só
@@ -73,7 +73,7 @@ public class EditarUsuarioController {
 
         try {
             // Sempre busca de novo no banco, nunca confia na linha que veio
-            // da tabela de ListarUsuariosController — é assim que a versão
+            // da tabela de ListarUsuariosController; é assim que a versão
             // conferida no Salvar reflete o estado mais recente possível.
             usuarioEditado = new UsuarioDAO().buscarPorId(TenisShop.usuarioEmEdicao.getId());
             if (usuarioEditado == null) {
@@ -109,7 +109,7 @@ public class EditarUsuarioController {
             }
 
             // usuarioEditado (carregado em initialize()) nunca é tocado
-            // daqui pra frente — é o "antes" que AuditoriaUtil vai comparar
+            // daqui pra frente; é o "antes" que AuditoriaUtil vai comparar
             // contra o "depois" montado abaixo. id, senha, versao e
             // deveTrocarSenha vêm copiados dele porque esta tela não edita
             // nenhum desses campos.
@@ -127,7 +127,7 @@ public class EditarUsuarioController {
 
             if (!atualizado) {
                 showAlert("Este usuário foi alterado por outra pessoa desde que esta tela foi aberta.\n\n"
-                        + "Os dados serão recarregados — refaça as alterações necessárias.", AlertType.ERROR);
+                        + "Os dados serão recarregados, refaça as alterações necessárias.", AlertType.ERROR);
                 TenisShop.setRoot("editar-usuario");
                 return;
             }
@@ -145,7 +145,7 @@ public class EditarUsuarioController {
      * Registra a auditoria da edição, escolhendo a ação certa conforme o
      * que mudou: uma mudança de ativo=true para ativo=false é o mais
      * próximo que este sistema tem de "remover" um usuário (não existe
-     * exclusão definitiva — ver o porquê na Aula 06), então ganha uma
+     * exclusão definitiva (ver o porquê na Aula 06), então ganha uma
      * ação própria e mais visível (USUARIO_DESATIVADO) em vez de cair no
      * genérico USUARIO_ATUALIZADO. O detalhe, nos três casos, é sempre a
      * descrição completa de tudo que mudou, não só do campo ativo.

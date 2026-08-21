@@ -15,7 +15,7 @@ import java.util.Properties;
  * Classe utilitária para enviar e-mails via SMTP (usada pela recuperação
  * de senha). As credenciais SMTP nunca ficam no código-fonte: são lidas em
  * tempo de execução de "email.properties", um arquivo fora do controle de
- * versão (ver email.properties.example e o .gitignore do projeto) — a
+ * versão (ver email.properties.example e o .gitignore do projeto); a
  * mesma prática de nunca commitar credenciais já discutida na Aula 02.
  *
  * @author Geovane Griesang
@@ -23,6 +23,43 @@ import java.util.Properties;
 public class EmailUtil {
 
     private static final String ARQUIVO_CONFIGURACAO = "/email.properties";
+    private static final String[] CHAVES_OBRIGATORIAS = {"smtp.host", "smtp.port", "smtp.usuario", "smtp.senha", "smtp.from"};
+
+    // Valores exatos do modelo em email.properties.example: se alguém só
+    // renomear o arquivo sem editar o conteúdo, smtp.senha continua igual
+    // a este placeholder, e estaConfigurado() precisa detectar isso como
+    // "não configurado", não como uma senha de app válida.
+    private static final String PLACEHOLDER_SENHA = "sua-senha-de-app-aqui";
+
+    /**
+     * Confere se email.properties existe e tem as credenciais mínimas
+     * preenchidas (não confirma que as credenciais são válidas de verdade;
+     * só um EmailUtil.enviar() bem-sucedido confirma isso). Usado em
+     * TenisShop.start() para avisar, uma única vez, que a recuperação de
+     * senha por e-mail não vai funcionar; esse aviso é seguro porque é o
+     * mesmo para qualquer pessoa que abrir o sistema, não depende de qual
+     * e-mail foi digitado em nenhuma tela, então não enfraquece a
+     * proteção contra descobrir quais e-mails têm conta (ver
+     * EsqueciSenhaController).
+     * @return true se todas as chaves obrigatórias estão presentes e preenchidas
+     */
+    public static boolean estaConfigurado() {
+        Properties configuracoes;
+        try {
+            configuracoes = carregarConfiguracoes();
+        } catch (IOException e) {
+            return false;
+        }
+
+        for (String chave : CHAVES_OBRIGATORIAS) {
+            String valor = configuracoes.getProperty(chave);
+            if (valor == null || valor.isBlank()) {
+                return false;
+            }
+        }
+
+        return !PLACEHOLDER_SENHA.equals(configuracoes.getProperty("smtp.senha"));
+    }
 
     /**
      * Envia um e-mail em texto puro pelo servidor SMTP configurado em

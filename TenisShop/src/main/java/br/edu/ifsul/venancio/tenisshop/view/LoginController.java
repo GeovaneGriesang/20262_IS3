@@ -49,7 +49,7 @@ public class LoginController {
     private void initialize() {
         // O link de autocadastro só aparece se a configuração do sistema
         // permitir; se a consulta falhar (banco fora do ar), o link fica
-        // escondido por padrão — mais seguro esconder na dúvida.
+        // escondido por padrão: mais seguro esconder na dúvida.
         boolean permitido = false;
         try {
             permitido = Boolean.TRUE.equals(new ConfiguracaoSistemaDAO().buscar().getPermitirAutocadastro());

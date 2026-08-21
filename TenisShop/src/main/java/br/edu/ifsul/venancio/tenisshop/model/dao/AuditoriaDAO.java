@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Classe responsável pelo acesso a dados da trilha de auditoria. Chamada
  * pelos Controllers logo depois de uma escrita já ter dado certo (nunca
- * pelos outros DAOs de escrita diretamente) — só o Controller sabe quem
+ * pelos outros DAOs de escrita diretamente); só o Controller sabe quem
  * é TenisShop.usuarioLogado, quem está realizando a ação.
  *
  * @author Geovane Griesang
@@ -61,7 +61,7 @@ public class AuditoriaDAO {
 
     /**
      * Lista todos os eventos de auditoria, do mais recente para o mais
-     * antigo. Sem paginação — mesmo padrão simples usado no restante do
+     * antigo. Sem paginação: mesmo padrão simples usado no restante do
      * sistema (ver listarTodos() de UsuarioDAO).
      * @return List<Auditoria> eventos registrados
      * @throws SQLException caso ocorra falha na consulta

@@ -39,7 +39,7 @@
          <children>
             <Label text="Senha temporária" />
             <PasswordField fx:id="pwdSenhaTemporaria" />
-            <Label fx:id="lblForcaSenha" style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Força: —" />
+            <Label fx:id="lblForcaSenha" style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Força: -" />
             <Label style="-fx-font-size: 11px; -fx-text-fill: #737373;" text="Entre 8 e 72 caracteres, com maiúscula, minúscula, número e símbolo." wrapText="true" />
          </children>
       </VBox>

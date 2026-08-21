@@ -19,13 +19,13 @@ import javafx.scene.control.TextField;
  * Controller do primeiro passo da recuperação de senha: pedir o e-mail.
  * Ponto central de segurança desta tela: ela SEMPRE mostra a mesma
  * mensagem e SEMPRE navega para a tela seguinte, não importa se o e-mail
- * existe, se o usuário está inativo, ou se o envio do e-mail falhou —
+ * existe, se o usuário está inativo, ou se o envio do e-mail falhou;
  * exatamente a mesma lógica de "não revelar quais e-mails têm conta" já
  * usada no login (LoginController), só que aplicada também ao fluxo, não
  * só ao texto da mensagem. Ela também tenta não revelar isso pelo
  * <em>tempo</em> de resposta: sem usuário, o processamento retorna quase
  * na hora; com usuário, grava um token e manda e-mail, o que demora bem
- * mais — ver DURACAO_MINIMA_MS.
+ * mais (ver DURACAO_MINIMA_MS).
  *
  * @author Geovane Griesang
  */
@@ -37,7 +37,7 @@ public class EsqueciSenhaController {
     // Tempo mínimo (em milissegundos) que a tela espera antes de
     // responder, contado a partir do clique. Sem isso, um e-mail sem
     // conta responderia visivelmente mais rápido que um e-mail com conta
-    // (que grava um token no banco e manda um e-mail de verdade) — outro
+    // (que grava um token no banco e manda um e-mail de verdade); outro
     // jeito de descobrir, cronometrando, quais e-mails têm cadastro,
     // mesmo com a mensagem sendo idêntica nos dois casos.
     private static final long DURACAO_MINIMA_MS = 400;
@@ -58,7 +58,7 @@ public class EsqueciSenhaController {
 
         // Todo o processamento fica dentro deste try isolado: qualquer
         // exceção é só registrada no console, nunca aparece pro usuário
-        // nem muda a navegação — ver o porquê no Javadoc da classe.
+        // nem muda a navegação (ver o porquê no Javadoc da classe).
         try {
             processarPedidoDeRecuperacao(email);
         } catch (Exception e) {
@@ -105,7 +105,7 @@ public class EsqueciSenhaController {
                 + "Use o código abaixo na tela \"Redefinir Senha\" do sistema:\n\n"
                 + token + "\n\n"
                 + "Este código é válido por " + VALIDADE_TOKEN_MINUTOS + " minutos e só pode ser usado uma vez.\n"
-                + "Se você não pediu essa redefinição, ignore este e-mail — sua senha continua a mesma.";
+                + "Se você não pediu essa redefinição, ignore este e-mail: sua senha continua a mesma.";
 
         EmailUtil.enviar(email, "TenisShop - Redefinição de senha", corpo);
     }

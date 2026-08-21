@@ -13,7 +13,7 @@
    </padding>
    <children>
       <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;" text="Auditoria do Sistema" />
-      <Label style="-fx-text-fill: #525252;" text="Registro somente leitura de ações realizadas no sistema, da mais recente para a mais antiga — incluindo, para cada edição, exatamente quais campos mudaram e para que valor." wrapText="true" />
+      <Label style="-fx-text-fill: #525252;" text="Registro somente leitura de ações realizadas no sistema, da mais recente para a mais antiga, incluindo, para cada edição, exatamente quais campos mudaram e para que valor." wrapText="true" />
       <TableView fx:id="tblAuditoria" prefHeight="400.0" prefWidth="880.0">
          <columns>
             <TableColumn fx:id="colDataHora" prefWidth="130.0" text="Quando" />

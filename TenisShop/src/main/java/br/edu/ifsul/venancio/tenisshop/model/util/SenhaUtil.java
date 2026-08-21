@@ -23,7 +23,7 @@ public class SenhaUtil {
 
     // O BCrypt ignora, em silêncio, qualquer byte além do 72º: duas senhas
     // diferentes que só divergem depois disso gerariam o mesmo hash. Uma
-    // senha "forte" de verdade também precisa respeitar esse teto — cada
+    // senha "forte" de verdade também precisa respeitar esse teto; cada
     // tela com campo de senha nova deve avisar esse limite, não só o
     // mínimo (ver Aula 04, Seção 09).
     private static final int TAMANHO_MAXIMO_BYTES = 72;

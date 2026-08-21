@@ -17,7 +17,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 /**
- * Controller da tela administrativa de listagem de usuários — a primeira
+ * Controller da tela administrativa de listagem de usuários, a primeira
  * TableView do projeto. Fecha uma lacuna que existia desde a Aula 04:
  * até aqui, um administrador só conseguia CRIAR usuários
  * (CadastrarUsuarioController), nunca listar ou editar um já existente.

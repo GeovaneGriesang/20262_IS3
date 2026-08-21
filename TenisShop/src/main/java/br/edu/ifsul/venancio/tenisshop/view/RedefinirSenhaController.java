@@ -26,7 +26,7 @@ import javafx.scene.control.TextField;
  * recebido por e-mail e salvar a nova senha. Assim como no primeiro
  * passo, o erro é sempre a mesma mensagem genérica ("código inválido ou
  * expirado"), sem distinguir se o e-mail não existe, o código é de outra
- * conta, já foi usado ou já expirou — cada uma dessas distinções daria a
+ * conta, já foi usado ou já expirou; cada uma dessas distinções daria a
  * quem está tentando adivinhar uma pista a mais do que deveria ter.
  *
  * @author Geovane Griesang
@@ -112,7 +112,7 @@ public class RedefinirSenhaController {
             TokenRecuperacaoSenha token = tokenDAO.buscarValidoPorHash(tokenHash);
 
             // Mesma mensagem genérica nos três casos: sem usuário, sem
-            // token, ou token de outra conta — nunca dizer qual deles foi.
+            // token, ou token de outra conta; nunca dizer qual deles foi.
             if (usuario == null || token == null || !token.getUsuarioId().equals(usuario.getId())) {
                 showAlert(MENSAGEM_ERRO_GENERICA, AlertType.ERROR);
                 return;

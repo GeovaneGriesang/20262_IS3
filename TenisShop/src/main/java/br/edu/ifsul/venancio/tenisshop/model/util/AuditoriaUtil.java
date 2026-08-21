@@ -4,7 +4,7 @@ import br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
 
 /**
  * Classe utilitária que compara o estado de um registro antes e depois
- * de uma edição, e descreve em texto exatamente o que mudou — campo a
+ * de uma edição, e descreve em texto exatamente o que mudou: campo a
  * campo, com o valor antigo e o novo. É o que permite à trilha de
  * auditoria (Aula 06) responder não só "o que foi alterado", mas
  * "para que valor mudou".
@@ -13,13 +13,13 @@ import br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
  * (GoF, categoria comportamental): guardar o estado de um objeto num
  * momento específico, sem que esse "retrato" seja alterado enquanto o
  * objeto original continua mudando. Aqui, o parâmetro "antes" é
- * exatamente esse retrato — o estado do usuário no instante em que a
+ * exatamente esse retrato: o estado do usuário no instante em que a
  * tela de edição foi aberta (ver EditarUsuarioController), guardado
  * intacto enquanto o formulário monta um objeto "depois" separado com
  * os dados novos. O Memento clássico do GoF também sabe <em>restaurar</em>
  * esse estado antigo automaticamente (um "desfazer"); esta versão é
- * simplificada, só para exibição — ninguém aqui clica em "desfazer" e
- * volta o banco ao estado anterior —, mas a ideia central (capturar uma
+ * simplificada, só para exibição (ninguém aqui clica em "desfazer" e
+ * volta o banco ao estado anterior), mas a ideia central (capturar uma
  * fotografia do estado para consultar depois, sem misturar com o estado
  * atual) é a mesma.
  *
@@ -32,8 +32,8 @@ public class AuditoriaUtil {
 
     /**
      * Compara dois estados de um mesmo usuário e descreve, campo a
-     * campo, o que mudou entre eles (nome, e-mail, perfil, ativo — nunca
-     * a senha).
+     * campo, o que mudou entre eles (nome, e-mail, perfil, ativo, mas
+     * nunca a senha).
      * @param antes estado do usuário antes da edição (o "retrato" tirado ao abrir a tela)
      * @param depois estado do usuário com os dados novos do formulário, ainda não salvos
      * @return String descrição legível de cada campo alterado, ou uma mensagem indicando que nada mudou

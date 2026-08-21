@@ -21,7 +21,7 @@ import javafx.scene.control.TableView;
  * o que AuditoriaDAO.registrar() já vem acumulando desde cada ponto de
  * escrita instrumentado do sistema (cadastro/edição de usuário, troca de
  * senha, login com sucesso ou falha, autocadastro, alteração de
- * configuração). Não existe filtro ou busca nesta primeira versão — só a
+ * configuração). Não existe filtro ou busca nesta primeira versão, só a
  * listagem completa, mais recente primeiro.
  *
  * @author Geovane Griesang
@@ -58,13 +58,13 @@ public class AuditoriaController {
         colDataHora.setCellValueFactory(dados ->
                 new SimpleStringProperty(dados.getValue().getDataHora().format(FORMATO_DATA_HORA)));
         colUsuario.setCellValueFactory(dados ->
-                new SimpleStringProperty(dados.getValue().getNomeUsuario() != null ? dados.getValue().getNomeUsuario() : "—"));
+                new SimpleStringProperty(dados.getValue().getNomeUsuario() != null ? dados.getValue().getNomeUsuario() : "-"));
         colAcao.setCellValueFactory(dados ->
                 new SimpleStringProperty(dados.getValue().getAcao().name()));
         colEntidade.setCellValueFactory(dados -> {
             Auditoria evento = dados.getValue();
             if (evento.getEntidade() == null) {
-                return new SimpleStringProperty("—");
+                return new SimpleStringProperty("-");
             }
             String texto = evento.getEntidadeId() != null
                     ? evento.getEntidade() + " #" + evento.getEntidadeId()
@@ -72,7 +72,7 @@ public class AuditoriaController {
             return new SimpleStringProperty(texto);
         });
         colDetalhe.setCellValueFactory(dados ->
-                new SimpleStringProperty(dados.getValue().getDetalhe() != null ? dados.getValue().getDetalhe() : "—"));
+                new SimpleStringProperty(dados.getValue().getDetalhe() != null ? dados.getValue().getDetalhe() : "-"));
 
         try {
             tblAuditoria.setItems(FXCollections.observableArrayList(new AuditoriaDAO().listarTodos()));
