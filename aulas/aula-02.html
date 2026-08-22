@@ -534,7 +534,7 @@
   .code-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     padding: 7px 14px;
     background: var(--surface-2);
     border-bottom: 1px solid var(--border);
@@ -547,6 +547,26 @@
     text-transform: uppercase;
     color: var(--text-faint);
   }
+  .code-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .code-toggle:hover { background: var(--surface-2); color: var(--text); }
+  .code-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .copy-btn {
     display: inline-flex;
     align-items: center;
@@ -562,12 +582,14 @@
     padding: 3px 7px;
     border-radius: 5px;
     font-family: inherit;
+    margin-left: auto;
   }
   .copy-btn:hover { background: var(--surface); color: var(--text); }
   .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .copy-btn svg { flex-shrink: 0; }
   .copy-btn.copied { color: var(--accent-ink); }
   .code-block pre {
+    display: none;
     margin: 0;
     padding: 14px 18px;
     background: var(--code-bg);
@@ -576,6 +598,7 @@
     font-size: 0.84rem;
     line-height: 1.7;
   }
+  .code-block.expanded pre { display: block; }
   .code-block code { background: none; border: none; padding: 0; font-size: 1em; color: var(--text); }
   code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
@@ -1209,43 +1232,85 @@
       <button type="button" class="download-btn" data-filename="Usuario.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCmltcG9ydCBqYXZhLnRpbWUuTG9jYWxEYXRlVGltZTsKCi8qKgogKiBSZXByZXNlbnRhIGEgZW50aWRhZGUgVXN1w6FyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqIENvbnTDqW0gb3MgYXRyaWJ1dG9zLCBjb25zdHJ1dG9yZXMsIGdldHRlcnMgZSBzZXR0ZXJzLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBVc3VhcmlvIHsKICAgIHByaXZhdGUgSW50ZWdlciBpZDsKICAgIHByaXZhdGUgU3RyaW5nIG5vbWU7CiAgICBwcml2YXRlIFN0cmluZyBlbWFpbDsKICAgIHByaXZhdGUgU3RyaW5nIHNlbmhhOwogICAgcHJpdmF0ZSBTdHJpbmcgcGVyZmlsOwogICAgcHJpdmF0ZSBCb29sZWFuIGF0aXZvOwogICAgcHJpdmF0ZSBMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybzsKCiAgICBwdWJsaWMgVXN1YXJpbygpIHsKICAgIH0KCiAgICBwdWJsaWMgVXN1YXJpbyhJbnRlZ2VyIGlkLCBTdHJpbmcgbm9tZSwgU3RyaW5nIGVtYWlsLCBTdHJpbmcgc2VuaGEsIFN0cmluZyBwZXJmaWwsIEJvb2xlYW4gYXRpdm8pIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICAgICAgdGhpcy5ub21lID0gbm9tZTsKICAgICAgICB0aGlzLmVtYWlsID0gZW1haWw7CiAgICAgICAgdGhpcy5zZW5oYSA9IHNlbmhhOwogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgICAgIHRoaXMuYXRpdm8gPSBhdGl2bzsKICAgIH0KCiAgICAvLyBHZXR0ZXJzIGUgU2V0dGVycwogICAgcHVibGljIEludGVnZXIgZ2V0SWQoKSB7CiAgICAgICAgcmV0dXJuIGlkOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldElkKEludGVnZXIgaWQpIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXROb21lKCkgewogICAgICAgIHJldHVybiBub21lOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldE5vbWUoU3RyaW5nIG5vbWUpIHsKICAgICAgICB0aGlzLm5vbWUgPSBub21lOwogICAgfQoKICAgIHB1YmxpYyBTdHJpbmcgZ2V0RW1haWwoKSB7CiAgICAgICAgcmV0dXJuIGVtYWlsOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldEVtYWlsKFN0cmluZyBlbWFpbCkgewogICAgICAgIHRoaXMuZW1haWwgPSBlbWFpbDsKICAgIH0KCiAgICBwdWJsaWMgU3RyaW5nIGdldFNlbmhhKCkgewogICAgICAgIHJldHVybiBzZW5oYTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRTZW5oYShTdHJpbmcgc2VuaGEpIHsKICAgICAgICB0aGlzLnNlbmhhID0gc2VuaGE7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXRQZXJmaWwoKSB7CiAgICAgICAgcmV0dXJuIHBlcmZpbDsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRQZXJmaWwoU3RyaW5nIHBlcmZpbCkgewogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgfQoKICAgIHB1YmxpYyBCb29sZWFuIGdldEF0aXZvKCkgewogICAgICAgIHJldHVybiBhdGl2bzsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRBdGl2byhCb29sZWFuIGF0aXZvKSB7CiAgICAgICAgdGhpcy5hdGl2byA9IGF0aXZvOwogICAgfQoKICAgIHB1YmxpYyBMb2NhbERhdGVUaW1lIGdldERhdGFDYWRhc3RybygpIHsKICAgICAgICByZXR1cm4gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldERhdGFDYWRhc3RybyhMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybykgewogICAgICAgIHRoaXMuZGF0YUNhZGFzdHJvID0gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIEBPdmVycmlkZQogICAgcHVibGljIFN0cmluZyB0b1N0cmluZygpIHsKICAgICAgICByZXR1cm4gdGhpcy5ub21lICsgIiAoIiArIHRoaXMucGVyZmlsICsgIikiOwogICAgfQp9"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Usuario.java</span></button>
 
       <h3>Conexão com o Banco de Dados: ConexaoBanco.java</h3>
+      <p>As credenciais do banco <strong>nunca</strong> ficam no código-fonte: são lidas em tempo de execução de <code>db.properties</code>, um arquivo fora do controle de versão, listado no <code>.gitignore</code>; só um modelo com valores de exemplo (<code>db.properties.example</code>) é commitado. É a mesma prática que a recuperação de senha por e-mail vai usar mais adiante, na Aula 04.</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">gitignore</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Credenciais do banco de dados MySQL - nunca versionar</span>
+/src/main/resources/db.properties</code></pre></div>
+
+      <p class="file-path">Local: <code>src/main/resources/db.properties.example</code> (copie para <code>db.properties</code>, mesma pasta, e preencha com as credenciais do MySQL do laboratório)</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">properties</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Modelo de configuração da conexão com o banco de dados MySQL (Aula 02).</span>
+<span class="tok-comment"># Copie este arquivo para &quot;db.properties&quot; (mesma pasta) e preencha com suas</span>
+<span class="tok-comment"># credenciais reais - &quot;db.properties&quot; está no .gitignore e NUNCA deve ser</span>
+<span class="tok-comment"># commitado.</span>
+
+db.url=jdbc:mysql://localhost:3306/tenisshop_db?useSSL=false&amp;serverTimezone=UTC
+db.usuario=root
+db.senha=</code></pre></div>
+      <button type="button" class="download-btn" data-filename="db.properties.example" data-b64="IyBNb2RlbG8gZGUgY29uZmlndXJhw6fDo28gZGEgY29uZXjDo28gY29tIG8gYmFuY28gZGUgZGFkb3MgTXlTUUwgKEF1bGEgMDIpLgojIENvcGllIGVzdGUgYXJxdWl2byBwYXJhICJkYi5wcm9wZXJ0aWVzIiAobWVzbWEgcGFzdGEpIGUgcHJlZW5jaGEgY29tIHN1YXMKIyBjcmVkZW5jaWFpcyByZWFpcyAtICJkYi5wcm9wZXJ0aWVzIiBlc3TDoSBubyAuZ2l0aWdub3JlIGUgTlVOQ0EgZGV2ZSBzZXIKIyBjb21taXRhZG8uCgpkYi51cmw9amRiYzpteXNxbDovL2xvY2FsaG9zdDozMzA2L3Rlbmlzc2hvcF9kYj91c2VTU0w9ZmFsc2Umc2VydmVyVGltZXpvbmU9VVRDCmRiLnVzdWFyaW89cm9vdApkYi5zZW5oYT0K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar db.properties.example</span></button>
+      <div class="callout-warn"><strong>Laboratório do IFSul:</strong> se o MySQL do computador tiver senha, coloque-a em <code>db.senha</code>; se não tiver (configuração padrão local), deixe em branco, como no modelo.</div>
+
       <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/dao/ConexaoBanco.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.dao;
 
+<span class="tok-kw">import</span> java.io.<span class="tok-fn">IOException</span>;
+<span class="tok-kw">import</span> java.io.<span class="tok-fn">InputStream</span>;
 <span class="tok-kw">import</span> java.sql.<span class="tok-fn">Connection</span>;
 <span class="tok-kw">import</span> java.sql.<span class="tok-fn">DriverManager</span>;
 <span class="tok-kw">import</span> java.sql.<span class="tok-fn">SQLException</span>;
+<span class="tok-kw">import</span> java.util.<span class="tok-fn">Properties</span>;
 
 <span class="tok-comment">/**
  * Classe responsável por gerenciar e fornecer conexões com o banco de dados MySQL.
  * Aplica o padrão de projeto Singleton simples para reaproveitamento da conexão.
+ * As credenciais nunca ficam no código-fonte: são lidas em tempo de execução
+ * de &quot;db.properties&quot;, um arquivo fora do controle de versão (ver
+ * db.properties.example e o .gitignore do projeto); a mesma prática já usada
+ * para as credenciais SMTP (ver EmailUtil, Aula 04).
  *
  * @author Geovane Griesang
  */</span>
 <span class="tok-kw">public</span> <span class="tok-kw">class</span> <span class="tok-fn">ConexaoBanco</span> {
 
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">String</span> <span class="tok-fn">URL</span> = <span class="tok-str">&quot;jdbc:mysql://localhost:3306/tenisshop_db?useSSL=false&amp;serverTimezone=UTC&quot;</span>;
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">String</span> <span class="tok-fn">USUARIO</span> = <span class="tok-str">&quot;root&quot;</span>;
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">String</span> <span class="tok-fn">SENHA</span> = <span class="tok-str">&quot;changeme&quot;</span>; <span class="tok-comment">// Insira a senha do MySQL do laboratório, se houver</span>
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> <span class="tok-fn">String</span> <span class="tok-fn">ARQUIVO_CONFIGURACAO</span> = <span class="tok-str">&quot;/db.properties&quot;</span>;
 
     <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-fn">Connection</span> conexao = <span class="tok-kw">null</span>;
 
     <span class="tok-comment">/**
      * Obtém uma conexão ativa com o banco de dados.
      * @return Connection objeto de conexão SQL
-     * @throws SQLException caso ocorra falha na conexão
+     * @throws SQLException caso ocorra falha na conexão ou na leitura de db.properties
      */</span>
     <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-fn">Connection</span> getConexao() <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
         <span class="tok-kw">try</span> {
             <span class="tok-kw">if</span> (conexao == <span class="tok-kw">null</span> || conexao.isClosed()) {
+                <span class="tok-fn">Properties</span> configuracoes = carregarConfiguracoes();
+                <span class="tok-fn">String</span> url = configuracoes.getProperty(<span class="tok-str">&quot;db.url&quot;</span>);
+                <span class="tok-fn">String</span> usuario = configuracoes.getProperty(<span class="tok-str">&quot;db.usuario&quot;</span>);
+                <span class="tok-fn">String</span> senha = configuracoes.getProperty(<span class="tok-str">&quot;db.senha&quot;</span>, <span class="tok-str">&quot;&quot;</span>);
+
                 <span class="tok-fn">Class</span>.forName(<span class="tok-str">&quot;com.mysql.cj.jdbc.Driver&quot;</span>);
-                conexao = <span class="tok-fn">DriverManager</span>.getConnection(<span class="tok-fn">URL</span>, <span class="tok-fn">USUARIO</span>, <span class="tok-fn">SENHA</span>);
+                conexao = <span class="tok-fn">DriverManager</span>.getConnection(url, usuario, senha);
                 <span class="tok-fn">System</span>.out.println(<span class="tok-str">&quot;[INFO] Conexão com o banco de dados realizada com sucesso!&quot;</span>);
             }
             <span class="tok-kw">return</span> conexao;
         } <span class="tok-kw">catch</span> (<span class="tok-fn">ClassNotFoundException</span> e) {
             <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-fn">SQLException</span>(<span class="tok-str">&quot;[ERRO] Driver JDBC do MySQL não foi encontrado.&quot;</span>, e);
+        } <span class="tok-kw">catch</span> (<span class="tok-fn">IOException</span> e) {
+            <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-fn">SQLException</span>(<span class="tok-str">&quot;[ERRO] Não foi possível ler db.properties.&quot;</span>, e);
         }
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-fn">Properties</span> carregarConfiguracoes() <span class="tok-kw">throws</span> <span class="tok-fn">IOException</span> {
+        <span class="tok-fn">Properties</span> configuracoes = <span class="tok-kw">new</span> <span class="tok-fn">Properties</span>();
+        <span class="tok-kw">try</span> (<span class="tok-fn">InputStream</span> entrada = <span class="tok-fn">ConexaoBanco</span>.<span class="tok-kw">class</span>.getResourceAsStream(<span class="tok-fn">ARQUIVO_CONFIGURACAO</span>)) {
+            <span class="tok-kw">if</span> (entrada == <span class="tok-kw">null</span>) {
+                <span class="tok-kw">throw</span> <span class="tok-kw">new</span> <span class="tok-fn">IOException</span>(
+                    <span class="tok-str">&quot;[ERRO] Arquivo db.properties não encontrado em src/main/resources. &quot;</span>
+                    + <span class="tok-str">&quot;Copie db.properties.example, renomeie para db.properties e preencha as credenciais do MySQL.&quot;</span>
+                );
+            }
+            configuracoes.load(entrada);
+        }
+        <span class="tok-kw">return</span> configuracoes;
     }
 
     <span class="tok-comment">/**
@@ -1264,7 +1329,7 @@
         }
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="ConexaoBanco.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsKCmltcG9ydCBqYXZhLnNxbC5Db25uZWN0aW9uOwppbXBvcnQgamF2YS5zcWwuRHJpdmVyTWFuYWdlcjsKaW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKCi8qKgogKiBDbGFzc2UgcmVzcG9uc8OhdmVsIHBvciBnZXJlbmNpYXIgZSBmb3JuZWNlciBjb25leMO1ZXMgY29tIG8gYmFuY28gZGUgZGFkb3MgTXlTUUwuCiAqIEFwbGljYSBvIHBhZHLDo28gZGUgcHJvamV0byBTaW5nbGV0b24gc2ltcGxlcyBwYXJhIHJlYXByb3ZlaXRhbWVudG8gZGEgY29uZXjDo28uCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGNsYXNzIENvbmV4YW9CYW5jbyB7CgogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgU3RyaW5nIFVSTCA9ICJqZGJjOm15c3FsOi8vbG9jYWxob3N0OjMzMDYvdGVuaXNzaG9wX2RiP3VzZVNTTD1mYWxzZSZzZXJ2ZXJUaW1lem9uZT1VVEMiOwogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgU3RyaW5nIFVTVUFSSU8gPSAicm9vdCI7CiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBTdHJpbmcgU0VOSEEgPSAiY2hhbmdlbWUiOyAvLyBJbnNpcmEgYSBzZW5oYSBkbyBNeVNRTCBkbyBsYWJvcmF0w7NyaW8sIHNlIGhvdXZlcgoKICAgIHByaXZhdGUgc3RhdGljIENvbm5lY3Rpb24gY29uZXhhbyA9IG51bGw7CgogICAgLyoqCiAgICAgKiBPYnTDqW0gdW1hIGNvbmV4w6NvIGF0aXZhIGNvbSBvIGJhbmNvIGRlIGRhZG9zLgogICAgICogQHJldHVybiBDb25uZWN0aW9uIG9iamV0byBkZSBjb25leMOjbyBTUUwKICAgICAqIEB0aHJvd3MgU1FMRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIG5hIGNvbmV4w6NvCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgQ29ubmVjdGlvbiBnZXRDb25leGFvKCkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgaWYgKGNvbmV4YW8gPT0gbnVsbCB8fCBjb25leGFvLmlzQ2xvc2VkKCkpIHsKICAgICAgICAgICAgICAgIENsYXNzLmZvck5hbWUoImNvbS5teXNxbC5jai5qZGJjLkRyaXZlciIpOwogICAgICAgICAgICAgICAgY29uZXhhbyA9IERyaXZlck1hbmFnZXIuZ2V0Q29ubmVjdGlvbihVUkwsIFVTVUFSSU8sIFNFTkhBKTsKICAgICAgICAgICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiW0lORk9dIENvbmV4w6NvIGNvbSBvIGJhbmNvIGRlIGRhZG9zIHJlYWxpemFkYSBjb20gc3VjZXNzbyEiKTsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4gY29uZXhhbzsKICAgICAgICB9IGNhdGNoIChDbGFzc05vdEZvdW5kRXhjZXB0aW9uIGUpIHsKICAgICAgICAgICAgdGhyb3cgbmV3IFNRTEV4Y2VwdGlvbigiW0VSUk9dIERyaXZlciBKREJDIGRvIE15U1FMIG7Do28gZm9pIGVuY29udHJhZG8uIiwgZSk7CiAgICAgICAgfQogICAgfQoKICAgIC8qKgogICAgICogRmVjaGEgYSBjb25leMOjbyBjb20gbyBiYW5jbyBkZSBkYWRvcyBjYXNvIGVzdGVqYSBhYmVydGEuCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBmZWNoYXJDb25leGFvKCkgewogICAgICAgIGlmIChjb25leGFvICE9IG51bGwpIHsKICAgICAgICAgICAgdHJ5IHsKICAgICAgICAgICAgICAgIGlmICghY29uZXhhby5pc0Nsb3NlZCgpKSB7CiAgICAgICAgICAgICAgICAgICAgY29uZXhhby5jbG9zZSgpOwogICAgICAgICAgICAgICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiW0lORk9dIENvbmV4w6NvIGNvbSBvIGJhbmNvIGRlIGRhZG9zIGVuY2VycmFkYS4iKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGUpIHsKICAgICAgICAgICAgICAgIFN5c3RlbS5lcnIucHJpbnRsbigiW0VSUk9dIEZhbGhhIGFvIGZlY2hhciBhIGNvbmV4w6NvOiAiICsgZS5nZXRNZXNzYWdlKCkpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQp9"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar ConexaoBanco.java</span></button>
+      <button type="button" class="download-btn" data-filename="ConexaoBanco.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsNCg0KaW1wb3J0IGphdmEuaW8uSU9FeGNlcHRpb247DQppbXBvcnQgamF2YS5pby5JbnB1dFN0cmVhbTsNCmltcG9ydCBqYXZhLnNxbC5Db25uZWN0aW9uOw0KaW1wb3J0IGphdmEuc3FsLkRyaXZlck1hbmFnZXI7DQppbXBvcnQgamF2YS5zcWwuU1FMRXhjZXB0aW9uOw0KaW1wb3J0IGphdmEudXRpbC5Qcm9wZXJ0aWVzOw0KDQovKioNCiAqIENsYXNzZSByZXNwb25zw6F2ZWwgcG9yIGdlcmVuY2lhciBlIGZvcm5lY2VyIGNvbmV4w7VlcyBjb20gbyBiYW5jbyBkZSBkYWRvcyBNeVNRTC4NCiAqIEFwbGljYSBvIHBhZHLDo28gZGUgcHJvamV0byBTaW5nbGV0b24gc2ltcGxlcyBwYXJhIHJlYXByb3ZlaXRhbWVudG8gZGEgY29uZXjDo28uDQogKiBBcyBjcmVkZW5jaWFpcyBudW5jYSBmaWNhbSBubyBjw7NkaWdvLWZvbnRlOiBzw6NvIGxpZGFzIGVtIHRlbXBvIGRlIGV4ZWN1w6fDo28NCiAqIGRlICJkYi5wcm9wZXJ0aWVzIiwgdW0gYXJxdWl2byBmb3JhIGRvIGNvbnRyb2xlIGRlIHZlcnPDo28gKHZlcg0KICogZGIucHJvcGVydGllcy5leGFtcGxlIGUgbyAuZ2l0aWdub3JlIGRvIHByb2pldG8pOyBhIG1lc21hIHByw6F0aWNhIGrDoSB1c2FkYQ0KICogcGFyYSBhcyBjcmVkZW5jaWFpcyBTTVRQICh2ZXIgRW1haWxVdGlsLCBBdWxhIDA0KS4NCiAqDQogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcNCiAqLw0KcHVibGljIGNsYXNzIENvbmV4YW9CYW5jbyB7DQoNCiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBTdHJpbmcgQVJRVUlWT19DT05GSUdVUkFDQU8gPSAiL2RiLnByb3BlcnRpZXMiOw0KDQogICAgcHJpdmF0ZSBzdGF0aWMgQ29ubmVjdGlvbiBjb25leGFvID0gbnVsbDsNCg0KICAgIC8qKg0KICAgICAqIE9idMOpbSB1bWEgY29uZXjDo28gYXRpdmEgY29tIG8gYmFuY28gZGUgZGFkb3MuDQogICAgICogQHJldHVybiBDb25uZWN0aW9uIG9iamV0byBkZSBjb25leMOjbyBTUUwNCiAgICAgKiBAdGhyb3dzIFNRTEV4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBuYSBjb25leMOjbyBvdSBuYSBsZWl0dXJhIGRlIGRiLnByb3BlcnRpZXMNCiAgICAgKi8NCiAgICBwdWJsaWMgc3RhdGljIENvbm5lY3Rpb24gZ2V0Q29uZXhhbygpIHRocm93cyBTUUxFeGNlcHRpb24gew0KICAgICAgICB0cnkgew0KICAgICAgICAgICAgaWYgKGNvbmV4YW8gPT0gbnVsbCB8fCBjb25leGFvLmlzQ2xvc2VkKCkpIHsNCiAgICAgICAgICAgICAgICBQcm9wZXJ0aWVzIGNvbmZpZ3VyYWNvZXMgPSBjYXJyZWdhckNvbmZpZ3VyYWNvZXMoKTsNCiAgICAgICAgICAgICAgICBTdHJpbmcgdXJsID0gY29uZmlndXJhY29lcy5nZXRQcm9wZXJ0eSgiZGIudXJsIik7DQogICAgICAgICAgICAgICAgU3RyaW5nIHVzdWFyaW8gPSBjb25maWd1cmFjb2VzLmdldFByb3BlcnR5KCJkYi51c3VhcmlvIik7DQogICAgICAgICAgICAgICAgU3RyaW5nIHNlbmhhID0gY29uZmlndXJhY29lcy5nZXRQcm9wZXJ0eSgiZGIuc2VuaGEiLCAiIik7DQoNCiAgICAgICAgICAgICAgICBDbGFzcy5mb3JOYW1lKCJjb20ubXlzcWwuY2ouamRiYy5Ecml2ZXIiKTsNCiAgICAgICAgICAgICAgICBjb25leGFvID0gRHJpdmVyTWFuYWdlci5nZXRDb25uZWN0aW9uKHVybCwgdXN1YXJpbywgc2VuaGEpOw0KICAgICAgICAgICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiW0lORk9dIENvbmV4w6NvIGNvbSBvIGJhbmNvIGRlIGRhZG9zIHJlYWxpemFkYSBjb20gc3VjZXNzbyEiKTsNCiAgICAgICAgICAgIH0NCiAgICAgICAgICAgIHJldHVybiBjb25leGFvOw0KICAgICAgICB9IGNhdGNoIChDbGFzc05vdEZvdW5kRXhjZXB0aW9uIGUpIHsNCiAgICAgICAgICAgIHRocm93IG5ldyBTUUxFeGNlcHRpb24oIltFUlJPXSBEcml2ZXIgSkRCQyBkbyBNeVNRTCBuw6NvIGZvaSBlbmNvbnRyYWRvLiIsIGUpOw0KICAgICAgICB9IGNhdGNoIChJT0V4Y2VwdGlvbiBlKSB7DQogICAgICAgICAgICB0aHJvdyBuZXcgU1FMRXhjZXB0aW9uKCJbRVJST10gTsOjbyBmb2kgcG9zc8OtdmVsIGxlciBkYi5wcm9wZXJ0aWVzLiIsIGUpOw0KICAgICAgICB9DQogICAgfQ0KDQogICAgcHJpdmF0ZSBzdGF0aWMgUHJvcGVydGllcyBjYXJyZWdhckNvbmZpZ3VyYWNvZXMoKSB0aHJvd3MgSU9FeGNlcHRpb24gew0KICAgICAgICBQcm9wZXJ0aWVzIGNvbmZpZ3VyYWNvZXMgPSBuZXcgUHJvcGVydGllcygpOw0KICAgICAgICB0cnkgKElucHV0U3RyZWFtIGVudHJhZGEgPSBDb25leGFvQmFuY28uY2xhc3MuZ2V0UmVzb3VyY2VBc1N0cmVhbShBUlFVSVZPX0NPTkZJR1VSQUNBTykpIHsNCiAgICAgICAgICAgIGlmIChlbnRyYWRhID09IG51bGwpIHsNCiAgICAgICAgICAgICAgICB0aHJvdyBuZXcgSU9FeGNlcHRpb24oDQogICAgICAgICAgICAgICAgICAgICJbRVJST10gQXJxdWl2byBkYi5wcm9wZXJ0aWVzIG7Do28gZW5jb250cmFkbyBlbSBzcmMvbWFpbi9yZXNvdXJjZXMuICINCiAgICAgICAgICAgICAgICAgICAgKyAiQ29waWUgZGIucHJvcGVydGllcy5leGFtcGxlLCByZW5vbWVpZSBwYXJhIGRiLnByb3BlcnRpZXMgZSBwcmVlbmNoYSBhcyBjcmVkZW5jaWFpcyBkbyBNeVNRTC4iDQogICAgICAgICAgICAgICAgKTsNCiAgICAgICAgICAgIH0NCiAgICAgICAgICAgIGNvbmZpZ3VyYWNvZXMubG9hZChlbnRyYWRhKTsNCiAgICAgICAgfQ0KICAgICAgICByZXR1cm4gY29uZmlndXJhY29lczsNCiAgICB9DQoNCiAgICAvKioNCiAgICAgKiBGZWNoYSBhIGNvbmV4w6NvIGNvbSBvIGJhbmNvIGRlIGRhZG9zIGNhc28gZXN0ZWphIGFiZXJ0YS4NCiAgICAgKi8NCiAgICBwdWJsaWMgc3RhdGljIHZvaWQgZmVjaGFyQ29uZXhhbygpIHsNCiAgICAgICAgaWYgKGNvbmV4YW8gIT0gbnVsbCkgew0KICAgICAgICAgICAgdHJ5IHsNCiAgICAgICAgICAgICAgICBpZiAoIWNvbmV4YW8uaXNDbG9zZWQoKSkgew0KICAgICAgICAgICAgICAgICAgICBjb25leGFvLmNsb3NlKCk7DQogICAgICAgICAgICAgICAgICAgIFN5c3RlbS5vdXQucHJpbnRsbigiW0lORk9dIENvbmV4w6NvIGNvbSBvIGJhbmNvIGRlIGRhZG9zIGVuY2VycmFkYS4iKTsNCiAgICAgICAgICAgICAgICB9DQogICAgICAgICAgICB9IGNhdGNoIChTUUxFeGNlcHRpb24gZSkgew0KICAgICAgICAgICAgICAgIFN5c3RlbS5lcnIucHJpbnRsbigiW0VSUk9dIEZhbGhhIGFvIGZlY2hhciBhIGNvbmV4w6NvOiAiICsgZS5nZXRNZXNzYWdlKCkpOw0KICAgICAgICAgICAgfQ0KICAgICAgICB9DQogICAgfQ0KfQ0K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar ConexaoBanco.java</span></button>
 
       <h3>Classe Principal: TenisShop.java</h3>
       <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/TenisShop.java</code></p>
@@ -1450,6 +1515,28 @@
           fallbackCopy(text);
           showCopied();
         }
+      });
+    });
+  })();
+
+  (function () {
+    document.querySelectorAll(".code-block").forEach(function (block) {
+      var head = block.querySelector(".code-head");
+      if (!head) return;
+
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "code-toggle";
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Mostrar código");
+      toggle.textContent = "+";
+      head.insertBefore(toggle, head.firstChild);
+
+      toggle.addEventListener("click", function () {
+        var expanded = block.classList.toggle("expanded");
+        toggle.textContent = expanded ? "\u2212" : "+";
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        toggle.setAttribute("aria-label", expanded ? "Ocultar código" : "Mostrar código");
       });
     });
   })();
