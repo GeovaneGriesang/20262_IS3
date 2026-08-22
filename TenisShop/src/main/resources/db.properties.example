@@ -1,0 +1,8 @@
+# Modelo de configuração da conexão com o banco de dados MySQL (Aula 02).
+# Copie este arquivo para "db.properties" (mesma pasta) e preencha com suas
+# credenciais reais - "db.properties" está no .gitignore e NUNCA deve ser
+# commitado.
+
+db.url=jdbc:mysql://localhost:3306/tenisshop_db?useSSL=false&serverTimezone=UTC
+db.usuario=root
+db.senha=

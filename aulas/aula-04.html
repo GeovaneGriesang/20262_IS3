@@ -534,7 +534,7 @@
   .code-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     padding: 7px 14px;
     background: var(--surface-2);
     border-bottom: 1px solid var(--border);
@@ -547,6 +547,26 @@
     text-transform: uppercase;
     color: var(--text-faint);
   }
+  .code-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .code-toggle:hover { background: var(--surface-2); color: var(--text); }
+  .code-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .copy-btn {
     display: inline-flex;
     align-items: center;
@@ -562,12 +582,14 @@
     padding: 3px 7px;
     border-radius: 5px;
     font-family: inherit;
+    margin-left: auto;
   }
   .copy-btn:hover { background: var(--surface); color: var(--text); }
   .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .copy-btn svg { flex-shrink: 0; }
   .copy-btn.copied { color: var(--accent-ink); }
   .code-block pre {
+    display: none;
     margin: 0;
     padding: 14px 18px;
     background: var(--code-bg);
@@ -576,6 +598,7 @@
     font-size: 0.84rem;
     line-height: 1.7;
   }
+  .code-block.expanded pre { display: block; }
   .code-block code { background: none; border: none; padding: 0; font-size: 1em; color: var(--text); }
   code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
@@ -896,6 +919,24 @@
         <strong>Por que salt importa</strong>
         <p style="margin:0;">Sem salt, duas pessoas com a mesma senha teriam o mesmo hash salvo no banco, e um atacante com uma tabela pré-computada de hashes comuns (<em>rainbow table</em>) quebraria várias contas de uma vez. Com um salt aleatório por usuário, cada hash é único mesmo para senhas repetidas, e a tabela pré-computada deixa de funcionar. É por isso que BCrypt, Argon2 e PBKDF2 (não o SHA-256 puro) são os algoritmos recomendados para senha.</p>
       </div>
+
+      <h3>Onde o Salt Fica Guardado, e Por que Isso Não é um Problema</h3>
+      <p>O BCrypt não guarda o salt separado, numa coluna à parte: ele embute o salt (junto com a versão do algoritmo e o fator de custo) dentro da própria string do hash, tudo colado numa sequência só. É por isso que <code>SenhaUtil.verificar()</code> não precisa buscar o salt em lugar nenhum, ele já vem junto com o hash lido da coluna <code>senha</code>.</p>
+      <p>A string que <code>SenhaUtil.gerarHash()</code> devolve segue um formato fixo, com quatro partes coladas uma na outra. Este é um hash real, gerado rodando <code>SenhaUtil</code> com <code>admin123</code>:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">texto</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>$2a$10$M.4k3WrnPILWrW4b2OTAZ.lbTCheCcEzVloj5FOPmaKepzzAvi7y2</code></pre></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Trecho</th><th>O que é</th></tr></thead>
+          <tbody>
+            <tr><td><code>$2a$</code></td><td>Versão do algoritmo BCrypt usada para gerar este hash.</td></tr>
+            <tr><td><code>10$</code></td><td>Fator de custo: quantas vezes (2<sup>10</sup>) o algoritmo repete internamente. Quanto maior, mais lento e mais caro de quebrar por força bruta.</td></tr>
+            <tr><td><code>M.4k3WrnPILWrW4b2OTAZ.</code></td><td>O salt: 22 caracteres gerados aleatoriamente por <code>BCrypt.gensalt()</code> a cada chamada.</td></tr>
+            <tr><td><code>lbTCheCcEzVloj5FOPmaKepzzAvi7y2</code></td><td>O hash de verdade: resultado de aplicar o BCrypt, com esse salt e esse custo, sobre a senha em texto puro.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>No login, <code>BCrypt.checkpw(senhaDigitada, hashSalvo)</code> lê essa mesma string salva no banco, separa as quatro partes, pega o salt e o custo de lá, recalcula o hash da senha digitada usando exatamente esse mesmo salt e esse mesmo custo, e compara o resultado com a parte final da string. Tudo isso acontece dentro da biblioteca jBCrypt; <code>SenhaUtil.verificar()</code> só delega para ela (ver Seção 05).</p>
+      <div class="callout-warn"><strong>E se alguém tiver acesso ao banco de dados?</strong> Essa pessoa vê o salt, sim, ele está ali, na própria coluna <code>senha</code>, junto com o hash. Isso não é uma falha: o salt nunca foi pensado para ser secreto, só para impedir que senhas iguais gerem o mesmo hash (o que quebraria uma rainbow table inteira de uma vez). Quem tem acesso ao banco também sabe o fator de custo, e mesmo assim não consegue voltar do hash para a senha original: o único caminho é tentar senhas candidatas, uma por uma, recalculando o hash de cada uma com esse mesmo salt (força bruta ou dicionário) e comparando com o que está salvo. É exatamente aí que o custo proposital do BCrypt e a política de senha forte (Seção 09) entram: uma senha fraca, mesmo com hash e salt corretos, ainda é adivinhável em tempo viável; uma senha forte, não.</div>
     </section>
 
     <section id="s3">
@@ -4982,6 +5023,28 @@ smtp.from=seu.email@gmail.com</code></pre></div>
           fallbackCopy(text);
           showCopied();
         }
+      });
+    });
+  })();
+
+  (function () {
+    document.querySelectorAll(".code-block").forEach(function (block) {
+      var head = block.querySelector(".code-head");
+      if (!head) return;
+
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "code-toggle";
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Mostrar código");
+      toggle.textContent = "+";
+      head.insertBefore(toggle, head.firstChild);
+
+      toggle.addEventListener("click", function () {
+        var expanded = block.classList.toggle("expanded");
+        toggle.textContent = expanded ? "\u2212" : "+";
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        toggle.setAttribute("aria-label", expanded ? "Ocultar código" : "Mostrar código");
       });
     });
   })();

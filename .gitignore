@@ -4,3 +4,8 @@
 # Copie TenisShop/src/main/resources/email.properties.example para
 # email.properties e preencha localmente; só o .example é commitado.
 /TenisShop/src/main/resources/email.properties
+
+# Credenciais do banco de dados MySQL (Aula 02) - nunca versionar.
+# Copie TenisShop/src/main/resources/db.properties.example para
+# db.properties e preencha localmente; só o .example é commitado.
+/TenisShop/src/main/resources/db.properties

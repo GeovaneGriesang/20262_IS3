@@ -534,7 +534,7 @@
   .code-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     padding: 7px 14px;
     background: var(--surface-2);
     border-bottom: 1px solid var(--border);
@@ -547,6 +547,26 @@
     text-transform: uppercase;
     color: var(--text-faint);
   }
+  .code-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .code-toggle:hover { background: var(--surface-2); color: var(--text); }
+  .code-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .copy-btn {
     display: inline-flex;
     align-items: center;
@@ -562,12 +582,14 @@
     padding: 3px 7px;
     border-radius: 5px;
     font-family: inherit;
+    margin-left: auto;
   }
   .copy-btn:hover { background: var(--surface); color: var(--text); }
   .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .copy-btn svg { flex-shrink: 0; }
   .copy-btn.copied { color: var(--accent-ink); }
   .code-block pre {
+    display: none;
     margin: 0;
     padding: 14px 18px;
     background: var(--code-bg);
@@ -576,6 +598,7 @@
     font-size: 0.84rem;
     line-height: 1.7;
   }
+  .code-block.expanded pre { display: block; }
   .code-block code { background: none; border: none; padding: 0; font-size: 1em; color: var(--text); }
   code {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
@@ -1002,6 +1025,28 @@
           fallbackCopy(text);
           showCopied();
         }
+      });
+    });
+  })();
+
+  (function () {
+    document.querySelectorAll(".code-block").forEach(function (block) {
+      var head = block.querySelector(".code-head");
+      if (!head) return;
+
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "code-toggle";
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Mostrar código");
+      toggle.textContent = "+";
+      head.insertBefore(toggle, head.firstChild);
+
+      toggle.addEventListener("click", function () {
+        var expanded = block.classList.toggle("expanded");
+        toggle.textContent = expanded ? "\u2212" : "+";
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        toggle.setAttribute("aria-label", expanded ? "Ocultar código" : "Mostrar código");
       });
     });
   })();
