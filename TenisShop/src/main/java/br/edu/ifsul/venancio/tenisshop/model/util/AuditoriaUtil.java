@@ -6,7 +6,7 @@ import br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
  * Classe utilitária que compara o estado de um registro antes e depois
  * de uma edição, e descreve em texto exatamente o que mudou: campo a
  * campo, com o valor antigo e o novo. É o que permite à trilha de
- * auditoria (Aula 10) responder não só "o que foi alterado", mas
+ * auditoria (Aula 11) responder não só "o que foi alterado", mas
  * "para que valor mudou".
  *
  * A ideia é inspirada no padrão de projeto <strong>Memento</strong>
