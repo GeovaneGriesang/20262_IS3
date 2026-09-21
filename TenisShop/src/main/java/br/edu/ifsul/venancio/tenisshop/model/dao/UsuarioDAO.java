@@ -32,7 +32,7 @@ public class UsuarioDAO {
      */
     public List<Usuario> listarTodos() throws SQLException {
         List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao FROM usuarios ORDER BY nome";
+        String sql = "SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao, foto FROM usuarios ORDER BY nome";
 
         Connection conexao = ConexaoBanco.getConexao();
         try (PreparedStatement stmt = conexao.prepareStatement(sql);
@@ -52,7 +52,7 @@ public class UsuarioDAO {
      * @throws SQLException caso ocorra falha na consulta
      */
     public Usuario buscarPorEmail(String email) throws SQLException {
-        String sql = "SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao FROM usuarios WHERE email = ?";
+        String sql = "SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao, foto FROM usuarios WHERE email = ?";
 
         Connection conexao = ConexaoBanco.getConexao();
         try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -103,7 +103,7 @@ public class UsuarioDAO {
      * @throws SQLException caso ocorra falha na consulta
      */
     public Usuario buscarPorId(int id) throws SQLException {
-        String sql = "SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao FROM usuarios WHERE id = ?";
+        String sql = "SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao, foto FROM usuarios WHERE id = ?";
 
         Connection conexao = ConexaoBanco.getConexao();
         try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
@@ -232,6 +232,30 @@ public class UsuarioDAO {
         usuario.setAtivo(rs.getBoolean("ativo"));
         usuario.setDeveTrocarSenha(rs.getBoolean("deve_trocar_senha"));
         usuario.setVersao(rs.getInt("versao"));
+        usuario.setFoto(rs.getString("foto"));
         return usuario;
+    }
+
+    /**
+     * Atualiza só o nome do arquivo de foto de um usuário (ou o limpa,
+     * passando null). É uma atualização separada de atualizar() de
+     * propósito: quem chama este método é a própria pessoa mexendo na sua
+     * foto (ver MeuPerfilController), nunca um administrador editando o
+     * cadastro de outra pessoa, então não há o risco de duas edições
+     * concorrentes que justificaria o controle de versão de atualizar()
+     * (Aula 10).
+     * @param usuarioId id do usuário dono da foto
+     * @param foto nome do arquivo salvo pela FotoUsuarioUtil, ou null para remover
+     * @throws SQLException caso ocorra falha na atualização
+     */
+    public void atualizarFoto(int usuarioId, String foto) throws SQLException {
+        String sql = "UPDATE usuarios SET foto = ? WHERE id = ?";
+
+        Connection conexao = ConexaoBanco.getConexao();
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, foto);
+            stmt.setInt(2, usuarioId);
+            stmt.executeUpdate();
+        }
     }
 }

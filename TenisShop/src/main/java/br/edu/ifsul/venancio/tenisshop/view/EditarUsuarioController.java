@@ -145,7 +145,7 @@ public class EditarUsuarioController {
      * Registra a auditoria da edição, escolhendo a ação certa conforme o
      * que mudou: uma mudança de ativo=true para ativo=false é o mais
      * próximo que este sistema tem de "remover" um usuário (não existe
-     * exclusão definitiva (ver o porquê na Aula 10), então ganha uma
+     * exclusão definitiva (ver o porquê na Aula 11), então ganha uma
      * ação própria e mais visível (USUARIO_DESATIVADO) em vez de cair no
      * genérico USUARIO_ATUALIZADO. O detalhe, nos três casos, é sempre a
      * descrição completa de tudo que mudou, não só do campo ativo.

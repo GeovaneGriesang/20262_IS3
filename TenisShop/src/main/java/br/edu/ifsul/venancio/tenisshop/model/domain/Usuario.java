@@ -18,6 +18,7 @@ public class Usuario {
     private LocalDateTime dataCadastro;
     private Boolean deveTrocarSenha;
     private Integer versao;
+    private String foto;
 
     public Usuario() {
     }
@@ -102,6 +103,14 @@ public class Usuario {
 
     public void setVersao(Integer versao) {
         this.versao = versao;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 
     @Override

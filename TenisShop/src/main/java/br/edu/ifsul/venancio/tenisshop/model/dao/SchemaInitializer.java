@@ -38,6 +38,7 @@ public class SchemaInitializer {
         criarTabelaUsuariosSeNaoExistir(conexao);
         adicionarColunaDeveTrocarSenhaSeNaoExistir(conexao);
         adicionarColunaVersaoSeNaoExistir(conexao);
+        adicionarColunaFotoSeNaoExistir(conexao);
         criarTabelaConfiguracaoSistemaSeNaoExistir(conexao);
         criarTabelaTokensRecuperacaoSeNaoExistir(conexao);
         criarTabelaAuditoriaSeNaoExistir(conexao);
@@ -89,6 +90,20 @@ public class SchemaInitializer {
             return;
         }
         String sql = "ALTER TABLE usuarios ADD COLUMN versao INT NOT NULL DEFAULT 1";
+        try (Statement stmt = conexao.createStatement()) {
+            stmt.executeUpdate(sql);
+        }
+    }
+
+    /**
+     * Adiciona a coluna foto (Aula 09): guarda só o nome do arquivo salvo
+     * pela FotoUsuarioUtil na pasta fotos_usuarios/, nunca a foto em si.
+     */
+    private static void adicionarColunaFotoSeNaoExistir(Connection conexao) throws SQLException {
+        if (colunaExiste(conexao, "usuarios", "foto")) {
+            return;
+        }
+        String sql = "ALTER TABLE usuarios ADD COLUMN foto VARCHAR(150) NULL";
         try (Statement stmt = conexao.createStatement()) {
             stmt.executeUpdate(sql);
         }

@@ -13,6 +13,7 @@
       <Label fx:id="lblBoasVindas" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Bem-vindo!" />
       <Label fx:id="lblPerfil" text="Perfil:" />
       <Button onAction="#irParaAlterarSenha" text="Alterar minha senha" />
+      <Button onAction="#irParaMeuPerfil" text="Meu Perfil (foto)" />
       <VBox fx:id="boxAreaAdmin" alignment="CENTER" managed="false" spacing="8.0" visible="false">
          <children>
             <Label style="-fx-text-fill: #1f6b2c; -fx-font-weight: bold;" text="Área administrativa" />

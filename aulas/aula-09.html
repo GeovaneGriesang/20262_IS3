@@ -791,8 +791,8 @@
   <div class="wrap">
     <div class="cover">
       <span class="eyebrow">Aula 09 · 25/09/2026</span>
-      <h1 class="title">Concorrência Otimista no TenisShop</h1>
-      <p class="subtitle">Guia completo da Aula 09: uma coluna de versão para impedir que duas pessoas editando o mesmo usuário se sobrescrevam sem perceber, e a primeira tela de listagem e edição (<code>TableView</code>) do projeto. A trilha de auditoria, que fecha esta dupla de aulas, fica para a Aula 10.</p>
+      <h1 class="title">Banco em Rede e Foto de Perfil no TenisShop</h1>
+      <p class="subtitle">Guia completo da Aula 09: como configurar o MySQL para ser acessado por outro computador na rede local, o arquivo de conexão que cada máquina passa a guardar (fora do controle de versão), e a primeira funcionalidade de upload de arquivo do projeto: a foto de perfil do usuário, com exibição, troca e remoção.</p>
       <dl class="meta">
         <div><dt>Curso</dt><dd>Tecnólogo em Análise e Desenvolvimento de Sistemas</dd></div>
         <div><dt>Disciplina</dt><dd>Informática e Sociedade III</dd></div>
@@ -802,98 +802,138 @@
       </dl>
     </div>
 
-    <div class="callout"><strong>Antes de começar:</strong> a Aula 08 foi de acompanhamento de projetos, sem conteúdo técnico novo; o último código entregue foi na Aula 04 (módulo de autenticação completo, banco de dados aplicado automaticamente pelo <code>SchemaInitializer</code>). A aula de hoje acrescenta uma capacidade nova ao mesmo <code>UsuarioDAO</code> e à mesma trilha de escrita já existente.</div>
+    <div class="callout"><strong>Antes de começar:</strong> o último código técnico entregue foi na Aula 04 (módulo de autenticação completo); a Aula 08 foi só acompanhamento de projetos. Nenhum dos dois assuntos de hoje depende de concorrência otimista ou de trilha de auditoria: essas duas capacidades ainda não existem no projeto e chegam nas Aulas 10 e 11. Onde o código desta aula precisar delas (a coluna <code>versao</code>, por exemplo, já está em <code>Usuario</code>), uma nota indica em qual aula futura aquilo é explicado.</div>
 
     <nav class="toc" aria-label="Índice">
       <h2>Índice</h2>
       <ol>
         <li><a href="#s1"><span class="n">01</span>Visão Geral e Objetivos de Aprendizagem</a></li>
-        <li><a href="#s2"><span class="n">02</span>Conceito: Concorrência e o Problema da Última Escrita Vence</a></li>
-        <li><a href="#s3"><span class="n">03</span>Bloqueio Otimista vs. Bloqueio Pessimista</a></li>
-        <li><a href="#s4"><span class="n">04</span>A Coluna versao e o Controle de Concorrência Otimista</a></li>
-        <li><a href="#s5"><span class="n">05</span>Fechando uma Lacuna do CRUD: Listar e Editar Usuários</a></li>
-        <li><a href="#s6"><span class="n">06</span>Testando o Conflito de Versão na Prática</a></li>
+        <li><a href="#s2"><span class="n">02</span>Conceito: Cliente e Servidor de Banco de Dados na Rede</a></li>
+        <li><a href="#s3"><span class="n">03</span>Configurando o MySQL e o Arquivo de Conexão em Cada Computador</a></li>
+        <li><a href="#s4"><span class="n">04</span>Por Que o Banco Guarda Só o Caminho: Upload de Arquivos</a></li>
+        <li><a href="#s5"><span class="n">05</span>Modelando a Foto de Perfil: Coluna, Usuario e FotoUsuarioUtil</a></li>
+        <li><a href="#s6"><span class="n">06</span>A Tela "Meu Perfil": Upload, Exibição, Edição e Exclusão</a></li>
         <li><a href="#s7"><span class="n">07</span>Referências e Materiais Complementares</a></li>
       </ol>
     </nav>
 
     <section id="s1">
       <h2><span class="num">01</span>Visão Geral e Objetivos de Aprendizagem</h2>
-      <p class="lead">A Aula 08 foi dedicada ao acompanhamento da evolução dos projetos, sem conteúdo técnico novo. Retomamos hoje o TenisShop com a primeira das duas perguntas que ficaram em aberto desde então: o que acontece quando duas pessoas, ao mesmo tempo, tentam alterar o mesmo registro? A segunda pergunta, "depois que algo muda, como saber quem mudou, o quê e quando?", fica para a Aula 10.</p>
+      <p class="lead">Até hoje, o MySQL do TenisShop sempre rodou na mesma máquina que executa a aplicação: <code>db.properties</code> (Aula 02) aponta para <code>localhost</code>, "este computador", e isso nunca precisou significar mais do que isso. Esta aula trata de dois assuntos independentes, mas que têm algo em comum: os dois tiram o projeto da bolha de uma única máquina isolada. Primeiro, como acessar um banco de dados que mora em outro computador da rede, útil sempre que o banco e a aplicação (ou os integrantes de um grupo) não estão fisicamente no mesmo lugar. Segundo, como deixar o usuário enviar um arquivo para o sistema, e o que fazer com ele: a foto de perfil é a primeira funcionalidade do TenisShop que lida com upload.</p>
       <h3>Objetivos de Aprendizagem</h3>
       <ul>
-        <li>Entender por que duas edições simultâneas do mesmo registro são um problema real, não teórico.</li>
-        <li>Implementar controle de concorrência otimista com uma coluna de versão, a técnica mais comum para esse problema em aplicações desktop/cliente-servidor simples.</li>
-        <li>Construir a primeira tela de listagem (<code>TableView</code>) do projeto, e a primeira tela de edição de um registro já existente.</li>
+        <li>Entender a diferença entre "banco de dados" e "servidor de banco de dados", e o que muda quando cliente e servidor são computadores diferentes.</li>
+        <li>Configurar o MySQL para aceitar conexões vindas de outro computador na rede local, e ajustar <code>db.properties</code> (e conferir o <code>.gitignore</code>) em cada máquina envolvida.</li>
+        <li>Entender por que um arquivo enviado pelo usuário normalmente não é guardado dentro do banco de dados, e o que o banco guarda no lugar dele.</li>
+        <li>Implementar upload, exibição, edição e exclusão da foto de perfil do usuário logado.</li>
       </ul>
-      <div class="callout">Esta técnica não é exclusiva de sistemas de usuários; se aplica a qualquer entidade do projeto de cada grupo que possa ser editada por mais de uma pessoa ao mesmo tempo.</div>
     </section>
 
     <section id="s2">
-      <h2><span class="num">02</span>Conceito: Concorrência e o Problema da Última Escrita Vence</h2>
-      <p>Imagine dois administradores do TenisShop, em computadores diferentes do laboratório, os dois abrindo a tela de edição do mesmo usuário ao mesmo tempo:</p>
-      <ol class="plain">
-        <li>Administrador A abre o usuário "Carlos" para editar. O sistema carrega os dados atuais: perfil OPERADOR.</li>
-        <li>Administrador B abre o <em>mesmo</em> usuário "Carlos" para editar, alguns segundos depois. Também carrega perfil OPERADOR.</li>
-        <li>Administrador B termina primeiro: muda o perfil para ADMINISTRADOR e salva. O banco agora tem ADMINISTRADOR.</li>
-        <li>Administrador A termina depois: ele nunca viu a mudança de B, então na tela dele o perfil ainda aparece OPERADOR. Ele só corrige o e-mail e salva.</li>
-      </ol>
-      <p>Se o <code>UPDATE</code> de A simplesmente sobrescrever a linha inteira com os dados que ele tinha na tela, a mudança de B desaparece sem nenhum aviso; o perfil volta a OPERADOR, e ninguém percebe até ser tarde demais. Isso se chama <strong>última escrita vence</strong> (<em>last write wins</em>): tecnicamente o sistema "funcionou" (nenhum erro, nenhuma exceção), mas o resultado está silenciosamente errado.</p>
-      <div class="callout-warn"><strong>Por que isso é pior do que parece:</strong> o problema não é a possibilidade de dois cliques ao mesmo tempo no mesmo milissegundo. É qualquer intervalo entre "abrir a tela" e "salvar": inclusive alguém que abriu a tela, foi atender uma ligação, e voltou 10 minutos depois. Quanto mais tempo uma edição fica aberta, maior a chance de conflito.</div>
-      <p>A solução não é impedir que duas pessoas <em>abram</em> o mesmo registro: isso é normal e inofensivo (ambos só estão <em>lendo</em>). O problema é só na hora de <em>salvar</em>: o sistema precisa perceber que os dados mudaram desde que foram lidos, e recusar a segunda escrita silenciosa.</p>
+      <h2><span class="num">02</span>Conceito: Cliente e Servidor de Banco de Dados na Rede</h2>
+      <p><code>ConexaoBanco</code> (Aula 02) sempre conversou com o MySQL por rede, mesmo rodando os dois na mesma máquina: <code>jdbc:mysql://localhost:3306/...</code> já é, tecnicamente, uma conexão de rede, só que com o computador "conversando consigo mesmo". <code>localhost</code> (endereço <code>127.0.0.1</code>) é o que se chama de <strong>endereço de loopback</strong>: em vez de sair pela placa de rede, o tráfego volta direto para a própria máquina. Nada muda no protocolo quando o MySQL passa a rodar num computador diferente do que executa o TenisShop; muda só o endereço usado para chegar até ele.</p>
+
+      <div class="callout"><strong>Curiosidade: o que é um "IP"?</strong> IP significa <em>Internet Protocol</em> (Protocolo de Internet): o conjunto de regras que faz dois computadores se encontrarem numa rede, e o "endereço IP" (ex.: <code>192.168.0.42</code>) é o número que identifica um computador dentro dessa rede, do mesmo jeito que um CEP identifica um endereço postal. Em uma rede local (de laboratório, de casa, de escritório), cada computador ligado ao mesmo roteador recebe um IP nesse formato, normalmente começando por <code>192.168.</code> ou <code>10.</code>.</div>
+
+      <div class="card-grid">
+        <div class="card"><h4><span class="dot"></span>Servidor de banco de dados</h4><p>O computador que roda o processo <code>mysqld</code>: é onde os arquivos de dados de verdade ficam gravados no disco. É ele quem "escuta" a porta 3306, esperando por conexões.</p></div>
+        <div class="card"><h4><span class="dot"></span>Cliente de banco de dados</h4><p>Qualquer programa que se conecta a um servidor MySQL para enviar comandos SQL e receber resultados, sem guardar dado nenhum localmente. O TenisShop (via <code>ConexaoBanco</code>) é sempre um cliente, nunca o servidor.</p></div>
+      </div>
+      <p>Os dois papéis podem estar na mesma máquina (o que este projeto sempre fez até agora) ou em máquinas diferentes ligadas pela mesma rede; nada no código do TenisShop precisa mudar para isso, porque <code>ConexaoBanco</code> já lê o endereço de <code>db.properties</code> em vez de ter <code>localhost</code> escrito direto no código (Aula 02). A única coisa que muda é <strong>qual endereço</strong> vai dentro desse arquivo, e esse endereço passa a ser diferente em cada computador.</p>
+
+      <div class="callout-warn"><strong>Por padrão, o MySQL só aceita conexões locais.</strong> Isso não é um detalhe esquecido: é uma configuração de segurança deliberada, para que instalar o MySQL num computador não abra automaticamente uma porta de entrada para qualquer máquina da rede. Tornar o servidor acessível de fora é uma decisão explícita, feita na Seção 03.</div>
     </section>
 
     <section id="s3">
-      <h2><span class="num">03</span>Bloqueio Otimista vs. Bloqueio Pessimista</h2>
-      <p>Existem duas famílias de solução para esse problema, com filosofias opostas:</p>
-      <div class="card-grid">
-        <div class="card"><h4><span class="dot"></span>Bloqueio Pessimista</h4><p>Assume que o conflito é provável: quando alguém abre um registro para editar, o sistema trava aquela linha (ou marca "em edição por Fulano") até a pessoa terminar ou a trava expirar. Ninguém mais consegue nem começar a editar enquanto isso.</p></div>
-        <div class="card"><h4><span class="dot"></span>Bloqueio Otimista</h4><p>Assume que o conflito é raro: qualquer pessoa pode abrir e editar livremente. Só na hora de <strong>salvar</strong> o sistema confere se os dados ainda estão como estavam quando foram lidos. Se mudaram, a escrita é recusada; sem nunca ter bloqueado ninguém de ler ou começar a editar.</p></div>
-      </div>
-      <p><strong>Esta aula usa bloqueio otimista.</strong> Três motivos concretos para essa escolha, e não a outra:</p>
+      <h2><span class="num">03</span>Configurando o MySQL e o Arquivo de Conexão em Cada Computador</h2>
+      <p>A partir daqui, chamamos de <strong>servidor</strong> o computador que hospeda o MySQL (com os dados de verdade) e de <strong>cliente</strong> qualquer outro computador que só executa o TenisShop e se conecta ao servidor pela rede. Numa dupla de colegas trabalhando em notebooks diferentes, por exemplo, um só precisa decidir qual dos dois vai guardar o banco.</p>
+
+      <h3>No Computador Servidor</h3>
       <ol class="plain">
-        <li><strong>Sem trava "esquecida" para gerenciar.</strong> Bloqueio pessimista precisa decidir o que fazer quando alguém trava um registro e depois fecha o programa sem salvar nem cancelar; a trava fica lá para sempre, a menos que exista um mecanismo de expiração por tempo. Bloqueio otimista não tem esse problema: não existe trava para esquecer.</li>
-        <li><strong>Combina melhor com uma aplicação desktop.</strong> Alguém pode deixar a tela de edição aberta por minutos (ou até esquecida, aberta, enquanto faz outra coisa) sem segurar recurso nenhum do banco de dados nesse meio-tempo.</li>
-        <li><strong>Implementável com SQL simples.</strong> Bloqueio pessimista de verdade normalmente envolve <code>SELECT ... FOR UPDATE</code> dentro de uma transação mantida aberta enquanto a pessoa edita; um nível de controle de transação que este curso ainda não introduziu. Bloqueio otimista precisa só de uma coluna a mais e um <code>WHERE</code> mais específico no <code>UPDATE</code>, como esta seção mostra a seguir.</li>
+        <li>Descubra o IP do servidor na rede local: no Windows, <code>ipconfig</code> num terminal; no Linux/macOS, <code>ip addr</code> ou <code>ifconfig</code>. Procure pelo endereço IPv4 da placa de rede conectada (ex.: <code>192.168.0.42</code>).</li>
+        <li>Edite o arquivo de configuração do MySQL (<code>my.ini</code> no Windows, normalmente em <code>C:\ProgramData\MySQL\MySQL Server 8.0\my.ini</code>; <code>mysqld.cnf</code> no Linux, normalmente em <code>/etc/mysql/mysql.conf.d/</code>) e ajuste (ou acrescente) a linha <code>bind-address</code>, que hoje restringe o MySQL a só aceitar conexões da própria máquina:</li>
+      </ol>
+      <div class="code-block"><div class="code-head"><span class="code-lang">ini</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># antes: só aceita conexões da própria máquina</span>
+<span class="tok-comment"># bind-address = 127.0.0.1</span>
+
+<span class="tok-comment"># depois: aceita conexões de qualquer endereço da rede</span>
+<span class="tok-var">bind-address</span> = <span class="tok-str">0.0.0.0</span></code></pre></div>
+      <ol class="plain" start="3">
+        <li>Reinicie o serviço do MySQL para a mudança valer.</li>
+        <li>Crie (ou ajuste) um usuário MySQL que aceite se conectar de qualquer host da rede, em vez de só <code>localhost</code>; o <code>%</code> depois do <code>@</code> é um curinga que significa "qualquer endereço":</li>
+      </ol>
+      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">CREATE USER</span> <span class="tok-str">'tenisshop'</span>@<span class="tok-str">'%'</span> <span class="tok-kw">IDENTIFIED BY</span> <span class="tok-str">'uma-senha-forte-aqui'</span>;
+<span class="tok-kw">GRANT ALL PRIVILEGES ON</span> tenisshop_db.* <span class="tok-kw">TO</span> <span class="tok-str">'tenisshop'</span>@<span class="tok-str">'%'</span>;
+<span class="tok-kw">FLUSH PRIVILEGES</span>;</code></pre></div>
+      <ol class="plain" start="5">
+        <li>Libere a porta 3306 no firewall do servidor (no Windows, uma regra de entrada no Firewall do Windows Defender; em laboratório, isso costuma exigir o suporte técnico do câmpus).</li>
+      </ol>
+
+      <div class="callout-warn"><strong>Isto é para rede local, não para a internet.</strong> Abrir <code>0.0.0.0</code> e um usuário <code>'%'</code> só é aceitável dentro de uma rede local confiável (laboratório, casa); nunca exponha um MySQL assim diretamente para a internet.</div>
+
+      <h3>Em Cada Computador Cliente</h3>
+      <p>A única mudança fica dentro do <code>db.properties</code> de cada máquina (Aula 02): a mesma URL, só trocando <code>localhost</code> pelo IP do servidor. O arquivo continua fora do controle de versão, exatamente como já era.</p>
+
+      <p class="file-path">Máquina servidor (roda o MySQL e, se for o caso, também o TenisShop localmente): <code>src/main/resources/db.properties</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">properties</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>db.url=jdbc:mysql://localhost:3306/tenisshop_db?useSSL=false&amp;serverTimezone=UTC
+db.usuario=tenisshop
+db.senha=uma-senha-forte-aqui</code></pre></div>
+
+      <p class="file-path">Máquina cliente (só executa o TenisShop; o MySQL está em <code>192.168.0.42</code>): <code>src/main/resources/db.properties</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">properties</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>db.url=jdbc:mysql://192.168.0.42:3306/tenisshop_db?useSSL=false&amp;serverTimezone=UTC
+db.usuario=tenisshop
+db.senha=uma-senha-forte-aqui</code></pre></div>
+
+      <div class="callout">Repare que o <code>.gitignore</code> não muda: a regra já registrada na Aula 02, <code>/TenisShop/src/main/resources/db.properties</code>, protege esse arquivo em <strong>qualquer</strong> máquina, servidor ou cliente, porque a regra é sobre o <em>nome do arquivo</em>, não sobre o que tem escrito dentro dele. É por isso que <code>db.properties.example</code> (com valores fictícios) continua sendo o único dos dois versionado; cada computador mantém seu próprio <code>db.properties</code> real, nunca commitado, com o endereço que faz sentido para ele.</div>
+
+      <h3>Testando a Conexão pela Rede</h3>
+      <ol class="plain">
+        <li>Na máquina cliente, confirme que consegue "ver" o servidor: <code>ping 192.168.0.42</code>.</li>
+        <li>Rode o TenisShop na máquina cliente (<code>mvn javafx:run</code>) com o <code>db.properties</code> já apontando para o IP do servidor.</li>
+        <li>Se a conexão falhar, confira nesta ordem: o MySQL do servidor está rodando; o <code>bind-address</code> foi realmente alterado e o serviço reiniciado; a porta 3306 está liberada no firewall do servidor; o IP no <code>db.properties</code> do cliente está correto (IPs de redes domésticas podem mudar quando o roteador reinicia).</li>
       </ol>
     </section>
 
     <section id="s4">
-      <h2><span class="num">04</span>A Coluna <code>versao</code> e o Controle de Concorrência Otimista</h2>
-      <p>A técnica: toda linha da tabela <code>usuarios</code> ganha uma coluna <code>versao</code>, que começa em 1 e é incrementada a cada <code>UPDATE</code> bem-sucedido. Quando uma tela edita um usuário, ela guarda a versão que leu; na hora de salvar, o <code>UPDATE</code> só afeta a linha se a versão no banco ainda for a mesma:</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      <h2><span class="num">04</span>Por Que o Banco Guarda Só o Caminho: Upload de Arquivos</h2>
+      <p>Todo campo do <code>Usuario</code> até hoje era um tipo simples: texto, número, verdadeiro/falso. Uma foto é diferente: é um arquivo binário, potencialmente grande, e a pergunta "onde ela fica guardada?" tem duas respostas possíveis.</p>
+      <div class="card-grid">
+        <div class="card"><h4><span class="dot"></span>Opção A: dentro do banco (coluna BLOB)</h4><p>O MySQL tem um tipo de coluna (<code>BLOB</code>) que guarda bytes crus. Funciona, mas deixa o banco pesado (um <em>dump</em> ou backup carrega toda foto de todo usuário junto) e cada leitura de uma linha de <code>usuarios</code> passa perto de um arquivo binário grande, mesmo quando ninguém precisa da foto naquele momento.</p></div>
+        <div class="card"><h4><span class="dot"></span>Opção B: no sistema de arquivos, só o caminho no banco (escolhida)</h4><p>A foto em si vira um arquivo comum numa pasta do projeto; o banco guarda apenas o <em>nome desse arquivo</em>, uma coluna de texto pequena e leve. É a prática mais comum fora de aplicações Java também, e a mesma ideia por trás de qualquer CDN de imagens: o banco de dados descreve onde a foto está, o sistema de arquivos guarda os bytes.</p></div>
+      </div>
+      <p>Escolhida a Opção B, falta decidir dois detalhes: em qual pasta guardar os arquivos, e como nomeá-los sem que dois usuários acabem esbarrando no mesmo nome. A convenção adotada: uma pasta própria, <code>fotos_usuarios/</code>, na raiz do módulo <code>TenisShop</code>; o nome de cada arquivo é o <strong>código (id) do usuário</strong> mais a extensão original do arquivo escolhido (ex.: usuário de id 7 que envia um <code>.png</code> vira <code>fotos_usuarios/7.png</code>). Como o id é único por definição, o nome do arquivo também é, e trocar a foto de um usuário é só sobrescrever o arquivo que já existe com esse nome.</p>
+      <div class="callout">A pasta <code>fotos_usuarios/</code> é, na prática, igual ao <code>db.properties</code> de cada máquina: dados que existem localmente em cada computador que roda o TenisShop, nunca commitados. Ela entra no <code>.gitignore</code> pelo mesmo motivo, e por isso é criada automaticamente pela aplicação (nunca por um script SQL) na primeira vez que alguém envia uma foto.</div>
+    </section>
 
-&lt;?import javafx.geometry.Insets?&gt;
-&lt;?import javafx.scene.control.Button?&gt;
-&lt;?import javafx.scene.control.Label?&gt;
-&lt;?import javafx.scene.control.TableColumn?&gt;
-&lt;?import javafx.scene.control.TableView?&gt;
-&lt;?import javafx.scene.layout.VBox?&gt;
+    <section id="s5">
+      <h2><span class="num">05</span>Modelando a Foto de Perfil: Coluna, Usuario e FotoUsuarioUtil</h2>
+      <p>Seguindo a convenção de schema estabelecida na Aula 04: todo script SQL novo (<code>V&lt;n&gt;</code>) vem acompanhado do passo idêntico e idempotente em <code>SchemaInitializer</code>.</p>
+      <p class="file-path">Local: <code>TenisShop/sql/V8__usuarios_foto.sql</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">-- Aula 09: foto de perfil do usuário.</span>
+<span class="tok-comment">-- O banco guarda só o nome do arquivo (ex.: &quot;7.png&quot;); a foto em si fica</span>
+<span class="tok-comment">-- na pasta fotos_usuarios/, fora do controle de versão, com o nome do</span>
+<span class="tok-comment">-- arquivo sendo o id do usuário mais a extensão original (ver</span>
+<span class="tok-comment">-- FotoUsuarioUtil). NULL significa &quot;usuário ainda sem foto&quot;.</span>
+<span class="tok-kw">ALTER TABLE</span> usuarios <span class="tok-kw">ADD COLUMN</span> foto <span class="tok-fn">VARCHAR</span>(150) <span class="tok-kw">NULL</span>;</code></pre></div>
+      <button type="button" class="download-btn" data-filename="V8__usuarios_foto.sql" data-b64="LS0gQXVsYSAwOTogZm90byBkZSBwZXJmaWwgZG8gdXN1w6FyaW8uCi0tIE8gYmFuY28gZ3VhcmRhIHPDsyBvIG5vbWUgZG8gYXJxdWl2byAoZXguOiAiNy5wbmciKTsgYSBmb3RvIGVtIHNpIGZpY2EKLS0gbmEgcGFzdGEgZm90b3NfdXN1YXJpb3MvLCBmb3JhIGRvIGNvbnRyb2xlIGRlIHZlcnPDo28sIGNvbSBvIG5vbWUgZG8KLS0gYXJxdWl2byBzZW5kbyBvIGlkIGRvIHVzdcOhcmlvIG1haXMgYSBleHRlbnPDo28gb3JpZ2luYWwgKHZlcgotLSBGb3RvVXN1YXJpb1V0aWwpLiBOVUxMIHNpZ25pZmljYSAidXN1w6FyaW8gYWluZGEgc2VtIGZvdG8iLgpBTFRFUiBUQUJMRSB1c3VhcmlvcyBBREQgQ09MVU1OIGZvdG8gVkFSQ0hBUigxNTApIE5VTEw7Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar V8__usuarios_foto.sql</span></button>
 
-&lt;<span class="tok-kw">VBox</span> alignment=&quot;CENTER&quot; prefHeight=&quot;540.0&quot; prefWidth=&quot;920.0&quot; spacing=&quot;14.0&quot; xmlns=&quot;http://javafx.com/javafx/21&quot; xmlns:fx=&quot;http://javafx.com/fxml/1&quot; fx:controller=&quot;br.edu.ifsul.venancio.tenisshop.view.AuditoriaController&quot;&gt;
-   &lt;<span class="tok-kw">padding</span>&gt;
-      &lt;<span class="tok-kw">Insets</span> bottom=&quot;24.0&quot; left=&quot;24.0&quot; right=&quot;24.0&quot; top=&quot;24.0&quot; /&gt;
-   &lt;/<span class="tok-kw">padding</span>&gt;
-   &lt;<span class="tok-kw">children</span>&gt;
-      &lt;<span class="tok-kw">Label</span> style=&quot;-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;&quot; text=&quot;Auditoria do Sistema&quot; /&gt;
-      &lt;<span class="tok-kw">Label</span> style=&quot;-fx-text-fill: #525252;&quot; text=&quot;Registro somente leitura de ações realizadas no sistema, da mais recente para a mais antiga, incluindo, para cada edição, exatamente quais campos mudaram e para que valor.&quot; wrapText=&quot;true&quot; /&gt;
-      &lt;<span class="tok-kw">TableView</span> fx:id=&quot;tblAuditoria&quot; prefHeight=&quot;400.0&quot; prefWidth=&quot;880.0&quot;&gt;
-         &lt;<span class="tok-kw">columns</span>&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colDataHora&quot; prefWidth=&quot;130.0&quot; text=&quot;Quando&quot; /&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colUsuario&quot; prefWidth=&quot;130.0&quot; text=&quot;Quem&quot; /&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colAcao&quot; prefWidth=&quot;170.0&quot; text=&quot;Ação&quot; /&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colEntidade&quot; prefWidth=&quot;90.0&quot; text=&quot;Entidade&quot; /&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colDetalhe&quot; prefWidth=&quot;350.0&quot; text=&quot;Detalhes&quot; /&gt;
-         &lt;/<span class="tok-kw">columns</span>&gt;
-      &lt;/<span class="tok-kw">TableView</span>&gt;
-      &lt;<span class="tok-kw">Button</span> onAction=&quot;#irParaPrincipal&quot; text=&quot;Voltar&quot; /&gt;
-   &lt;/<span class="tok-kw">children</span>&gt;
-&lt;/<span class="tok-kw">VBox</span>&gt;</code></pre></div>
-      <p>Se ninguém mais alterou o registro, a linha "id = X E versao = Y" existe, o <code>UPDATE</code> afeta 1 linha, e a versão sobe para Y+1. Se outra pessoa já salvou uma alteração nesse meio-tempo, a versão no banco já não é mais Y; a cláusula <code>WHERE</code> não encontra nenhuma linha, o <code>UPDATE</code> afeta <strong>0 linhas</strong>, e é exatamente esse "0" que o código Java usa para detectar o conflito, sem precisar de nenhuma consulta extra.</p>
+      <p>O passo correspondente em <code>SchemaInitializer</code> segue o mesmo padrão de <code>adicionarColunaVersaoSeNaoExistir</code>: confere se a coluna já existe antes de tentar criá-la.</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">/**
+ * Adiciona a coluna foto (Aula 09): guarda só o nome do arquivo salvo
+ * pela FotoUsuarioUtil na pasta fotos_usuarios/, nunca a foto em si.
+ */</span>
+<span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> adicionarColunaFotoSeNaoExistir(Connection conexao) <span class="tok-kw">throws</span> SQLException {
+    <span class="tok-kw">if</span> (colunaExiste(conexao, <span class="tok-str">&quot;usuarios&quot;</span>, <span class="tok-str">&quot;foto&quot;</span>)) {
+        <span class="tok-kw">return</span>;
+    }
+    String sql = <span class="tok-str">&quot;ALTER TABLE usuarios ADD COLUMN foto VARCHAR(150) NULL&quot;</span>;
+    <span class="tok-kw">try</span> (Statement stmt = conexao.createStatement()) {
+        stmt.executeUpdate(sql);
+    }
+}</code></pre></div>
+      <div class="callout">O arquivo completo e atualizado de <code>SchemaInitializer.java</code> (já com esta mudança, mais a coluna <code>versao</code> e a tabela <code>auditoria</code>) é entregue por inteiro na Aula 11 (Seção 03), quando todos os passos já tiverem sido apresentados.</div>
 
-      <h3>Sinalizando o Conflito: boolean, não uma Exception</h3>
-      <p>Uma decisão de projeto: <code>UsuarioDAO.atualizar()</code> retorna um <code>boolean</code> simples (<code>true</code> = salvou, <code>false</code> = conflito de versão) em vez de lançar uma exceção customizada. Duas razões: primeiro, o cronograma da disciplina só introduz classes de Exception próprias em 25/09 (três aulas à frente desta), então uma <code>ConflitoVersaoException</code> agora seria ensinar um conceito fora de ordem. Segundo, este projeto já tem um precedente idêntico: <code>UsuarioDAO.autenticar()</code> retorna <code>null</code> em vez de lançar uma exceção quando o login não confere, porque "não confere" é um resultado de negócio esperado, não uma falha de infraestrutura. Um conflito de versão é a mesma categoria de coisa: <code>SQLException</code> continua reservada só para quando o MySQL realmente falha.</p>
-
+      <p><code>Usuario</code> ganha o campo correspondente, com getter e setter simples como qualquer outro atributo de texto:</p>
       <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/domain/Usuario.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.domain;
 
@@ -915,6 +955,7 @@
     <span class="tok-kw">private</span> LocalDateTime dataCadastro;
     <span class="tok-kw">private</span> Boolean deveTrocarSenha;
     <span class="tok-kw">private</span> Integer versao;
+    <span class="tok-kw">private</span> String foto;
 
     <span class="tok-kw">public</span> Usuario() {
     }
@@ -1001,762 +1042,365 @@
         <span class="tok-kw">this</span>.versao = versao;
     }
 
+    <span class="tok-kw">public</span> String getFoto() {
+        <span class="tok-kw">return</span> foto;
+    }
+
+    <span class="tok-kw">public</span> <span class="tok-kw">void</span> setFoto(String foto) {
+        <span class="tok-kw">this</span>.foto = foto;
+    }
+
     @Override
     <span class="tok-kw">public</span> String toString() {
         <span class="tok-kw">return</span> <span class="tok-kw">this</span>.nome + <span class="tok-str">&quot; (&quot;</span> + <span class="tok-kw">this</span>.perfil + <span class="tok-str">&quot;)&quot;</span>;
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="Usuario.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCmltcG9ydCBqYXZhLnRpbWUuTG9jYWxEYXRlVGltZTsKCi8qKgogKiBSZXByZXNlbnRhIGEgZW50aWRhZGUgVXN1w6FyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqIENvbnTDqW0gb3MgYXRyaWJ1dG9zLCBjb25zdHJ1dG9yZXMsIGdldHRlcnMgZSBzZXR0ZXJzLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBVc3VhcmlvIHsKICAgIHByaXZhdGUgSW50ZWdlciBpZDsKICAgIHByaXZhdGUgU3RyaW5nIG5vbWU7CiAgICBwcml2YXRlIFN0cmluZyBlbWFpbDsKICAgIHByaXZhdGUgU3RyaW5nIHNlbmhhOwogICAgcHJpdmF0ZSBQZXJmaWwgcGVyZmlsOwogICAgcHJpdmF0ZSBCb29sZWFuIGF0aXZvOwogICAgcHJpdmF0ZSBMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybzsKICAgIHByaXZhdGUgQm9vbGVhbiBkZXZlVHJvY2FyU2VuaGE7CiAgICBwcml2YXRlIEludGVnZXIgdmVyc2FvOwoKICAgIHB1YmxpYyBVc3VhcmlvKCkgewogICAgfQoKICAgIHB1YmxpYyBVc3VhcmlvKEludGVnZXIgaWQsIFN0cmluZyBub21lLCBTdHJpbmcgZW1haWwsIFN0cmluZyBzZW5oYSwgUGVyZmlsIHBlcmZpbCwgQm9vbGVhbiBhdGl2bykgewogICAgICAgIHRoaXMuaWQgPSBpZDsKICAgICAgICB0aGlzLm5vbWUgPSBub21lOwogICAgICAgIHRoaXMuZW1haWwgPSBlbWFpbDsKICAgICAgICB0aGlzLnNlbmhhID0gc2VuaGE7CiAgICAgICAgdGhpcy5wZXJmaWwgPSBwZXJmaWw7CiAgICAgICAgdGhpcy5hdGl2byA9IGF0aXZvOwogICAgfQoKICAgIC8vIEdldHRlcnMgZSBTZXR0ZXJzCiAgICBwdWJsaWMgSW50ZWdlciBnZXRJZCgpIHsKICAgICAgICByZXR1cm4gaWQ7CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0SWQoSW50ZWdlciBpZCkgewogICAgICAgIHRoaXMuaWQgPSBpZDsKICAgIH0KCiAgICBwdWJsaWMgU3RyaW5nIGdldE5vbWUoKSB7CiAgICAgICAgcmV0dXJuIG5vbWU7CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0Tm9tZShTdHJpbmcgbm9tZSkgewogICAgICAgIHRoaXMubm9tZSA9IG5vbWU7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXRFbWFpbCgpIHsKICAgICAgICByZXR1cm4gZW1haWw7CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0RW1haWwoU3RyaW5nIGVtYWlsKSB7CiAgICAgICAgdGhpcy5lbWFpbCA9IGVtYWlsOwogICAgfQoKICAgIHB1YmxpYyBTdHJpbmcgZ2V0U2VuaGEoKSB7CiAgICAgICAgcmV0dXJuIHNlbmhhOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldFNlbmhhKFN0cmluZyBzZW5oYSkgewogICAgICAgIHRoaXMuc2VuaGEgPSBzZW5oYTsKICAgIH0KCiAgICBwdWJsaWMgUGVyZmlsIGdldFBlcmZpbCgpIHsKICAgICAgICByZXR1cm4gcGVyZmlsOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldFBlcmZpbChQZXJmaWwgcGVyZmlsKSB7CiAgICAgICAgdGhpcy5wZXJmaWwgPSBwZXJmaWw7CiAgICB9CgogICAgcHVibGljIEJvb2xlYW4gZ2V0QXRpdm8oKSB7CiAgICAgICAgcmV0dXJuIGF0aXZvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldEF0aXZvKEJvb2xlYW4gYXRpdm8pIHsKICAgICAgICB0aGlzLmF0aXZvID0gYXRpdm87CiAgICB9CgogICAgcHVibGljIExvY2FsRGF0ZVRpbWUgZ2V0RGF0YUNhZGFzdHJvKCkgewogICAgICAgIHJldHVybiBkYXRhQ2FkYXN0cm87CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0RGF0YUNhZGFzdHJvKExvY2FsRGF0ZVRpbWUgZGF0YUNhZGFzdHJvKSB7CiAgICAgICAgdGhpcy5kYXRhQ2FkYXN0cm8gPSBkYXRhQ2FkYXN0cm87CiAgICB9CgogICAgcHVibGljIEJvb2xlYW4gZ2V0RGV2ZVRyb2NhclNlbmhhKCkgewogICAgICAgIHJldHVybiBkZXZlVHJvY2FyU2VuaGE7CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0RGV2ZVRyb2NhclNlbmhhKEJvb2xlYW4gZGV2ZVRyb2NhclNlbmhhKSB7CiAgICAgICAgdGhpcy5kZXZlVHJvY2FyU2VuaGEgPSBkZXZlVHJvY2FyU2VuaGE7CiAgICB9CgogICAgcHVibGljIEludGVnZXIgZ2V0VmVyc2FvKCkgewogICAgICAgIHJldHVybiB2ZXJzYW87CiAgICB9CgogICAgcHVibGljIHZvaWQgc2V0VmVyc2FvKEludGVnZXIgdmVyc2FvKSB7CiAgICAgICAgdGhpcy52ZXJzYW8gPSB2ZXJzYW87CiAgICB9CgogICAgQE92ZXJyaWRlCiAgICBwdWJsaWMgU3RyaW5nIHRvU3RyaW5nKCkgewogICAgICAgIHJldHVybiB0aGlzLm5vbWUgKyAiICgiICsgdGhpcy5wZXJmaWwgKyAiKSI7CiAgICB9Cn0K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Usuario.java</span></button>
+      <button type="button" class="download-btn" data-filename="Usuario.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbjsKCmltcG9ydCBqYXZhLnRpbWUuTG9jYWxEYXRlVGltZTsKCi8qKgogKiBSZXByZXNlbnRhIGEgZW50aWRhZGUgVXN1w6FyaW8gbm8gc2lzdGVtYSBUZW5pc1Nob3AuCiAqIENvbnTDqW0gb3MgYXRyaWJ1dG9zLCBjb25zdHJ1dG9yZXMsIGdldHRlcnMgZSBzZXR0ZXJzLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBVc3VhcmlvIHsKICAgIHByaXZhdGUgSW50ZWdlciBpZDsKICAgIHByaXZhdGUgU3RyaW5nIG5vbWU7CiAgICBwcml2YXRlIFN0cmluZyBlbWFpbDsKICAgIHByaXZhdGUgU3RyaW5nIHNlbmhhOwogICAgcHJpdmF0ZSBQZXJmaWwgcGVyZmlsOwogICAgcHJpdmF0ZSBCb29sZWFuIGF0aXZvOwogICAgcHJpdmF0ZSBMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybzsKICAgIHByaXZhdGUgQm9vbGVhbiBkZXZlVHJvY2FyU2VuaGE7CiAgICBwcml2YXRlIEludGVnZXIgdmVyc2FvOwogICAgcHJpdmF0ZSBTdHJpbmcgZm90bzsKCiAgICBwdWJsaWMgVXN1YXJpbygpIHsKICAgIH0KCiAgICBwdWJsaWMgVXN1YXJpbyhJbnRlZ2VyIGlkLCBTdHJpbmcgbm9tZSwgU3RyaW5nIGVtYWlsLCBTdHJpbmcgc2VuaGEsIFBlcmZpbCBwZXJmaWwsIEJvb2xlYW4gYXRpdm8pIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICAgICAgdGhpcy5ub21lID0gbm9tZTsKICAgICAgICB0aGlzLmVtYWlsID0gZW1haWw7CiAgICAgICAgdGhpcy5zZW5oYSA9IHNlbmhhOwogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgICAgIHRoaXMuYXRpdm8gPSBhdGl2bzsKICAgIH0KCiAgICAvLyBHZXR0ZXJzIGUgU2V0dGVycwogICAgcHVibGljIEludGVnZXIgZ2V0SWQoKSB7CiAgICAgICAgcmV0dXJuIGlkOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldElkKEludGVnZXIgaWQpIHsKICAgICAgICB0aGlzLmlkID0gaWQ7CiAgICB9CgogICAgcHVibGljIFN0cmluZyBnZXROb21lKCkgewogICAgICAgIHJldHVybiBub21lOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldE5vbWUoU3RyaW5nIG5vbWUpIHsKICAgICAgICB0aGlzLm5vbWUgPSBub21lOwogICAgfQoKICAgIHB1YmxpYyBTdHJpbmcgZ2V0RW1haWwoKSB7CiAgICAgICAgcmV0dXJuIGVtYWlsOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldEVtYWlsKFN0cmluZyBlbWFpbCkgewogICAgICAgIHRoaXMuZW1haWwgPSBlbWFpbDsKICAgIH0KCiAgICBwdWJsaWMgU3RyaW5nIGdldFNlbmhhKCkgewogICAgICAgIHJldHVybiBzZW5oYTsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRTZW5oYShTdHJpbmcgc2VuaGEpIHsKICAgICAgICB0aGlzLnNlbmhhID0gc2VuaGE7CiAgICB9CgogICAgcHVibGljIFBlcmZpbCBnZXRQZXJmaWwoKSB7CiAgICAgICAgcmV0dXJuIHBlcmZpbDsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRQZXJmaWwoUGVyZmlsIHBlcmZpbCkgewogICAgICAgIHRoaXMucGVyZmlsID0gcGVyZmlsOwogICAgfQoKICAgIHB1YmxpYyBCb29sZWFuIGdldEF0aXZvKCkgewogICAgICAgIHJldHVybiBhdGl2bzsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRBdGl2byhCb29sZWFuIGF0aXZvKSB7CiAgICAgICAgdGhpcy5hdGl2byA9IGF0aXZvOwogICAgfQoKICAgIHB1YmxpYyBMb2NhbERhdGVUaW1lIGdldERhdGFDYWRhc3RybygpIHsKICAgICAgICByZXR1cm4gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldERhdGFDYWRhc3RybyhMb2NhbERhdGVUaW1lIGRhdGFDYWRhc3RybykgewogICAgICAgIHRoaXMuZGF0YUNhZGFzdHJvID0gZGF0YUNhZGFzdHJvOwogICAgfQoKICAgIHB1YmxpYyBCb29sZWFuIGdldERldmVUcm9jYXJTZW5oYSgpIHsKICAgICAgICByZXR1cm4gZGV2ZVRyb2NhclNlbmhhOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldERldmVUcm9jYXJTZW5oYShCb29sZWFuIGRldmVUcm9jYXJTZW5oYSkgewogICAgICAgIHRoaXMuZGV2ZVRyb2NhclNlbmhhID0gZGV2ZVRyb2NhclNlbmhhOwogICAgfQoKICAgIHB1YmxpYyBJbnRlZ2VyIGdldFZlcnNhbygpIHsKICAgICAgICByZXR1cm4gdmVyc2FvOwogICAgfQoKICAgIHB1YmxpYyB2b2lkIHNldFZlcnNhbyhJbnRlZ2VyIHZlcnNhbykgewogICAgICAgIHRoaXMudmVyc2FvID0gdmVyc2FvOwogICAgfQoKICAgIHB1YmxpYyBTdHJpbmcgZ2V0Rm90bygpIHsKICAgICAgICByZXR1cm4gZm90bzsKICAgIH0KCiAgICBwdWJsaWMgdm9pZCBzZXRGb3RvKFN0cmluZyBmb3RvKSB7CiAgICAgICAgdGhpcy5mb3RvID0gZm90bzsKICAgIH0KCiAgICBAT3ZlcnJpZGUKICAgIHB1YmxpYyBTdHJpbmcgdG9TdHJpbmcoKSB7CiAgICAgICAgcmV0dXJuIHRoaXMubm9tZSArICIgKCIgKyB0aGlzLnBlcmZpbCArICIpIjsKICAgIH0KfQo="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar Usuario.java</span></button>
+      <div class="callout">Repare no campo <code>versao</code>: ele já está aqui porque este é o estado <em>atual</em> da classe, mas só é explicado na Aula 10; ignore-o por enquanto.</div>
 
-      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/dao/UsuarioDAO.java</code></p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.dao;
+      <p><code>UsuarioDAO</code> ganha um método próprio para gravar só a foto, separado de <code>atualizar()</code> de propósito: quem chama este método é a própria pessoa mexendo na sua foto (Seção 06), nunca um administrador editando o cadastro de outra pessoa, então não há o risco de duas edições concorrentes que justificaria o controle de versão que <code>atualizar()</code> usa (Aula 10).</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">/**
+ * Atualiza só o nome do arquivo de foto de um usuário (ou o limpa,
+ * passando null).
+ * @param usuarioId id do usuário dono da foto
+ * @param foto nome do arquivo salvo pela FotoUsuarioUtil, ou null para remover
+ * @throws SQLException caso ocorra falha na atualização
+ */</span>
+<span class="tok-kw">public</span> <span class="tok-kw">void</span> atualizarFoto(<span class="tok-kw">int</span> usuarioId, String foto) <span class="tok-kw">throws</span> SQLException {
+    String sql = <span class="tok-str">&quot;UPDATE usuarios SET foto = ? WHERE id = ?&quot;</span>;
 
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.Perfil;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.util.SenhaUtil;
-<span class="tok-kw">import</span> java.sql.Connection;
-<span class="tok-kw">import</span> java.sql.PreparedStatement;
-<span class="tok-kw">import</span> java.sql.ResultSet;
-<span class="tok-kw">import</span> java.sql.SQLException;
-<span class="tok-kw">import</span> java.util.ArrayList;
-<span class="tok-kw">import</span> java.util.List;
+    Connection conexao = ConexaoBanco.getConexao();
+    <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        stmt.setString(1, foto);
+        stmt.setInt(2, usuarioId);
+        stmt.executeUpdate();
+    }
+}</code></pre></div>
+      <div class="callout">As três consultas <code>SELECT</code> de <code>UsuarioDAO</code> (<code>listarTodos</code>, <code>buscarPorEmail</code>, <code>buscarPorId</code>) e o método <code>mapearUsuario</code> também ganham a coluna <code>foto</code> na lista de campos lidos; o arquivo completo e atualizado, já com esta mudança e o controle de concorrência, é entregue por inteiro na Aula 10.</div>
+
+      <h3>FotoUsuarioUtil: Onde os Bytes de Verdade São Gravados</h3>
+      <p>Uma classe utilitária nova, no mesmo espírito de <code>SenhaUtil</code> e <code>TokenUtil</code> (sem estado, métodos estáticos), cuida de copiar o arquivo escolhido para a pasta <code>fotos_usuarios/</code>, apagar um arquivo antigo e resolver o caminho completo de uma foto salva:</p>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/model/util/FotoUsuarioUtil.java</code></p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.model.util;
+
+<span class="tok-kw">import</span> java.io.File;
+<span class="tok-kw">import</span> java.io.IOException;
+<span class="tok-kw">import</span> java.nio.file.DirectoryStream;
+<span class="tok-kw">import</span> java.nio.file.Files;
+<span class="tok-kw">import</span> java.nio.file.Path;
+<span class="tok-kw">import</span> java.nio.file.Paths;
+<span class="tok-kw">import</span> java.nio.file.StandardCopyOption;
 
 <span class="tok-comment">/**
- * Classe responsável pelo acesso a dados da entidade Usuario.
- * Aplica o padrão de projeto DAO (Data Access Object).
+ * Classe utilitária responsável por guardar, no sistema de arquivos, a
+ * foto de perfil de cada usuário (ver MeuPerfilController). O banco de
+ * dados nunca guarda a foto em si, só o nome do arquivo (coluna
+ * usuarios.foto, Aula 09): a foto de verdade fica numa pasta própria,
+ * fora do controle de versão (ver .gitignore), com o nome do arquivo
+ * sendo o id do usuário mais a extensão original (ex.: &quot;7.png&quot;).
+ *
+ * Guardar arquivos grandes direto no banco (numa coluna BLOB) funciona,
+ * mas deixa o banco pesado e lento para fazer backup; guardar só o
+ * &quot;endereço&quot; do arquivo e deixar o sistema de arquivos cuidar dos bytes
+ * é a prática mais comum, inclusive fora de aplicações Java.
  *
  * @author Geovane Griesang
  */</span>
-<span class="tok-kw">public</span> <span class="tok-kw">class</span> UsuarioDAO {
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> FotoUsuarioUtil {
 
-    <span class="tok-comment">// Hash &quot;de mentira&quot;, calculado uma única vez, usado só para gastar o</span>
-    <span class="tok-comment">// mesmo tempo de um BCrypt.checkpw() de verdade quando o e-mail nem</span>
-    <span class="tok-comment">// existe (ver autenticar()); sem isso, uma resposta rápida demais já</span>
-    <span class="tok-comment">// denunciaria que o e-mail não tem conta, mesmo com a mensagem de</span>
-    <span class="tok-comment">// erro sendo idêntica nos dois casos.</span>
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> String HASH_FICTICIO = SenhaUtil.gerarHash(<span class="tok-str">&quot;senha-usada-so-para-igualar-o-tempo-de-resposta&quot;</span>);
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> Path PASTA_FOTOS = Paths.get(<span class="tok-str">&quot;fotos_usuarios&quot;</span>);
 
     <span class="tok-comment">/**
-     * Lista todos os usuários cadastrados no banco de dados.
-     * @return List&lt;Usuario&gt; lista de usuários encontrados
-     * @throws SQLException caso ocorra falha na consulta
+     * Copia o arquivo escolhido pelo usuário para a pasta de fotos,
+     * nomeando-o com o id do usuário e a extensão original. Se já existir
+     * uma foto anterior desse usuário (mesma ou outra extensão), ela é
+     * apagada antes, para não acumular arquivos órfãos.
+     * @param usuarioId id do usuário dono da foto
+     * @param arquivoOrigem arquivo escolhido no seletor de arquivos (FileChooser)
+     * @return String nome do arquivo salvo (ex.: &quot;7.png&quot;), para gravar em usuarios.foto
+     * @throws IOException caso ocorra falha ao criar a pasta ou copiar o arquivo
      */</span>
-    <span class="tok-kw">public</span> List&lt;Usuario&gt; listarTodos() <span class="tok-kw">throws</span> SQLException {
-        List&lt;Usuario&gt; usuarios = <span class="tok-kw">new</span> ArrayList&lt;&gt;();
-        String sql = <span class="tok-str">&quot;SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao FROM usuarios ORDER BY nome&quot;</span>;
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> String salvar(<span class="tok-kw">int</span> usuarioId, File arquivoOrigem) <span class="tok-kw">throws</span> IOException {
+        Files.createDirectories(PASTA_FOTOS);
+        removerFotosExistentes(usuarioId);
 
-        Connection conexao = ConexaoBanco.getConexao();
-        <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        String nomeOriginal = arquivoOrigem.getName();
+        String extensao = nomeOriginal.contains(<span class="tok-str">&quot;.&quot;</span>)
+                ? nomeOriginal.substring(nomeOriginal.lastIndexOf(&#x27;.&#x27;))
+                : <span class="tok-str">&quot;&quot;</span>;
+        String nomeArquivo = usuarioId + extensao;
 
-            <span class="tok-kw">while</span> (rs.next()) {
-                usuarios.add(mapearUsuario(rs));
+        Files.copy(arquivoOrigem.toPath(), PASTA_FOTOS.resolve(nomeArquivo), StandardCopyOption.REPLACE_EXISTING);
+        <span class="tok-kw">return</span> nomeArquivo;
+    }
+
+    <span class="tok-comment">/**
+     * Remove o arquivo de foto informado, se ele existir. Não faz nada
+     * (sem lançar erro) se o nome for null ou o arquivo já não existir.
+     * @param nomeArquivo nome do arquivo salvo por salvar(), ou null
+     * @throws IOException caso ocorra falha ao apagar o arquivo
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> excluir(String nomeArquivo) <span class="tok-kw">throws</span> IOException {
+        <span class="tok-kw">if</span> (nomeArquivo == <span class="tok-kw">null</span>) {
+            <span class="tok-kw">return</span>;
+        }
+        Files.deleteIfExists(PASTA_FOTOS.resolve(nomeArquivo));
+    }
+
+    <span class="tok-comment">/**
+     * Resolve o caminho completo de um arquivo de foto, para carregá-lo
+     * na tela (ex.: new Image(caminhoCompleto(usuario.getFoto()).toUri().toString())).
+     * @param nomeArquivo nome do arquivo salvo por salvar()
+     * @return Path caminho completo do arquivo na pasta de fotos
+     */</span>
+    <span class="tok-kw">public</span> <span class="tok-kw">static</span> Path caminhoCompleto(String nomeArquivo) {
+        <span class="tok-kw">return</span> PASTA_FOTOS.resolve(nomeArquivo);
+    }
+
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> removerFotosExistentes(<span class="tok-kw">int</span> usuarioId) <span class="tok-kw">throws</span> IOException {
+        <span class="tok-kw">if</span> (!Files.isDirectory(PASTA_FOTOS)) {
+            <span class="tok-kw">return</span>;
+        }
+        String prefixo = usuarioId + <span class="tok-str">&quot;.&quot;</span>;
+        <span class="tok-kw">try</span> (DirectoryStream&lt;Path&gt; arquivos = Files.newDirectoryStream(PASTA_FOTOS, prefixo + <span class="tok-str">&quot;*&quot;</span>)) {
+            <span class="tok-kw">for</span> (Path arquivo : arquivos) {
+                Files.deleteIfExists(arquivo);
             }
         }
-        <span class="tok-kw">return</span> usuarios;
-    }
-
-    <span class="tok-comment">/**
-     * Busca um usuário pelo e-mail cadastrado.
-     * @param email e-mail do usuário buscado
-     * @return Usuario encontrado, ou null se não existir
-     * @throws SQLException caso ocorra falha na consulta
-     */</span>
-    <span class="tok-kw">public</span> Usuario buscarPorEmail(String email) <span class="tok-kw">throws</span> SQLException {
-        String sql = <span class="tok-str">&quot;SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao FROM usuarios WHERE email = ?&quot;</span>;
-
-        Connection conexao = ConexaoBanco.getConexao();
-        <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-            stmt.setString(1, email);
-
-            <span class="tok-kw">try</span> (ResultSet rs = stmt.executeQuery()) {
-                <span class="tok-kw">if</span> (rs.next()) {
-                    <span class="tok-kw">return</span> mapearUsuario(rs);
-                }
-            }
-        }
-        <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
-    }
-
-    <span class="tok-comment">/**
-     * Autentica um usuário conferindo a senha digitada contra o hash BCrypt
-     * armazenado no banco; a senha em si nunca é comparada diretamente, e
-     * usuários inativos não conseguem autenticar mesmo com a senha correta.
-     * Mesmo quando o e-mail não existe, um BCrypt.checkpw() é executado
-     * assim mesmo (contra um hash fixo, sem relação com o e-mail
-     * digitado): o BCrypt é lento de propósito, então pular essa conta
-     * faria a resposta voltar visivelmente mais rápido para e-mails sem
-     * conta, um jeito de descobrir quais e-mails têm cadastro só
-     * cronometrando a resposta, mesmo com a mensagem de erro sendo
-     * idêntica nos dois casos (ver LoginController).
-     * @param email e-mail digitado no login
-     * @param senhaDigitada senha em texto puro digitada no login
-     * @return Usuario autenticado, ou null se e-mail, senha ou status não conferirem
-     * @throws SQLException caso ocorra falha na consulta
-     */</span>
-    <span class="tok-kw">public</span> Usuario autenticar(String email, String senhaDigitada) <span class="tok-kw">throws</span> SQLException {
-        Usuario usuario = buscarPorEmail(email);
-        <span class="tok-kw">if</span> (usuario == <span class="tok-kw">null</span> || !Boolean.TRUE.equals(usuario.getAtivo())) {
-            SenhaUtil.verificar(senhaDigitada, HASH_FICTICIO);
-            <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
-        }
-
-        <span class="tok-kw">if</span> (SenhaUtil.verificar(senhaDigitada, usuario.getSenha())) {
-            <span class="tok-kw">return</span> usuario;
-        }
-        <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
-    }
-
-    <span class="tok-comment">/**
-     * Busca um usuário pelo id.
-     * @param id id do usuário buscado
-     * @return Usuario encontrado, ou null se não existir
-     * @throws SQLException caso ocorra falha na consulta
-     */</span>
-    <span class="tok-kw">public</span> Usuario buscarPorId(<span class="tok-kw">int</span> id) <span class="tok-kw">throws</span> SQLException {
-        String sql = <span class="tok-str">&quot;SELECT id, nome, email, senha, perfil, ativo, deve_trocar_senha, versao FROM usuarios WHERE id = ?&quot;</span>;
-
-        Connection conexao = ConexaoBanco.getConexao();
-        <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-
-            <span class="tok-kw">try</span> (ResultSet rs = stmt.executeQuery()) {
-                <span class="tok-kw">if</span> (rs.next()) {
-                    <span class="tok-kw">return</span> mapearUsuario(rs);
-                }
-            }
-        }
-        <span class="tok-kw">return</span> <span class="tok-kw">null</span>;
-    }
-
-    <span class="tok-comment">/**
-     * Confere se já existe um usuário cadastrado com o e-mail informado.
-     * Usado tanto pelo cadastro feito pelo administrador quanto pelo
-     * autocadastro, para recusar e-mails duplicados antes de tentar o INSERT.
-     * @param email e-mail a conferir
-     * @return true se já existe um usuário com esse e-mail
-     * @throws SQLException caso ocorra falha na consulta
-     */</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">boolean</span> existeEmail(String email) <span class="tok-kw">throws</span> SQLException {
-        String sql = <span class="tok-str">&quot;SELECT 1 FROM usuarios WHERE email = ? LIMIT 1&quot;</span>;
-
-        Connection conexao = ConexaoBanco.getConexao();
-        <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-            stmt.setString(1, email);
-
-            <span class="tok-kw">try</span> (ResultSet rs = stmt.executeQuery()) {
-                <span class="tok-kw">return</span> rs.next();
-            }
-        }
-    }
-
-    <span class="tok-comment">/**
-     * Insere um novo usuário no banco de dados. A senha já deve chegar
-     * como hash BCrypt (gerado com SenhaUtil.gerarHash); este método
-     * nunca hasheia nem valida a senha, só persiste o que recebeu.
-     * @param usuario usuário a inserir; após a chamada, usuario.getId() é preenchido com o id gerado
-     * @throws SQLException caso ocorra falha na inserção
-     */</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">void</span> inserir(Usuario usuario) <span class="tok-kw">throws</span> SQLException {
-        String sql = <span class="tok-str">&quot;INSERT INTO usuarios (nome, email, senha, perfil, ativo, deve_trocar_senha) VALUES (?, ?, ?, ?, ?, ?)&quot;</span>;
-
-        Connection conexao = ConexaoBanco.getConexao();
-        <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, usuario.getNome());
-            stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getSenha());
-            stmt.setString(4, usuario.getPerfil().name());
-            stmt.setBoolean(5, Boolean.TRUE.equals(usuario.getAtivo()));
-            stmt.setBoolean(6, Boolean.TRUE.equals(usuario.getDeveTrocarSenha()));
-            stmt.executeUpdate();
-
-            <span class="tok-kw">try</span> (ResultSet chavesGeradas = stmt.getGeneratedKeys()) {
-                <span class="tok-kw">if</span> (chavesGeradas.next()) {
-                    usuario.setId(chavesGeradas.getInt(1));
-                }
-            }
-        }
-    }
-
-    <span class="tok-comment">/**
-     * Atualiza a senha (já como hash BCrypt) de um usuário existente, e
-     * define se ele deverá trocá-la novamente no próximo login. Usado
-     * tanto pela troca de senha comum quanto pela redefinição via token.
-     * Qualquer token de recuperação ainda válido do usuário é invalidado
-     * junto; sem isso, um token antigo (de um e-mail de recuperação
-     * anterior) continuaria funcionando mesmo depois da senha já ter
-     * mudado por outro caminho, dentro da janela de 30 minutos.
-     * @param usuarioId id do usuário
-     * @param novoHash novo hash BCrypt da senha (gerado com SenhaUtil.gerarHash)
-     * @param deveTrocarSenha true para exigir nova troca no próximo login
-     * @throws SQLException caso ocorra falha na atualização
-     */</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">void</span> alterarSenha(<span class="tok-kw">int</span> usuarioId, String novoHash, <span class="tok-kw">boolean</span> deveTrocarSenha) <span class="tok-kw">throws</span> SQLException {
-        String sql = <span class="tok-str">&quot;UPDATE usuarios SET senha = ?, deve_trocar_senha = ? WHERE id = ?&quot;</span>;
-
-        Connection conexao = ConexaoBanco.getConexao();
-        <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-            stmt.setString(1, novoHash);
-            stmt.setBoolean(2, deveTrocarSenha);
-            stmt.setInt(3, usuarioId);
-            stmt.executeUpdate();
-        }
-
-        <span class="tok-kw">new</span> TokenRecuperacaoSenhaDAO().invalidarTokensDoUsuario(usuarioId);
-    }
-
-    <span class="tok-comment">/**
-     * Atualiza os dados cadastrais (nome, e-mail, perfil, ativo, mas nunca a
-     * senha, que só é trocada por alterarSenha) de um usuário existente,
-     * usando controle de concorrência otimista: o UPDATE só é aplicado se
-     * a versão informada em usuario.getVersao() ainda for a versão atual
-     * no banco, e a versão é incrementada junto. Se outra atualização já
-     * tiver acontecido entre a leitura e esta chamada (outra pessoa editou
-     * o mesmo usuário nesse meio-tempo), nenhuma linha é afetada.
-     * @param usuario usuário com os dados novos e a versão que foi lida antes de editar
-     * @return true se a atualização foi aplicada; false se houve conflito de versão
-     * @throws SQLException caso ocorra falha na atualização
-     */</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">boolean</span> atualizar(Usuario usuario) <span class="tok-kw">throws</span> SQLException {
-        String sql = <span class="tok-str">&quot;UPDATE usuarios SET nome = ?, email = ?, perfil = ?, ativo = ?, versao = versao + 1 &quot;</span>
-                + <span class="tok-str">&quot;WHERE id = ? AND versao = ?&quot;</span>;
-
-        Connection conexao = ConexaoBanco.getConexao();
-        <span class="tok-kw">try</span> (PreparedStatement stmt = conexao.prepareStatement(sql)) {
-            stmt.setString(1, usuario.getNome());
-            stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getPerfil().name());
-            stmt.setBoolean(4, Boolean.TRUE.equals(usuario.getAtivo()));
-            stmt.setInt(5, usuario.getId());
-            stmt.setInt(6, usuario.getVersao());
-            <span class="tok-kw">return</span> stmt.executeUpdate() &gt; 0;
-        }
-    }
-
-    <span class="tok-kw">private</span> Usuario mapearUsuario(ResultSet rs) <span class="tok-kw">throws</span> SQLException {
-        Usuario usuario = <span class="tok-kw">new</span> Usuario();
-        usuario.setId(rs.getInt(<span class="tok-str">&quot;id&quot;</span>));
-        usuario.setNome(rs.getString(<span class="tok-str">&quot;nome&quot;</span>));
-        usuario.setEmail(rs.getString(<span class="tok-str">&quot;email&quot;</span>));
-        usuario.setSenha(rs.getString(<span class="tok-str">&quot;senha&quot;</span>));
-        usuario.setPerfil(Perfil.valueOf(rs.getString(<span class="tok-str">&quot;perfil&quot;</span>)));
-        usuario.setAtivo(rs.getBoolean(<span class="tok-str">&quot;ativo&quot;</span>));
-        usuario.setDeveTrocarSenha(rs.getBoolean(<span class="tok-str">&quot;deve_trocar_senha&quot;</span>));
-        usuario.setVersao(rs.getInt(<span class="tok-str">&quot;versao&quot;</span>));
-        <span class="tok-kw">return</span> usuario;
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="UsuarioDAO.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhbzsKCmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5QZXJmaWw7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRvbWFpbi5Vc3VhcmlvOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC51dGlsLlNlbmhhVXRpbDsKaW1wb3J0IGphdmEuc3FsLkNvbm5lY3Rpb247CmltcG9ydCBqYXZhLnNxbC5QcmVwYXJlZFN0YXRlbWVudDsKaW1wb3J0IGphdmEuc3FsLlJlc3VsdFNldDsKaW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKaW1wb3J0IGphdmEudXRpbC5BcnJheUxpc3Q7CmltcG9ydCBqYXZhLnV0aWwuTGlzdDsKCi8qKgogKiBDbGFzc2UgcmVzcG9uc8OhdmVsIHBlbG8gYWNlc3NvIGEgZGFkb3MgZGEgZW50aWRhZGUgVXN1YXJpby4KICogQXBsaWNhIG8gcGFkcsOjbyBkZSBwcm9qZXRvIERBTyAoRGF0YSBBY2Nlc3MgT2JqZWN0KS4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgVXN1YXJpb0RBTyB7CgogICAgLy8gSGFzaCAiZGUgbWVudGlyYSIsIGNhbGN1bGFkbyB1bWEgw7puaWNhIHZleiwgdXNhZG8gc8OzIHBhcmEgZ2FzdGFyIG8KICAgIC8vIG1lc21vIHRlbXBvIGRlIHVtIEJDcnlwdC5jaGVja3B3KCkgZGUgdmVyZGFkZSBxdWFuZG8gbyBlLW1haWwgbmVtCiAgICAvLyBleGlzdGUgKHZlciBhdXRlbnRpY2FyKCkpIOKAlCBzZW0gaXNzbywgdW1hIHJlc3Bvc3RhIHLDoXBpZGEgZGVtYWlzIGrDoQogICAgLy8gZGVudW5jaWFyaWEgcXVlIG8gZS1tYWlsIG7Do28gdGVtIGNvbnRhLCBtZXNtbyBjb20gYSBtZW5zYWdlbSBkZQogICAgLy8gZXJybyBzZW5kbyBpZMOqbnRpY2Egbm9zIGRvaXMgY2Fzb3MuCiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBTdHJpbmcgSEFTSF9GSUNUSUNJTyA9IFNlbmhhVXRpbC5nZXJhckhhc2goInNlbmhhLXVzYWRhLXNvLXBhcmEtaWd1YWxhci1vLXRlbXBvLWRlLXJlc3Bvc3RhIik7CgogICAgLyoqCiAgICAgKiBMaXN0YSB0b2RvcyBvcyB1c3XDoXJpb3MgY2FkYXN0cmFkb3Mgbm8gYmFuY28gZGUgZGFkb3MuCiAgICAgKiBAcmV0dXJuIExpc3Q8VXN1YXJpbz4gbGlzdGEgZGUgdXN1w6FyaW9zIGVuY29udHJhZG9zCiAgICAgKiBAdGhyb3dzIFNRTEV4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBuYSBjb25zdWx0YQogICAgICovCiAgICBwdWJsaWMgTGlzdDxVc3VhcmlvPiBsaXN0YXJUb2RvcygpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIExpc3Q8VXN1YXJpbz4gdXN1YXJpb3MgPSBuZXcgQXJyYXlMaXN0PD4oKTsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvLCBkZXZlX3Ryb2Nhcl9zZW5oYSwgdmVyc2FvIEZST00gdXN1YXJpb3MgT1JERVIgQlkgbm9tZSI7CgogICAgICAgIENvbm5lY3Rpb24gY29uZXhhbyA9IENvbmV4YW9CYW5jby5nZXRDb25leGFvKCk7CiAgICAgICAgdHJ5IChQcmVwYXJlZFN0YXRlbWVudCBzdG10ID0gY29uZXhhby5wcmVwYXJlU3RhdGVtZW50KHNxbCk7CiAgICAgICAgICAgICBSZXN1bHRTZXQgcnMgPSBzdG10LmV4ZWN1dGVRdWVyeSgpKSB7CgogICAgICAgICAgICB3aGlsZSAocnMubmV4dCgpKSB7CiAgICAgICAgICAgICAgICB1c3Vhcmlvcy5hZGQobWFwZWFyVXN1YXJpbyhycykpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIHJldHVybiB1c3VhcmlvczsKICAgIH0KCiAgICAvKioKICAgICAqIEJ1c2NhIHVtIHVzdcOhcmlvIHBlbG8gZS1tYWlsIGNhZGFzdHJhZG8uCiAgICAgKiBAcGFyYW0gZW1haWwgZS1tYWlsIGRvIHVzdcOhcmlvIGJ1c2NhZG8KICAgICAqIEByZXR1cm4gVXN1YXJpbyBlbmNvbnRyYWRvLCBvdSBudWxsIHNlIG7Do28gZXhpc3RpcgogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgY29uc3VsdGEKICAgICAqLwogICAgcHVibGljIFVzdWFyaW8gYnVzY2FyUG9yRW1haWwoU3RyaW5nIGVtYWlsKSB0aHJvd3MgU1FMRXhjZXB0aW9uIHsKICAgICAgICBTdHJpbmcgc3FsID0gIlNFTEVDVCBpZCwgbm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvLCBkZXZlX3Ryb2Nhcl9zZW5oYSwgdmVyc2FvIEZST00gdXN1YXJpb3MgV0hFUkUgZW1haWwgPSA/IjsKCiAgICAgICAgQ29ubmVjdGlvbiBjb25leGFvID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICB0cnkgKFByZXBhcmVkU3RhdGVtZW50IHN0bXQgPSBjb25leGFvLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICBzdG10LnNldFN0cmluZygxLCBlbWFpbCk7CgogICAgICAgICAgICB0cnkgKFJlc3VsdFNldCBycyA9IHN0bXQuZXhlY3V0ZVF1ZXJ5KCkpIHsKICAgICAgICAgICAgICAgIGlmIChycy5uZXh0KCkpIHsKICAgICAgICAgICAgICAgICAgICByZXR1cm4gbWFwZWFyVXN1YXJpbyhycyk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgcmV0dXJuIG51bGw7CiAgICB9CgogICAgLyoqCiAgICAgKiBBdXRlbnRpY2EgdW0gdXN1w6FyaW8gY29uZmVyaW5kbyBhIHNlbmhhIGRpZ2l0YWRhIGNvbnRyYSBvIGhhc2ggQkNyeXB0CiAgICAgKiBhcm1hemVuYWRvIG5vIGJhbmNvOyBhIHNlbmhhIGVtIHNpIG51bmNhIMOpIGNvbXBhcmFkYSBkaXJldGFtZW50ZSwgZQogICAgICogdXN1w6FyaW9zIGluYXRpdm9zIG7Do28gY29uc2VndWVtIGF1dGVudGljYXIgbWVzbW8gY29tIGEgc2VuaGEgY29ycmV0YS4KICAgICAqIE1lc21vIHF1YW5kbyBvIGUtbWFpbCBuw6NvIGV4aXN0ZSwgdW0gQkNyeXB0LmNoZWNrcHcoKSDDqSBleGVjdXRhZG8KICAgICAqIGFzc2ltIG1lc21vIChjb250cmEgdW0gaGFzaCBmaXhvLCBzZW0gcmVsYcOnw6NvIGNvbSBvIGUtbWFpbAogICAgICogZGlnaXRhZG8pOiBvIEJDcnlwdCDDqSBsZW50byBkZSBwcm9ww7NzaXRvLCBlbnTDo28gcHVsYXIgZXNzYSBjb250YQogICAgICogZmFyaWEgYSByZXNwb3N0YSB2b2x0YXIgdmlzaXZlbG1lbnRlIG1haXMgcsOhcGlkbyBwYXJhIGUtbWFpbHMgc2VtCiAgICAgKiBjb250YSDigJQgdW0gamVpdG8gZGUgZGVzY29icmlyIHF1YWlzIGUtbWFpbHMgdMOqbSBjYWRhc3RybyBzw7MKICAgICAqIGNyb25vbWV0cmFuZG8gYSByZXNwb3N0YSwgbWVzbW8gY29tIGEgbWVuc2FnZW0gZGUgZXJybyBzZW5kbwogICAgICogaWTDqm50aWNhIG5vcyBkb2lzIGNhc29zICh2ZXIgTG9naW5Db250cm9sbGVyKS4KICAgICAqIEBwYXJhbSBlbWFpbCBlLW1haWwgZGlnaXRhZG8gbm8gbG9naW4KICAgICAqIEBwYXJhbSBzZW5oYURpZ2l0YWRhIHNlbmhhIGVtIHRleHRvIHB1cm8gZGlnaXRhZGEgbm8gbG9naW4KICAgICAqIEByZXR1cm4gVXN1YXJpbyBhdXRlbnRpY2Fkbywgb3UgbnVsbCBzZSBlLW1haWwsIHNlbmhhIG91IHN0YXR1cyBuw6NvIGNvbmZlcmlyZW0KICAgICAqIEB0aHJvd3MgU1FMRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIG5hIGNvbnN1bHRhCiAgICAgKi8KICAgIHB1YmxpYyBVc3VhcmlvIGF1dGVudGljYXIoU3RyaW5nIGVtYWlsLCBTdHJpbmcgc2VuaGFEaWdpdGFkYSkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgVXN1YXJpbyB1c3VhcmlvID0gYnVzY2FyUG9yRW1haWwoZW1haWwpOwogICAgICAgIGlmICh1c3VhcmlvID09IG51bGwgfHwgIUJvb2xlYW4uVFJVRS5lcXVhbHModXN1YXJpby5nZXRBdGl2bygpKSkgewogICAgICAgICAgICBTZW5oYVV0aWwudmVyaWZpY2FyKHNlbmhhRGlnaXRhZGEsIEhBU0hfRklDVElDSU8pOwogICAgICAgICAgICByZXR1cm4gbnVsbDsKICAgICAgICB9CgogICAgICAgIGlmIChTZW5oYVV0aWwudmVyaWZpY2FyKHNlbmhhRGlnaXRhZGEsIHVzdWFyaW8uZ2V0U2VuaGEoKSkpIHsKICAgICAgICAgICAgcmV0dXJuIHVzdWFyaW87CiAgICAgICAgfQogICAgICAgIHJldHVybiBudWxsOwogICAgfQoKICAgIC8qKgogICAgICogQnVzY2EgdW0gdXN1w6FyaW8gcGVsbyBpZC4KICAgICAqIEBwYXJhbSBpZCBpZCBkbyB1c3XDoXJpbyBidXNjYWRvCiAgICAgKiBAcmV0dXJuIFVzdWFyaW8gZW5jb250cmFkbywgb3UgbnVsbCBzZSBuw6NvIGV4aXN0aXIKICAgICAqIEB0aHJvd3MgU1FMRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIG5hIGNvbnN1bHRhCiAgICAgKi8KICAgIHB1YmxpYyBVc3VhcmlvIGJ1c2NhclBvcklkKGludCBpZCkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgU3RyaW5nIHNxbCA9ICJTRUxFQ1QgaWQsIG5vbWUsIGVtYWlsLCBzZW5oYSwgcGVyZmlsLCBhdGl2bywgZGV2ZV90cm9jYXJfc2VuaGEsIHZlcnNhbyBGUk9NIHVzdWFyaW9zIFdIRVJFIGlkID0gPyI7CgogICAgICAgIENvbm5lY3Rpb24gY29uZXhhbyA9IENvbmV4YW9CYW5jby5nZXRDb25leGFvKCk7CiAgICAgICAgdHJ5IChQcmVwYXJlZFN0YXRlbWVudCBzdG10ID0gY29uZXhhby5wcmVwYXJlU3RhdGVtZW50KHNxbCkpIHsKICAgICAgICAgICAgc3RtdC5zZXRJbnQoMSwgaWQpOwoKICAgICAgICAgICAgdHJ5IChSZXN1bHRTZXQgcnMgPSBzdG10LmV4ZWN1dGVRdWVyeSgpKSB7CiAgICAgICAgICAgICAgICBpZiAocnMubmV4dCgpKSB7CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIG1hcGVhclVzdWFyaW8ocnMpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgICAgIHJldHVybiBudWxsOwogICAgfQoKICAgIC8qKgogICAgICogQ29uZmVyZSBzZSBqw6EgZXhpc3RlIHVtIHVzdcOhcmlvIGNhZGFzdHJhZG8gY29tIG8gZS1tYWlsIGluZm9ybWFkby4KICAgICAqIFVzYWRvIHRhbnRvIHBlbG8gY2FkYXN0cm8gZmVpdG8gcGVsbyBhZG1pbmlzdHJhZG9yIHF1YW50byBwZWxvCiAgICAgKiBhdXRvY2FkYXN0cm8sIHBhcmEgcmVjdXNhciBlLW1haWxzIGR1cGxpY2Fkb3MgYW50ZXMgZGUgdGVudGFyIG8gSU5TRVJULgogICAgICogQHBhcmFtIGVtYWlsIGUtbWFpbCBhIGNvbmZlcmlyCiAgICAgKiBAcmV0dXJuIHRydWUgc2UgasOhIGV4aXN0ZSB1bSB1c3XDoXJpbyBjb20gZXNzZSBlLW1haWwKICAgICAqIEB0aHJvd3MgU1FMRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIG5hIGNvbnN1bHRhCiAgICAgKi8KICAgIHB1YmxpYyBib29sZWFuIGV4aXN0ZUVtYWlsKFN0cmluZyBlbWFpbCkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgU3RyaW5nIHNxbCA9ICJTRUxFQ1QgMSBGUk9NIHVzdWFyaW9zIFdIRVJFIGVtYWlsID0gPyBMSU1JVCAxIjsKCiAgICAgICAgQ29ubmVjdGlvbiBjb25leGFvID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICB0cnkgKFByZXBhcmVkU3RhdGVtZW50IHN0bXQgPSBjb25leGFvLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICBzdG10LnNldFN0cmluZygxLCBlbWFpbCk7CgogICAgICAgICAgICB0cnkgKFJlc3VsdFNldCBycyA9IHN0bXQuZXhlY3V0ZVF1ZXJ5KCkpIHsKICAgICAgICAgICAgICAgIHJldHVybiBycy5uZXh0KCk7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9CgogICAgLyoqCiAgICAgKiBJbnNlcmUgdW0gbm92byB1c3XDoXJpbyBubyBiYW5jbyBkZSBkYWRvcy4gQSBzZW5oYSBqw6EgZGV2ZSBjaGVnYXIKICAgICAqIGNvbW8gaGFzaCBCQ3J5cHQgKGdlcmFkbyBjb20gU2VuaGFVdGlsLmdlcmFySGFzaCkg4oCUIGVzdGUgbcOpdG9kbwogICAgICogbnVuY2EgaGFzaGVpYSBuZW0gdmFsaWRhIGEgc2VuaGEsIHPDsyBwZXJzaXN0ZSBvIHF1ZSByZWNlYmV1LgogICAgICogQHBhcmFtIHVzdWFyaW8gdXN1w6FyaW8gYSBpbnNlcmlyOyBhcMOzcyBhIGNoYW1hZGEsIHVzdWFyaW8uZ2V0SWQoKSDDqSBwcmVlbmNoaWRvIGNvbSBvIGlkIGdlcmFkbwogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgaW5zZXLDp8OjbwogICAgICovCiAgICBwdWJsaWMgdm9pZCBpbnNlcmlyKFVzdWFyaW8gdXN1YXJpbykgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgU3RyaW5nIHNxbCA9ICJJTlNFUlQgSU5UTyB1c3VhcmlvcyAobm9tZSwgZW1haWwsIHNlbmhhLCBwZXJmaWwsIGF0aXZvLCBkZXZlX3Ryb2Nhcl9zZW5oYSkgVkFMVUVTICg/LCA/LCA/LCA/LCA/LCA/KSI7CgogICAgICAgIENvbm5lY3Rpb24gY29uZXhhbyA9IENvbmV4YW9CYW5jby5nZXRDb25leGFvKCk7CiAgICAgICAgdHJ5IChQcmVwYXJlZFN0YXRlbWVudCBzdG10ID0gY29uZXhhby5wcmVwYXJlU3RhdGVtZW50KHNxbCwgUHJlcGFyZWRTdGF0ZW1lbnQuUkVUVVJOX0dFTkVSQVRFRF9LRVlTKSkgewogICAgICAgICAgICBzdG10LnNldFN0cmluZygxLCB1c3VhcmlvLmdldE5vbWUoKSk7CiAgICAgICAgICAgIHN0bXQuc2V0U3RyaW5nKDIsIHVzdWFyaW8uZ2V0RW1haWwoKSk7CiAgICAgICAgICAgIHN0bXQuc2V0U3RyaW5nKDMsIHVzdWFyaW8uZ2V0U2VuaGEoKSk7CiAgICAgICAgICAgIHN0bXQuc2V0U3RyaW5nKDQsIHVzdWFyaW8uZ2V0UGVyZmlsKCkubmFtZSgpKTsKICAgICAgICAgICAgc3RtdC5zZXRCb29sZWFuKDUsIEJvb2xlYW4uVFJVRS5lcXVhbHModXN1YXJpby5nZXRBdGl2bygpKSk7CiAgICAgICAgICAgIHN0bXQuc2V0Qm9vbGVhbig2LCBCb29sZWFuLlRSVUUuZXF1YWxzKHVzdWFyaW8uZ2V0RGV2ZVRyb2NhclNlbmhhKCkpKTsKICAgICAgICAgICAgc3RtdC5leGVjdXRlVXBkYXRlKCk7CgogICAgICAgICAgICB0cnkgKFJlc3VsdFNldCBjaGF2ZXNHZXJhZGFzID0gc3RtdC5nZXRHZW5lcmF0ZWRLZXlzKCkpIHsKICAgICAgICAgICAgICAgIGlmIChjaGF2ZXNHZXJhZGFzLm5leHQoKSkgewogICAgICAgICAgICAgICAgICAgIHVzdWFyaW8uc2V0SWQoY2hhdmVzR2VyYWRhcy5nZXRJbnQoMSkpOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIC8qKgogICAgICogQXR1YWxpemEgYSBzZW5oYSAoasOhIGNvbW8gaGFzaCBCQ3J5cHQpIGRlIHVtIHVzdcOhcmlvIGV4aXN0ZW50ZSwgZQogICAgICogZGVmaW5lIHNlIGVsZSBkZXZlcsOhIHRyb2PDoS1sYSBub3ZhbWVudGUgbm8gcHLDs3hpbW8gbG9naW4uIFVzYWRvCiAgICAgKiB0YW50byBwZWxhIHRyb2NhIGRlIHNlbmhhIGNvbXVtIHF1YW50byBwZWxhIHJlZGVmaW5pw6fDo28gdmlhIHRva2VuLgogICAgICogUXVhbHF1ZXIgdG9rZW4gZGUgcmVjdXBlcmHDp8OjbyBhaW5kYSB2w6FsaWRvIGRvIHVzdcOhcmlvIMOpIGludmFsaWRhZG8KICAgICAqIGp1bnRvIOKAlCBzZW0gaXNzbywgdW0gdG9rZW4gYW50aWdvIChkZSB1bSBlLW1haWwgZGUgcmVjdXBlcmHDp8OjbwogICAgICogYW50ZXJpb3IpIGNvbnRpbnVhcmlhIGZ1bmNpb25hbmRvIG1lc21vIGRlcG9pcyBkYSBzZW5oYSBqw6EgdGVyCiAgICAgKiBtdWRhZG8gcG9yIG91dHJvIGNhbWluaG8sIGRlbnRybyBkYSBqYW5lbGEgZGUgMzAgbWludXRvcy4KICAgICAqIEBwYXJhbSB1c3VhcmlvSWQgaWQgZG8gdXN1w6FyaW8KICAgICAqIEBwYXJhbSBub3ZvSGFzaCBub3ZvIGhhc2ggQkNyeXB0IGRhIHNlbmhhIChnZXJhZG8gY29tIFNlbmhhVXRpbC5nZXJhckhhc2gpCiAgICAgKiBAcGFyYW0gZGV2ZVRyb2NhclNlbmhhIHRydWUgcGFyYSBleGlnaXIgbm92YSB0cm9jYSBubyBwcsOzeGltbyBsb2dpbgogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgbmEgYXR1YWxpemHDp8OjbwogICAgICovCiAgICBwdWJsaWMgdm9pZCBhbHRlcmFyU2VuaGEoaW50IHVzdWFyaW9JZCwgU3RyaW5nIG5vdm9IYXNoLCBib29sZWFuIGRldmVUcm9jYXJTZW5oYSkgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgU3RyaW5nIHNxbCA9ICJVUERBVEUgdXN1YXJpb3MgU0VUIHNlbmhhID0gPywgZGV2ZV90cm9jYXJfc2VuaGEgPSA/IFdIRVJFIGlkID0gPyI7CgogICAgICAgIENvbm5lY3Rpb24gY29uZXhhbyA9IENvbmV4YW9CYW5jby5nZXRDb25leGFvKCk7CiAgICAgICAgdHJ5IChQcmVwYXJlZFN0YXRlbWVudCBzdG10ID0gY29uZXhhby5wcmVwYXJlU3RhdGVtZW50KHNxbCkpIHsKICAgICAgICAgICAgc3RtdC5zZXRTdHJpbmcoMSwgbm92b0hhc2gpOwogICAgICAgICAgICBzdG10LnNldEJvb2xlYW4oMiwgZGV2ZVRyb2NhclNlbmhhKTsKICAgICAgICAgICAgc3RtdC5zZXRJbnQoMywgdXN1YXJpb0lkKTsKICAgICAgICAgICAgc3RtdC5leGVjdXRlVXBkYXRlKCk7CiAgICAgICAgfQoKICAgICAgICBuZXcgVG9rZW5SZWN1cGVyYWNhb1NlbmhhREFPKCkuaW52YWxpZGFyVG9rZW5zRG9Vc3VhcmlvKHVzdWFyaW9JZCk7CiAgICB9CgogICAgLyoqCiAgICAgKiBBdHVhbGl6YSBvcyBkYWRvcyBjYWRhc3RyYWlzIChub21lLCBlLW1haWwsIHBlcmZpbCwgYXRpdm8g4oCUIG51bmNhIGEKICAgICAqIHNlbmhhLCBxdWUgc8OzIMOpIHRyb2NhZGEgcG9yIGFsdGVyYXJTZW5oYSkgZGUgdW0gdXN1w6FyaW8gZXhpc3RlbnRlLAogICAgICogdXNhbmRvIGNvbnRyb2xlIGRlIGNvbmNvcnLDqm5jaWEgb3RpbWlzdGE6IG8gVVBEQVRFIHPDsyDDqSBhcGxpY2FkbyBzZQogICAgICogYSB2ZXJzw6NvIGluZm9ybWFkYSBlbSB1c3VhcmlvLmdldFZlcnNhbygpIGFpbmRhIGZvciBhIHZlcnPDo28gYXR1YWwKICAgICAqIG5vIGJhbmNvLCBlIGEgdmVyc8OjbyDDqSBpbmNyZW1lbnRhZGEganVudG8uIFNlIG91dHJhIGF0dWFsaXphw6fDo28gasOhCiAgICAgKiB0aXZlciBhY29udGVjaWRvIGVudHJlIGEgbGVpdHVyYSBlIGVzdGEgY2hhbWFkYSAob3V0cmEgcGVzc29hIGVkaXRvdQogICAgICogbyBtZXNtbyB1c3XDoXJpbyBuZXNzZSBtZWlvLXRlbXBvKSwgbmVuaHVtYSBsaW5oYSDDqSBhZmV0YWRhLgogICAgICogQHBhcmFtIHVzdWFyaW8gdXN1w6FyaW8gY29tIG9zIGRhZG9zIG5vdm9zIGUgYSB2ZXJzw6NvIHF1ZSBmb2kgbGlkYSBhbnRlcyBkZSBlZGl0YXIKICAgICAqIEByZXR1cm4gdHJ1ZSBzZSBhIGF0dWFsaXphw6fDo28gZm9pIGFwbGljYWRhOyBmYWxzZSBzZSBob3V2ZSBjb25mbGl0byBkZSB2ZXJzw6NvCiAgICAgKiBAdGhyb3dzIFNRTEV4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBuYSBhdHVhbGl6YcOnw6NvCiAgICAgKi8KICAgIHB1YmxpYyBib29sZWFuIGF0dWFsaXphcihVc3VhcmlvIHVzdWFyaW8pIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIFN0cmluZyBzcWwgPSAiVVBEQVRFIHVzdWFyaW9zIFNFVCBub21lID0gPywgZW1haWwgPSA/LCBwZXJmaWwgPSA/LCBhdGl2byA9ID8sIHZlcnNhbyA9IHZlcnNhbyArIDEgIgogICAgICAgICAgICAgICAgKyAiV0hFUkUgaWQgPSA/IEFORCB2ZXJzYW8gPSA/IjsKCiAgICAgICAgQ29ubmVjdGlvbiBjb25leGFvID0gQ29uZXhhb0JhbmNvLmdldENvbmV4YW8oKTsKICAgICAgICB0cnkgKFByZXBhcmVkU3RhdGVtZW50IHN0bXQgPSBjb25leGFvLnByZXBhcmVTdGF0ZW1lbnQoc3FsKSkgewogICAgICAgICAgICBzdG10LnNldFN0cmluZygxLCB1c3VhcmlvLmdldE5vbWUoKSk7CiAgICAgICAgICAgIHN0bXQuc2V0U3RyaW5nKDIsIHVzdWFyaW8uZ2V0RW1haWwoKSk7CiAgICAgICAgICAgIHN0bXQuc2V0U3RyaW5nKDMsIHVzdWFyaW8uZ2V0UGVyZmlsKCkubmFtZSgpKTsKICAgICAgICAgICAgc3RtdC5zZXRCb29sZWFuKDQsIEJvb2xlYW4uVFJVRS5lcXVhbHModXN1YXJpby5nZXRBdGl2bygpKSk7CiAgICAgICAgICAgIHN0bXQuc2V0SW50KDUsIHVzdWFyaW8uZ2V0SWQoKSk7CiAgICAgICAgICAgIHN0bXQuc2V0SW50KDYsIHVzdWFyaW8uZ2V0VmVyc2FvKCkpOwogICAgICAgICAgICByZXR1cm4gc3RtdC5leGVjdXRlVXBkYXRlKCkgPiAwOwogICAgICAgIH0KICAgIH0KCiAgICBwcml2YXRlIFVzdWFyaW8gbWFwZWFyVXN1YXJpbyhSZXN1bHRTZXQgcnMpIHRocm93cyBTUUxFeGNlcHRpb24gewogICAgICAgIFVzdWFyaW8gdXN1YXJpbyA9IG5ldyBVc3VhcmlvKCk7CiAgICAgICAgdXN1YXJpby5zZXRJZChycy5nZXRJbnQoImlkIikpOwogICAgICAgIHVzdWFyaW8uc2V0Tm9tZShycy5nZXRTdHJpbmcoIm5vbWUiKSk7CiAgICAgICAgdXN1YXJpby5zZXRFbWFpbChycy5nZXRTdHJpbmcoImVtYWlsIikpOwogICAgICAgIHVzdWFyaW8uc2V0U2VuaGEocnMuZ2V0U3RyaW5nKCJzZW5oYSIpKTsKICAgICAgICB1c3VhcmlvLnNldFBlcmZpbChQZXJmaWwudmFsdWVPZihycy5nZXRTdHJpbmcoInBlcmZpbCIpKSk7CiAgICAgICAgdXN1YXJpby5zZXRBdGl2byhycy5nZXRCb29sZWFuKCJhdGl2byIpKTsKICAgICAgICB1c3VhcmlvLnNldERldmVUcm9jYXJTZW5oYShycy5nZXRCb29sZWFuKCJkZXZlX3Ryb2Nhcl9zZW5oYSIpKTsKICAgICAgICB1c3VhcmlvLnNldFZlcnNhbyhycy5nZXRJbnQoInZlcnNhbyIpKTsKICAgICAgICByZXR1cm4gdXN1YXJpbzsKICAgIH0KfQo="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar UsuarioDAO.java</span></button>
+      <button type="button" class="download-btn" data-filename="FotoUsuarioUtil.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLnV0aWw7CgppbXBvcnQgamF2YS5pby5GaWxlOwppbXBvcnQgamF2YS5pby5JT0V4Y2VwdGlvbjsKaW1wb3J0IGphdmEubmlvLmZpbGUuRGlyZWN0b3J5U3RyZWFtOwppbXBvcnQgamF2YS5uaW8uZmlsZS5GaWxlczsKaW1wb3J0IGphdmEubmlvLmZpbGUuUGF0aDsKaW1wb3J0IGphdmEubmlvLmZpbGUuUGF0aHM7CmltcG9ydCBqYXZhLm5pby5maWxlLlN0YW5kYXJkQ29weU9wdGlvbjsKCi8qKgogKiBDbGFzc2UgdXRpbGl0w6FyaWEgcmVzcG9uc8OhdmVsIHBvciBndWFyZGFyLCBubyBzaXN0ZW1hIGRlIGFycXVpdm9zLCBhCiAqIGZvdG8gZGUgcGVyZmlsIGRlIGNhZGEgdXN1w6FyaW8gKHZlciBNZXVQZXJmaWxDb250cm9sbGVyKS4gTyBiYW5jbyBkZQogKiBkYWRvcyBudW5jYSBndWFyZGEgYSBmb3RvIGVtIHNpLCBzw7MgbyBub21lIGRvIGFycXVpdm8gKGNvbHVuYQogKiB1c3Vhcmlvcy5mb3RvLCBBdWxhIDA5KTogYSBmb3RvIGRlIHZlcmRhZGUgZmljYSBudW1hIHBhc3RhIHByw7NwcmlhLAogKiBmb3JhIGRvIGNvbnRyb2xlIGRlIHZlcnPDo28gKHZlciAuZ2l0aWdub3JlKSwgY29tIG8gbm9tZSBkbyBhcnF1aXZvCiAqIHNlbmRvIG8gaWQgZG8gdXN1w6FyaW8gbWFpcyBhIGV4dGVuc8OjbyBvcmlnaW5hbCAoZXguOiAiNy5wbmciKS4KICoKICogR3VhcmRhciBhcnF1aXZvcyBncmFuZGVzIGRpcmV0byBubyBiYW5jbyAobnVtYSBjb2x1bmEgQkxPQikgZnVuY2lvbmEsCiAqIG1hcyBkZWl4YSBvIGJhbmNvIHBlc2FkbyBlIGxlbnRvIHBhcmEgZmF6ZXIgYmFja3VwOyBndWFyZGFyIHPDsyBvCiAqICJlbmRlcmXDp28iIGRvIGFycXVpdm8gZSBkZWl4YXIgbyBzaXN0ZW1hIGRlIGFycXVpdm9zIGN1aWRhciBkb3MgYnl0ZXMKICogw6kgYSBwcsOhdGljYSBtYWlzIGNvbXVtLCBpbmNsdXNpdmUgZm9yYSBkZSBhcGxpY2HDp8O1ZXMgSmF2YS4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgRm90b1VzdWFyaW9VdGlsIHsKCiAgICBwcml2YXRlIHN0YXRpYyBmaW5hbCBQYXRoIFBBU1RBX0ZPVE9TID0gUGF0aHMuZ2V0KCJmb3Rvc191c3VhcmlvcyIpOwoKICAgIC8qKgogICAgICogQ29waWEgbyBhcnF1aXZvIGVzY29saGlkbyBwZWxvIHVzdcOhcmlvIHBhcmEgYSBwYXN0YSBkZSBmb3RvcywKICAgICAqIG5vbWVhbmRvLW8gY29tIG8gaWQgZG8gdXN1w6FyaW8gZSBhIGV4dGVuc8OjbyBvcmlnaW5hbC4gU2UgasOhIGV4aXN0aXIKICAgICAqIHVtYSBmb3RvIGFudGVyaW9yIGRlc3NlIHVzdcOhcmlvIChtZXNtYSBvdSBvdXRyYSBleHRlbnPDo28pLCBlbGEgw6kKICAgICAqIGFwYWdhZGEgYW50ZXMsIHBhcmEgbsOjbyBhY3VtdWxhciBhcnF1aXZvcyDDs3Jmw6Nvcy4KICAgICAqIEBwYXJhbSB1c3VhcmlvSWQgaWQgZG8gdXN1w6FyaW8gZG9ubyBkYSBmb3RvCiAgICAgKiBAcGFyYW0gYXJxdWl2b09yaWdlbSBhcnF1aXZvIGVzY29saGlkbyBubyBzZWxldG9yIGRlIGFycXVpdm9zIChGaWxlQ2hvb3NlcikKICAgICAqIEByZXR1cm4gU3RyaW5nIG5vbWUgZG8gYXJxdWl2byBzYWx2byAoZXguOiAiNy5wbmciKSwgcGFyYSBncmF2YXIgZW0gdXN1YXJpb3MuZm90bwogICAgICogQHRocm93cyBJT0V4Y2VwdGlvbiBjYXNvIG9jb3JyYSBmYWxoYSBhbyBjcmlhciBhIHBhc3RhIG91IGNvcGlhciBvIGFycXVpdm8KICAgICAqLwogICAgcHVibGljIHN0YXRpYyBTdHJpbmcgc2FsdmFyKGludCB1c3VhcmlvSWQsIEZpbGUgYXJxdWl2b09yaWdlbSkgdGhyb3dzIElPRXhjZXB0aW9uIHsKICAgICAgICBGaWxlcy5jcmVhdGVEaXJlY3RvcmllcyhQQVNUQV9GT1RPUyk7CiAgICAgICAgcmVtb3ZlckZvdG9zRXhpc3RlbnRlcyh1c3VhcmlvSWQpOwoKICAgICAgICBTdHJpbmcgbm9tZU9yaWdpbmFsID0gYXJxdWl2b09yaWdlbS5nZXROYW1lKCk7CiAgICAgICAgU3RyaW5nIGV4dGVuc2FvID0gbm9tZU9yaWdpbmFsLmNvbnRhaW5zKCIuIikKICAgICAgICAgICAgICAgID8gbm9tZU9yaWdpbmFsLnN1YnN0cmluZyhub21lT3JpZ2luYWwubGFzdEluZGV4T2YoJy4nKSkKICAgICAgICAgICAgICAgIDogIiI7CiAgICAgICAgU3RyaW5nIG5vbWVBcnF1aXZvID0gdXN1YXJpb0lkICsgZXh0ZW5zYW87CgogICAgICAgIEZpbGVzLmNvcHkoYXJxdWl2b09yaWdlbS50b1BhdGgoKSwgUEFTVEFfRk9UT1MucmVzb2x2ZShub21lQXJxdWl2byksIFN0YW5kYXJkQ29weU9wdGlvbi5SRVBMQUNFX0VYSVNUSU5HKTsKICAgICAgICByZXR1cm4gbm9tZUFycXVpdm87CiAgICB9CgogICAgLyoqCiAgICAgKiBSZW1vdmUgbyBhcnF1aXZvIGRlIGZvdG8gaW5mb3JtYWRvLCBzZSBlbGUgZXhpc3Rpci4gTsOjbyBmYXogbmFkYQogICAgICogKHNlbSBsYW7Dp2FyIGVycm8pIHNlIG8gbm9tZSBmb3IgbnVsbCBvdSBvIGFycXVpdm8gasOhIG7Do28gZXhpc3Rpci4KICAgICAqIEBwYXJhbSBub21lQXJxdWl2byBub21lIGRvIGFycXVpdm8gc2Fsdm8gcG9yIHNhbHZhcigpLCBvdSBudWxsCiAgICAgKiBAdGhyb3dzIElPRXhjZXB0aW9uIGNhc28gb2NvcnJhIGZhbGhhIGFvIGFwYWdhciBvIGFycXVpdm8KICAgICAqLwogICAgcHVibGljIHN0YXRpYyB2b2lkIGV4Y2x1aXIoU3RyaW5nIG5vbWVBcnF1aXZvKSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIGlmIChub21lQXJxdWl2byA9PSBudWxsKSB7CiAgICAgICAgICAgIHJldHVybjsKICAgICAgICB9CiAgICAgICAgRmlsZXMuZGVsZXRlSWZFeGlzdHMoUEFTVEFfRk9UT1MucmVzb2x2ZShub21lQXJxdWl2bykpOwogICAgfQoKICAgIC8qKgogICAgICogUmVzb2x2ZSBvIGNhbWluaG8gY29tcGxldG8gZGUgdW0gYXJxdWl2byBkZSBmb3RvLCBwYXJhIGNhcnJlZ8OhLWxvCiAgICAgKiBuYSB0ZWxhIChleC46IG5ldyBJbWFnZShjYW1pbmhvQ29tcGxldG8odXN1YXJpby5nZXRGb3RvKCkpLnRvVXJpKCkudG9TdHJpbmcoKSkpLgogICAgICogQHBhcmFtIG5vbWVBcnF1aXZvIG5vbWUgZG8gYXJxdWl2byBzYWx2byBwb3Igc2FsdmFyKCkKICAgICAqIEByZXR1cm4gUGF0aCBjYW1pbmhvIGNvbXBsZXRvIGRvIGFycXVpdm8gbmEgcGFzdGEgZGUgZm90b3MKICAgICAqLwogICAgcHVibGljIHN0YXRpYyBQYXRoIGNhbWluaG9Db21wbGV0byhTdHJpbmcgbm9tZUFycXVpdm8pIHsKICAgICAgICByZXR1cm4gUEFTVEFfRk9UT1MucmVzb2x2ZShub21lQXJxdWl2byk7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgdm9pZCByZW1vdmVyRm90b3NFeGlzdGVudGVzKGludCB1c3VhcmlvSWQpIHRocm93cyBJT0V4Y2VwdGlvbiB7CiAgICAgICAgaWYgKCFGaWxlcy5pc0RpcmVjdG9yeShQQVNUQV9GT1RPUykpIHsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KICAgICAgICBTdHJpbmcgcHJlZml4byA9IHVzdWFyaW9JZCArICIuIjsKICAgICAgICB0cnkgKERpcmVjdG9yeVN0cmVhbTxQYXRoPiBhcnF1aXZvcyA9IEZpbGVzLm5ld0RpcmVjdG9yeVN0cmVhbShQQVNUQV9GT1RPUywgcHJlZml4byArICIqIikpIHsKICAgICAgICAgICAgZm9yIChQYXRoIGFycXVpdm8gOiBhcnF1aXZvcykgewogICAgICAgICAgICAgICAgRmlsZXMuZGVsZXRlSWZFeGlzdHMoYXJxdWl2byk7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cn0K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar FotoUsuarioUtil.java</span></button>
+      <div class="callout"><strong>Por que remover a foto antiga antes de salvar a nova?</strong> Como o nome do arquivo é o id do usuário mais a extensão, trocar uma foto <code>.png</code> por uma <code>.jpg</code> deixaria o arquivo antigo (<code>7.png</code>) esquecido na pasta, do lado do novo (<code>7.jpg</code>); <code>removerFotosExistentes</code> evita esse acúmulo de arquivos órfãos.</div>
 
-      <h3>Aplicando a Mudança de Schema</h3>
-      <p>Seguindo a convenção estabelecida na Aula 04 (Seção 12): todo script SQL novo vem acompanhado do passo idêntico e idempotente em <code>SchemaInitializer</code>, para que o schema se monte sozinho em qualquer banco, sem precisar colar SQL manualmente.</p>
-      <p class="file-path">Local: <code>TenisShop/sql/V5__usuarios_versao.sql</code></p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment">-- V5: coluna de versão em usuarios, para controle de concorrência</span>
-<span class="tok-comment">-- otimista (evita que duas edições simultâneas do mesmo usuário se</span>
-<span class="tok-comment">-- sobrescrevam silenciosamente; ver Aula 06, &quot;Bloqueio Otimista&quot;).</span>
-<span class="tok-comment">-- Aplicado automaticamente por SchemaInitializer.java.</span>
-
-<span class="tok-kw">USE</span> tenisshop_db;
-
-<span class="tok-kw">ALTER</span> <span class="tok-kw">TABLE</span> usuarios <span class="tok-kw">ADD</span> <span class="tok-kw">COLUMN</span> versao <span class="tok-kw">INT</span> <span class="tok-kw">NOT</span> <span class="tok-kw">NULL</span> <span class="tok-kw">DEFAULT</span> 1;</code></pre></div>
-      <button type="button" class="download-btn" data-filename="V5__usuarios_versao.sql" data-b64="LS0gVjU6IGNvbHVuYSBkZSB2ZXJzw6NvIGVtIHVzdWFyaW9zLCBwYXJhIGNvbnRyb2xlIGRlIGNvbmNvcnLDqm5jaWEKLS0gb3RpbWlzdGEgKGV2aXRhIHF1ZSBkdWFzIGVkacOnw7VlcyBzaW11bHTDom5lYXMgZG8gbWVzbW8gdXN1w6FyaW8gc2UKLS0gc29icmVzY3JldmFtIHNpbGVuY2lvc2FtZW50ZSDigJQgdmVyIEF1bGEgMDYsICJCbG9xdWVpbyBPdGltaXN0YSIpLgotLSBBcGxpY2FkbyBhdXRvbWF0aWNhbWVudGUgcG9yIFNjaGVtYUluaXRpYWxpemVyLmphdmEuCgpVU0UgdGVuaXNzaG9wX2RiOwoKQUxURVIgVEFCTEUgdXN1YXJpb3MgQUREIENPTFVNTiB2ZXJzYW8gSU5UIE5PVCBOVUxMIERFRkFVTFQgMTsK"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar V5__usuarios_versao.sql</span></button>
-
-      <p>E o passo equivalente em <code>SchemaInitializer.java</code> (mesmo padrão de <code>adicionarColunaDeveTrocarSenhaSeNaoExistir</code> já existente; confere se a coluna existe antes de tentar criar):</p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> <span class="tok-fn">adicionarColunaVersaoSeNaoExistir</span>(<span class="tok-fn">Connection</span> conexao) <span class="tok-kw">throws</span> <span class="tok-fn">SQLException</span> {
-    <span class="tok-kw">if</span> (colunaExiste(conexao, <span class="tok-str">"usuarios"</span>, <span class="tok-str">"versao"</span>)) {
-        <span class="tok-kw">return</span>;
-    }
-    <span class="tok-fn">String</span> sql = <span class="tok-str">"ALTER TABLE usuarios ADD COLUMN versao INT NOT NULL DEFAULT 1"</span>;
-    <span class="tok-kw">try</span> (<span class="tok-fn">Statement</span> stmt = conexao.createStatement()) {
-        stmt.executeUpdate(sql);
-    }
-}</code></pre></div>
-      <div class="callout">O arquivo completo e atualizado de <code>SchemaInitializer.java</code> (já com esta mudança e a da trilha de auditoria) é entregue por inteiro na Aula 10 (Seção 03), quando a tabela <code>auditoria</code> também já tiver sido apresentada.</div>
+      <div class="callout"><strong>Adicione ao <code>.gitignore</code>:</strong> assim como <code>db.properties</code> (Aula 02), a pasta inteira de fotos é local a cada máquina e nunca deve ser commitada.</div>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-comment"># Fotos de perfil dos usuários (Aula 09) - arquivos de cada máquina,</span>
+<span class="tok-comment"># nunca versionar; o banco guarda só o nome do arquivo (ver FotoUsuarioUtil).</span>
+/TenisShop/fotos_usuarios/</code></pre></div>
     </section>
 
-    <section id="s5">
-      <h2><span class="num">05</span>Fechando uma Lacuna do CRUD: Listar e Editar Usuários</h2>
-      <p>A coluna <code>versao</code> só faz sentido se existir uma tela onde alguém edita um usuário já existente; e essa tela nunca existiu. Desde a Aula 04, um administrador só conseguia <strong>criar</strong> usuários (<code>CadastrarUsuarioController</code>); não havia como listar quem já tinha conta, nem como corrigir um nome digitado errado ou promover alguém a administrador depois do cadastro. Esta seção fecha essa lacuna com duas telas novas.</p>
+    <section id="s6">
+      <h2><span class="num">06</span>A Tela "Meu Perfil": Upload, Exibição, Edição e Exclusão</h2>
+      <p>Diferente das telas administrativas (<code>CadastrarUsuarioController</code>, e a partir da Aula 10, <code>EditarUsuarioController</code>), "Meu Perfil" é <strong>autosserviço</strong>: qualquer pessoa logada mexe só na própria foto, no mesmo espírito de <code>AlterarSenhaController</code> (Aula 04). O botão "Escolher Foto..." só troca a pré-visualização e guarda o arquivo escolhido em memória; nada é copiado para <code>fotos_usuarios/</code> nem gravado no banco até o clique em Salvar, para não deixar arquivos "perdidos" na pasta caso a pessoa desista.</p>
 
-      <h3>Passando Dados entre Telas sem Parâmetros</h3>
-      <p><code>TenisShop.setRoot(String fxml)</code> só recebe o nome do arquivo FXML; não existe mecanismo de navegação com parâmetros neste projeto. A mesma solução já usada para "quem está logado" (<code>TenisShop.usuarioLogado</code>) resolve "qual usuário está sendo editado": um segundo campo <code>static</code>, <code>usuarioEmEdicao</code>, que a tela de listagem preenche antes de navegar, e a tela de edição lê ao abrir.</p>
-      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/TenisShop.java</code></p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop;
-
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.dao.SchemaInitializer;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
-<span class="tok-kw">import</span> java.io.IOException;
-<span class="tok-kw">import</span> java.sql.SQLException;
-<span class="tok-kw">import</span> javafx.application.Application;
-<span class="tok-kw">import</span> javafx.fxml.FXMLLoader;
-<span class="tok-kw">import</span> javafx.scene.Parent;
-<span class="tok-kw">import</span> javafx.scene.Scene;
-<span class="tok-kw">import</span> javafx.scene.control.Alert;
-<span class="tok-kw">import</span> javafx.scene.control.Alert.AlertType;
-<span class="tok-kw">import</span> javafx.stage.Stage;
-
-<span class="tok-comment">/**
- * Classe principal da aplicação TenisShop: inicializa a interface JavaFX
- * a partir da tela de login e comanda a navegação entre telas.
- * Não é o Model nem a View nem o Controller do padrão MVC; é a &quot;casca&quot; que
- * hospeda uma única Scene e troca só a raiz dela a cada tela, para nunca
- * abrir mais de uma janela ao mesmo tempo.
- *
- * @author Geovane Griesang
- */</span>
-<span class="tok-kw">public</span> <span class="tok-kw">class</span> TenisShop <span class="tok-kw">extends</span> Application {
-
-    <span class="tok-comment">// Guarda quem está logado para as telas seguintes consultarem; fica</span>
-    <span class="tok-comment">// static porque só existe uma sessão de usuário por vez nesta aplicação.</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> Usuario usuarioLogado;
-
-    <span class="tok-comment">// Guarda qual usuário está sendo editado, entre a tela de listagem e a</span>
-    <span class="tok-comment">// de edição: como setRoot() só recebe o nome do FXML, sem parâmetros,</span>
-    <span class="tok-comment">// esta é a mesma solução (campo static) já usada para usuarioLogado,</span>
-    <span class="tok-comment">// aplicada agora para passar dados entre duas telas administrativas.</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> Usuario usuarioEmEdicao;
-
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> Scene scene;
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> Stage stage;
-
-    @Override
-    <span class="tok-kw">public</span> <span class="tok-kw">void</span> start(Stage stage) <span class="tok-kw">throws</span> IOException {
-        TenisShop.stage = stage;
-
-        <span class="tok-kw">try</span> {
-            <span class="tok-comment">// Roda antes de qualquer tela: cria tabelas/colunas que ainda</span>
-            <span class="tok-comment">// não existem e semeia o primeiro administrador, se o banco</span>
-            <span class="tok-comment">// estiver vazio. Ver SchemaInitializer para o motivo de isto</span>
-            <span class="tok-comment">// ser automático em vez de exigir que alguém rode SQL à mão.</span>
-            SchemaInitializer.inicializar();
-        } <span class="tok-kw">catch</span> (SQLException e) {
-            Alert alert = <span class="tok-kw">new</span> Alert(AlertType.ERROR);
-            alert.setTitle(<span class="tok-str">&quot;TenisShop&quot;</span>);
-            alert.setHeaderText(<span class="tok-kw">null</span>);
-            alert.setContentText(<span class="tok-str">&quot;Não foi possível preparar o banco de dados. Verifique se o MySQL está ativo.\n\nDetalhes: &quot;</span> + e.getMessage());
-            alert.showAndWait();
-            <span class="tok-kw">return</span>;
-        }
-
-        scene = <span class="tok-kw">new</span> Scene(loadFXML(<span class="tok-str">&quot;login&quot;</span>));
-        stage.setTitle(<span class="tok-str">&quot;TenisShop&quot;</span>);
-        stage.setScene(scene);
-        stage.sizeToScene();
-        stage.show();
-    }
-
-    <span class="tok-comment">/**
-     * Troca a tela atual sem abrir uma janela nova: os Controllers chamam
-     * este método (ex.: TenisShop.setRoot(&quot;principal&quot;)) para navegar.
-     * Cada tela tem seu próprio prefWidth/prefHeight no FXML, e o
-     * sizeToScene() garante que a janela sempre reajusta para o tamanho
-     * preferido da tela nova; sem ele, a janela ficaria travada no
-     * tamanho da tela anterior, cortando botões de telas maiores.
-     * @param fxml nome do arquivo FXML, sem a extensão (ex.: &quot;login&quot;)
-     * @throws IOException se o FXML não existir ou tiver erro de carga
-     */</span>
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> setRoot(String fxml) <span class="tok-kw">throws</span> IOException {
-        scene.setRoot(loadFXML(fxml));
-        stage.sizeToScene();
-    }
-
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> Parent loadFXML(String fxml) <span class="tok-kw">throws</span> IOException {
-        FXMLLoader fxmlLoader = <span class="tok-kw">new</span> FXMLLoader(TenisShop.<span class="tok-kw">class</span>.getResource(<span class="tok-str">&quot;view/&quot;</span> + fxml + <span class="tok-str">&quot;.fxml&quot;</span>));
-        <span class="tok-kw">return</span> fxmlLoader.load();
-    }
-
-    <span class="tok-kw">public</span> <span class="tok-kw">static</span> <span class="tok-kw">void</span> main(String[] args) {
-        launch();
-    }
-}</code></pre></div>
-      <button type="button" class="download-btn" data-filename="TenisShop.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wOwoKaW1wb3J0IGJyLmVkdS5pZnN1bC52ZW5hbmNpby50ZW5pc3Nob3AubW9kZWwuZGFvLlNjaGVtYUluaXRpYWxpemVyOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC5kb21haW4uVXN1YXJpbzsKaW1wb3J0IGphdmEuaW8uSU9FeGNlcHRpb247CmltcG9ydCBqYXZhLnNxbC5TUUxFeGNlcHRpb247CmltcG9ydCBqYXZhZnguYXBwbGljYXRpb24uQXBwbGljYXRpb247CmltcG9ydCBqYXZhZnguZnhtbC5GWE1MTG9hZGVyOwppbXBvcnQgamF2YWZ4LnNjZW5lLlBhcmVudDsKaW1wb3J0IGphdmFmeC5zY2VuZS5TY2VuZTsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkFsZXJ0OwppbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuQWxlcnQuQWxlcnRUeXBlOwppbXBvcnQgamF2YWZ4LnN0YWdlLlN0YWdlOwoKLyoqCiAqIENsYXNzZSBwcmluY2lwYWwgZGEgYXBsaWNhw6fDo28gVGVuaXNTaG9wOiBpbmljaWFsaXphIGEgaW50ZXJmYWNlIEphdmFGWAogKiBhIHBhcnRpciBkYSB0ZWxhIGRlIGxvZ2luIGUgY29tYW5kYSBhIG5hdmVnYcOnw6NvIGVudHJlIHRlbGFzLgogKiBOw6NvIMOpIG8gTW9kZWwgbmVtIGEgVmlldyBuZW0gbyBDb250cm9sbGVyIGRvIHBhZHLDo28gTVZDOyDDqSBhICJjYXNjYSIgcXVlCiAqIGhvc3BlZGEgdW1hIMO6bmljYSBTY2VuZSBlIHRyb2NhIHPDsyBhIHJhaXogZGVsYSBhIGNhZGEgdGVsYSwgcGFyYSBudW5jYQogKiBhYnJpciBtYWlzIGRlIHVtYSBqYW5lbGEgYW8gbWVzbW8gdGVtcG8uCiAqCiAqIEBhdXRob3IgR2VvdmFuZSBHcmllc2FuZwogKi8KcHVibGljIGNsYXNzIFRlbmlzU2hvcCBleHRlbmRzIEFwcGxpY2F0aW9uIHsKCiAgICAvLyBHdWFyZGEgcXVlbSBlc3TDoSBsb2dhZG8gcGFyYSBhcyB0ZWxhcyBzZWd1aW50ZXMgY29uc3VsdGFyZW07IGZpY2EKICAgIC8vIHN0YXRpYyBwb3JxdWUgc8OzIGV4aXN0ZSB1bWEgc2Vzc8OjbyBkZSB1c3XDoXJpbyBwb3IgdmV6IG5lc3RhIGFwbGljYcOnw6NvLgogICAgcHVibGljIHN0YXRpYyBVc3VhcmlvIHVzdWFyaW9Mb2dhZG87CgogICAgLy8gR3VhcmRhIHF1YWwgdXN1w6FyaW8gZXN0w6Egc2VuZG8gZWRpdGFkbywgZW50cmUgYSB0ZWxhIGRlIGxpc3RhZ2VtIGUgYQogICAgLy8gZGUgZWRpw6fDo286IGNvbW8gc2V0Um9vdCgpIHPDsyByZWNlYmUgbyBub21lIGRvIEZYTUwsIHNlbSBwYXLDom1ldHJvcywKICAgIC8vIGVzdGEgw6kgYSBtZXNtYSBzb2x1w6fDo28gKGNhbXBvIHN0YXRpYykgasOhIHVzYWRhIHBhcmEgdXN1YXJpb0xvZ2FkbywKICAgIC8vIGFwbGljYWRhIGFnb3JhIHBhcmEgcGFzc2FyIGRhZG9zIGVudHJlIGR1YXMgdGVsYXMgYWRtaW5pc3RyYXRpdmFzLgogICAgcHVibGljIHN0YXRpYyBVc3VhcmlvIHVzdWFyaW9FbUVkaWNhbzsKCiAgICBwcml2YXRlIHN0YXRpYyBTY2VuZSBzY2VuZTsKICAgIHByaXZhdGUgc3RhdGljIFN0YWdlIHN0YWdlOwoKICAgIEBPdmVycmlkZQogICAgcHVibGljIHZvaWQgc3RhcnQoU3RhZ2Ugc3RhZ2UpIHRocm93cyBJT0V4Y2VwdGlvbiB7CiAgICAgICAgVGVuaXNTaG9wLnN0YWdlID0gc3RhZ2U7CgogICAgICAgIHRyeSB7CiAgICAgICAgICAgIC8vIFJvZGEgYW50ZXMgZGUgcXVhbHF1ZXIgdGVsYTogY3JpYSB0YWJlbGFzL2NvbHVuYXMgcXVlIGFpbmRhCiAgICAgICAgICAgIC8vIG7Do28gZXhpc3RlbSBlIHNlbWVpYSBvIHByaW1laXJvIGFkbWluaXN0cmFkb3IsIHNlIG8gYmFuY28KICAgICAgICAgICAgLy8gZXN0aXZlciB2YXppby4gVmVyIFNjaGVtYUluaXRpYWxpemVyIHBhcmEgbyBtb3Rpdm8gZGUgaXN0bwogICAgICAgICAgICAvLyBzZXIgYXV0b23DoXRpY28gZW0gdmV6IGRlIGV4aWdpciBxdWUgYWxndcOpbSByb2RlIFNRTCDDoCBtw6NvLgogICAgICAgICAgICBTY2hlbWFJbml0aWFsaXplci5pbmljaWFsaXphcigpOwogICAgICAgIH0gY2F0Y2ggKFNRTEV4Y2VwdGlvbiBlKSB7CiAgICAgICAgICAgIEFsZXJ0IGFsZXJ0ID0gbmV3IEFsZXJ0KEFsZXJ0VHlwZS5FUlJPUik7CiAgICAgICAgICAgIGFsZXJ0LnNldFRpdGxlKCJUZW5pc1Nob3AiKTsKICAgICAgICAgICAgYWxlcnQuc2V0SGVhZGVyVGV4dChudWxsKTsKICAgICAgICAgICAgYWxlcnQuc2V0Q29udGVudFRleHQoIk7Do28gZm9pIHBvc3PDrXZlbCBwcmVwYXJhciBvIGJhbmNvIGRlIGRhZG9zLiBWZXJpZmlxdWUgc2UgbyBNeVNRTCBlc3TDoSBhdGl2by5cblxuRGV0YWxoZXM6ICIgKyBlLmdldE1lc3NhZ2UoKSk7CiAgICAgICAgICAgIGFsZXJ0LnNob3dBbmRXYWl0KCk7CiAgICAgICAgICAgIHJldHVybjsKICAgICAgICB9CgogICAgICAgIHNjZW5lID0gbmV3IFNjZW5lKGxvYWRGWE1MKCJsb2dpbiIpKTsKICAgICAgICBzdGFnZS5zZXRUaXRsZSgiVGVuaXNTaG9wIik7CiAgICAgICAgc3RhZ2Uuc2V0U2NlbmUoc2NlbmUpOwogICAgICAgIHN0YWdlLnNpemVUb1NjZW5lKCk7CiAgICAgICAgc3RhZ2Uuc2hvdygpOwogICAgfQoKICAgIC8qKgogICAgICogVHJvY2EgYSB0ZWxhIGF0dWFsIHNlbSBhYnJpciB1bWEgamFuZWxhIG5vdmE6IG9zIENvbnRyb2xsZXJzIGNoYW1hbQogICAgICogZXN0ZSBtw6l0b2RvIChleC46IFRlbmlzU2hvcC5zZXRSb290KCJwcmluY2lwYWwiKSkgcGFyYSBuYXZlZ2FyLgogICAgICogQ2FkYSB0ZWxhIHRlbSBzZXUgcHLDs3ByaW8gcHJlZldpZHRoL3ByZWZIZWlnaHQgbm8gRlhNTCwgZSBvCiAgICAgKiBzaXplVG9TY2VuZSgpIGdhcmFudGUgcXVlIGEgamFuZWxhIHNlbXByZSByZWFqdXN0YSBwYXJhIG8gdGFtYW5obwogICAgICogcHJlZmVyaWRvIGRhIHRlbGEgbm92YSDigJQgc2VtIGVsZSwgYSBqYW5lbGEgZmljYXJpYSB0cmF2YWRhIG5vCiAgICAgKiB0YW1hbmhvIGRhIHRlbGEgYW50ZXJpb3IsIGNvcnRhbmRvIGJvdMO1ZXMgZGUgdGVsYXMgbWFpb3Jlcy4KICAgICAqIEBwYXJhbSBmeG1sIG5vbWUgZG8gYXJxdWl2byBGWE1MLCBzZW0gYSBleHRlbnPDo28gKGV4LjogImxvZ2luIikKICAgICAqIEB0aHJvd3MgSU9FeGNlcHRpb24gc2UgbyBGWE1MIG7Do28gZXhpc3RpciBvdSB0aXZlciBlcnJvIGRlIGNhcmdhCiAgICAgKi8KICAgIHB1YmxpYyBzdGF0aWMgdm9pZCBzZXRSb290KFN0cmluZyBmeG1sKSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIHNjZW5lLnNldFJvb3QobG9hZEZYTUwoZnhtbCkpOwogICAgICAgIHN0YWdlLnNpemVUb1NjZW5lKCk7CiAgICB9CgogICAgcHJpdmF0ZSBzdGF0aWMgUGFyZW50IGxvYWRGWE1MKFN0cmluZyBmeG1sKSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIEZYTUxMb2FkZXIgZnhtbExvYWRlciA9IG5ldyBGWE1MTG9hZGVyKFRlbmlzU2hvcC5jbGFzcy5nZXRSZXNvdXJjZSgidmlldy8iICsgZnhtbCArICIuZnhtbCIpKTsKICAgICAgICByZXR1cm4gZnhtbExvYWRlci5sb2FkKCk7CiAgICB9CgogICAgcHVibGljIHN0YXRpYyB2b2lkIG1haW4oU3RyaW5nW10gYXJncykgewogICAgICAgIGxhdW5jaCgpOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar TenisShop.java</span></button>
-
-      <h3>Tela de Listagem: a Primeira TableView do Projeto</h3>
-      <p>Nenhuma tela até aqui precisou mostrar uma coleção de registros: só formulários de um registro por vez. <code>TableView</code> é o controle padrão do JavaFX para isso: cada <code>TableColumn</code> sabe extrair um valor de cada objeto da lista (via <code>PropertyValueFactory</code>, que usa reflexão para chamar o getter correspondente ao nome da coluna).</p>
-      <p class="file-path">Local: <code>src/main/resources/br/edu/ifsul/venancio/tenisshop/view/listar-usuarios.fxml</code></p>
+      <p class="file-path">Local: <code>src/main/resources/br/edu/ifsul/venancio/tenisshop/view/meu-perfil.fxml</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 
 &lt;?import javafx.geometry.Insets?&gt;
 &lt;?import javafx.scene.control.Button?&gt;
 &lt;?import javafx.scene.control.Label?&gt;
-&lt;?import javafx.scene.control.TableColumn?&gt;
-&lt;?import javafx.scene.control.TableView?&gt;
+&lt;?import javafx.scene.image.ImageView?&gt;
 &lt;?import javafx.scene.layout.HBox?&gt;
 &lt;?import javafx.scene.layout.VBox?&gt;
 
-&lt;<span class="tok-kw">VBox</span> alignment=&quot;CENTER&quot; prefHeight=&quot;480.0&quot; prefWidth=&quot;620.0&quot; spacing=&quot;14.0&quot; xmlns=&quot;http://javafx.com/javafx/21&quot; xmlns:fx=&quot;http://javafx.com/fxml/1&quot; fx:controller=&quot;br.edu.ifsul.venancio.tenisshop.view.ListarUsuariosController&quot;&gt;
+&lt;<span class="tok-kw">VBox</span> alignment=&quot;CENTER&quot; prefHeight=&quot;480.0&quot; prefWidth=&quot;420.0&quot; spacing=&quot;14.0&quot; xmlns=&quot;http://javafx.com/javafx/21&quot; xmlns:fx=&quot;http://javafx.com/fxml/1&quot; fx:controller=&quot;br.edu.ifsul.venancio.tenisshop.view.MeuPerfilController&quot;&gt;
    &lt;<span class="tok-kw">padding</span>&gt;
       &lt;<span class="tok-kw">Insets</span> bottom=&quot;24.0&quot; left=&quot;24.0&quot; right=&quot;24.0&quot; top=&quot;24.0&quot; /&gt;
    &lt;/<span class="tok-kw">padding</span>&gt;
    &lt;<span class="tok-kw">children</span>&gt;
-      &lt;<span class="tok-kw">Label</span> style=&quot;-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;&quot; text=&quot;Usuários Cadastrados&quot; /&gt;
-      &lt;<span class="tok-kw">TableView</span> fx:id=&quot;tblUsuarios&quot; prefHeight=&quot;360.0&quot; prefWidth=&quot;580.0&quot;&gt;
-         &lt;<span class="tok-kw">columns</span>&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colNome&quot; prefWidth=&quot;180.0&quot; text=&quot;Nome&quot; /&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colEmail&quot; prefWidth=&quot;220.0&quot; text=&quot;E-mail&quot; /&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colPerfil&quot; prefWidth=&quot;100.0&quot; text=&quot;Perfil&quot; /&gt;
-            &lt;<span class="tok-kw">TableColumn</span> fx:id=&quot;colAtivo&quot; prefWidth=&quot;70.0&quot; text=&quot;Ativo&quot; /&gt;
-         &lt;/<span class="tok-kw">columns</span>&gt;
-      &lt;/<span class="tok-kw">TableView</span>&gt;
+      &lt;<span class="tok-kw">Label</span> style=&quot;-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;&quot; text=&quot;Meu Perfil&quot; /&gt;
+      &lt;<span class="tok-kw">Label</span> style=&quot;-fx-text-fill: #525252;&quot; text=&quot;Escolha uma foto de perfil (PNG ou JPG). A foto fica salva na pasta fotos_usuarios/, nunca no banco de dados.&quot; wrapText=&quot;true&quot; /&gt;
+      &lt;<span class="tok-kw">VBox</span> alignment=&quot;CENTER&quot; style=&quot;-fx-border-color: #c8c8c8; -fx-border-width: 1px;&quot;&gt;
+         &lt;<span class="tok-kw">children</span>&gt;
+            &lt;<span class="tok-kw">ImageView</span> fx:id=&quot;imgFoto&quot; fitHeight=&quot;180.0&quot; fitWidth=&quot;180.0&quot; pickOnBounds=&quot;true&quot; preserveRatio=&quot;true&quot; /&gt;
+         &lt;/<span class="tok-kw">children</span>&gt;
+      &lt;/<span class="tok-kw">VBox</span>&gt;
       &lt;<span class="tok-kw">HBox</span> alignment=&quot;CENTER&quot; spacing=&quot;12.0&quot;&gt;
          &lt;<span class="tok-kw">children</span>&gt;
-            &lt;<span class="tok-kw">Button</span> onAction=&quot;#irParaPrincipal&quot; text=&quot;Voltar&quot; /&gt;
-            &lt;<span class="tok-kw">Button</span> fx:id=&quot;btnEditar&quot; disable=&quot;true&quot; onAction=&quot;#btnEditarAction&quot; style=&quot;-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;&quot; text=&quot;Editar&quot; /&gt;
+            &lt;<span class="tok-kw">Button</span> onAction=&quot;#btnEscolherFotoAction&quot; text=&quot;Escolher Foto...&quot; /&gt;
+            &lt;<span class="tok-kw">Button</span> onAction=&quot;#btnRemoverFotoAction&quot; text=&quot;Remover Foto&quot; /&gt;
          &lt;/<span class="tok-kw">children</span>&gt;
       &lt;/<span class="tok-kw">HBox</span>&gt;
-   &lt;/<span class="tok-kw">children</span>&gt;
-&lt;/<span class="tok-kw">VBox</span>&gt;</code></pre></div>
-      <button type="button" class="download-btn" data-filename="listar-usuarios.fxml" data-b64="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KCjw/aW1wb3J0IGphdmFmeC5nZW9tZXRyeS5JbnNldHM/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5CdXR0b24/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5MYWJlbD8+Cjw/aW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLlRhYmxlQ29sdW1uPz4KPD9pbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuVGFibGVWaWV3Pz4KPD9pbXBvcnQgamF2YWZ4LnNjZW5lLmxheW91dC5IQm94Pz4KPD9pbXBvcnQgamF2YWZ4LnNjZW5lLmxheW91dC5WQm94Pz4KCjxWQm94IGFsaWdubWVudD0iQ0VOVEVSIiBwcmVmSGVpZ2h0PSI0ODAuMCIgcHJlZldpZHRoPSI2MjAuMCIgc3BhY2luZz0iMTQuMCIgeG1sbnM9Imh0dHA6Ly9qYXZhZnguY29tL2phdmFmeC8yMSIgeG1sbnM6Zng9Imh0dHA6Ly9qYXZhZnguY29tL2Z4bWwvMSIgZng6Y29udHJvbGxlcj0iYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC52aWV3Lkxpc3RhclVzdWFyaW9zQ29udHJvbGxlciI+CiAgIDxwYWRkaW5nPgogICAgICA8SW5zZXRzIGJvdHRvbT0iMjQuMCIgbGVmdD0iMjQuMCIgcmlnaHQ9IjI0LjAiIHRvcD0iMjQuMCIgLz4KICAgPC9wYWRkaW5nPgogICA8Y2hpbGRyZW4+CiAgICAgIDxMYWJlbCBzdHlsZT0iLWZ4LWZvbnQtc2l6ZTogMjJweDsgLWZ4LWZvbnQtd2VpZ2h0OiBib2xkOyAtZngtdGV4dC1maWxsOiAjMWY2YjJjOyIgdGV4dD0iVXN1w6FyaW9zIENhZGFzdHJhZG9zIiAvPgogICAgICA8VGFibGVWaWV3IGZ4OmlkPSJ0YmxVc3VhcmlvcyIgcHJlZkhlaWdodD0iMzYwLjAiIHByZWZXaWR0aD0iNTgwLjAiPgogICAgICAgICA8Y29sdW1ucz4KICAgICAgICAgICAgPFRhYmxlQ29sdW1uIGZ4OmlkPSJjb2xOb21lIiBwcmVmV2lkdGg9IjE4MC4wIiB0ZXh0PSJOb21lIiAvPgogICAgICAgICAgICA8VGFibGVDb2x1bW4gZng6aWQ9ImNvbEVtYWlsIiBwcmVmV2lkdGg9IjIyMC4wIiB0ZXh0PSJFLW1haWwiIC8+CiAgICAgICAgICAgIDxUYWJsZUNvbHVtbiBmeDppZD0iY29sUGVyZmlsIiBwcmVmV2lkdGg9IjEwMC4wIiB0ZXh0PSJQZXJmaWwiIC8+CiAgICAgICAgICAgIDxUYWJsZUNvbHVtbiBmeDppZD0iY29sQXRpdm8iIHByZWZXaWR0aD0iNzAuMCIgdGV4dD0iQXRpdm8iIC8+CiAgICAgICAgIDwvY29sdW1ucz4KICAgICAgPC9UYWJsZVZpZXc+CiAgICAgIDxIQm94IGFsaWdubWVudD0iQ0VOVEVSIiBzcGFjaW5nPSIxMi4wIj4KICAgICAgICAgPGNoaWxkcmVuPgogICAgICAgICAgICA8QnV0dG9uIG9uQWN0aW9uPSIjaXJQYXJhUHJpbmNpcGFsIiB0ZXh0PSJWb2x0YXIiIC8+CiAgICAgICAgICAgIDxCdXR0b24gZng6aWQ9ImJ0bkVkaXRhciIgZGlzYWJsZT0idHJ1ZSIgb25BY3Rpb249IiNidG5FZGl0YXJBY3Rpb24iIHN0eWxlPSItZngtYmFja2dyb3VuZC1jb2xvcjogIzJmOWU0MTsgLWZ4LXRleHQtZmlsbDogd2hpdGU7IC1meC1mb250LXdlaWdodDogYm9sZDsiIHRleHQ9IkVkaXRhciIgLz4KICAgICAgICAgPC9jaGlsZHJlbj4KICAgICAgPC9IQm94PgogICA8L2NoaWxkcmVuPgo8L1ZCb3g+Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar listar-usuarios.fxml</span></button>
-
-      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/view/ListarUsuariosController.java</code></p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.view;
-
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.TenisShop;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.dao.UsuarioDAO;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.Perfil;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
-<span class="tok-kw">import</span> java.io.IOException;
-<span class="tok-kw">import</span> java.sql.SQLException;
-<span class="tok-kw">import</span> javafx.collections.FXCollections;
-<span class="tok-kw">import</span> javafx.event.ActionEvent;
-<span class="tok-kw">import</span> javafx.fxml.FXML;
-<span class="tok-kw">import</span> javafx.scene.control.Alert;
-<span class="tok-kw">import</span> javafx.scene.control.Alert.AlertType;
-<span class="tok-kw">import</span> javafx.scene.control.Button;
-<span class="tok-kw">import</span> javafx.scene.control.TableColumn;
-<span class="tok-kw">import</span> javafx.scene.control.TableView;
-<span class="tok-kw">import</span> javafx.scene.control.cell.PropertyValueFactory;
-
-<span class="tok-comment">/**
- * Controller da tela administrativa de listagem de usuários, a primeira
- * TableView do projeto. Fecha uma lacuna que existia desde a Aula 04:
- * até aqui, um administrador só conseguia CRIAR usuários
- * (CadastrarUsuarioController), nunca listar ou editar um já existente.
- * Selecionar uma linha e clicar em Editar leva à tela de edição
- * (EditarUsuarioController), que é onde o controle de concorrência
- * otimista (coluna &quot;versao&quot;) entra em ação.
- *
- * @author Geovane Griesang
- */</span>
-<span class="tok-kw">public</span> <span class="tok-kw">class</span> ListarUsuariosController {
-
-    @FXML
-    <span class="tok-kw">private</span> TableView&lt;Usuario&gt; tblUsuarios;
-
-    @FXML
-    <span class="tok-kw">private</span> TableColumn&lt;Usuario, String&gt; colNome;
-
-    @FXML
-    <span class="tok-kw">private</span> TableColumn&lt;Usuario, String&gt; colEmail;
-
-    @FXML
-    <span class="tok-kw">private</span> TableColumn&lt;Usuario, Perfil&gt; colPerfil;
-
-    @FXML
-    <span class="tok-kw">private</span> TableColumn&lt;Usuario, Boolean&gt; colAtivo;
-
-    @FXML
-    <span class="tok-kw">private</span> Button btnEditar;
-
-    @FXML
-    <span class="tok-kw">private</span> <span class="tok-kw">void</span> initialize() <span class="tok-kw">throws</span> IOException {
-        <span class="tok-kw">if</span> (TenisShop.usuarioLogado == <span class="tok-kw">null</span> || TenisShop.usuarioLogado.getPerfil() != Perfil.ADMINISTRADOR) {
-            TenisShop.setRoot(<span class="tok-str">&quot;principal&quot;</span>);
-            <span class="tok-kw">return</span>;
-        }
-
-        colNome.setCellValueFactory(<span class="tok-kw">new</span> PropertyValueFactory&lt;&gt;(<span class="tok-str">&quot;nome&quot;</span>));
-        colEmail.setCellValueFactory(<span class="tok-kw">new</span> PropertyValueFactory&lt;&gt;(<span class="tok-str">&quot;email&quot;</span>));
-        colPerfil.setCellValueFactory(<span class="tok-kw">new</span> PropertyValueFactory&lt;&gt;(<span class="tok-str">&quot;perfil&quot;</span>));
-        colAtivo.setCellValueFactory(<span class="tok-kw">new</span> PropertyValueFactory&lt;&gt;(<span class="tok-str">&quot;ativo&quot;</span>));
-        colAtivo.setCellFactory(coluna -&gt; <span class="tok-kw">new</span> javafx.scene.control.TableCell&lt;&gt;() {
-            @Override
-            <span class="tok-kw">protected</span> <span class="tok-kw">void</span> updateItem(Boolean ativo, <span class="tok-kw">boolean</span> vazio) {
-                <span class="tok-kw">super</span>.updateItem(ativo, vazio);
-                setText(vazio || ativo == <span class="tok-kw">null</span> ? <span class="tok-kw">null</span> : (ativo ? <span class="tok-str">&quot;Sim&quot;</span> : <span class="tok-str">&quot;Não&quot;</span>));
-            }
-        });
-
-        btnEditar.disableProperty().bind(tblUsuarios.getSelectionModel().selectedItemProperty().isNull());
-
-        <span class="tok-kw">try</span> {
-            tblUsuarios.setItems(FXCollections.observableArrayList(<span class="tok-kw">new</span> UsuarioDAO().listarTodos()));
-        } <span class="tok-kw">catch</span> (SQLException e) {
-            showAlert(<span class="tok-str">&quot;Não foi possível carregar a lista de usuários. Verifique se o MySQL está ativo.&quot;</span>, AlertType.ERROR);
-        }
-    }
-
-    @FXML
-    <span class="tok-kw">private</span> <span class="tok-kw">void</span> btnEditarAction(ActionEvent event) <span class="tok-kw">throws</span> IOException {
-        Usuario selecionado = tblUsuarios.getSelectionModel().getSelectedItem();
-        <span class="tok-kw">if</span> (selecionado == <span class="tok-kw">null</span>) {
-            <span class="tok-kw">return</span>;
-        }
-        TenisShop.usuarioEmEdicao = selecionado;
-        TenisShop.setRoot(<span class="tok-str">&quot;editar-usuario&quot;</span>);
-    }
-
-    @FXML
-    <span class="tok-kw">private</span> <span class="tok-kw">void</span> irParaPrincipal(ActionEvent event) <span class="tok-kw">throws</span> IOException {
-        TenisShop.setRoot(<span class="tok-str">&quot;principal&quot;</span>);
-    }
-
-    <span class="tok-kw">private</span> <span class="tok-kw">void</span> showAlert(String message, AlertType alertType) {
-        Alert alert = <span class="tok-kw">new</span> Alert(alertType);
-        alert.setTitle(<span class="tok-str">&quot;Usuários Cadastrados&quot;</span>);
-        alert.setHeaderText(<span class="tok-kw">null</span>);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-}</code></pre></div>
-      <button type="button" class="download-btn" data-filename="ListarUsuariosController.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXc7CgppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5UZW5pc1Nob3A7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhby5Vc3VhcmlvREFPOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC5kb21haW4uUGVyZmlsOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC5kb21haW4uVXN1YXJpbzsKaW1wb3J0IGphdmEuaW8uSU9FeGNlcHRpb247CmltcG9ydCBqYXZhLnNxbC5TUUxFeGNlcHRpb247CmltcG9ydCBqYXZhZnguY29sbGVjdGlvbnMuRlhDb2xsZWN0aW9uczsKaW1wb3J0IGphdmFmeC5ldmVudC5BY3Rpb25FdmVudDsKaW1wb3J0IGphdmFmeC5meG1sLkZYTUw7CmltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5BbGVydDsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkFsZXJ0LkFsZXJ0VHlwZTsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkJ1dHRvbjsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLlRhYmxlQ29sdW1uOwppbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuVGFibGVWaWV3OwppbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuY2VsbC5Qcm9wZXJ0eVZhbHVlRmFjdG9yeTsKCi8qKgogKiBDb250cm9sbGVyIGRhIHRlbGEgYWRtaW5pc3RyYXRpdmEgZGUgbGlzdGFnZW0gZGUgdXN1w6FyaW9zIOKAlCBhIHByaW1laXJhCiAqIFRhYmxlVmlldyBkbyBwcm9qZXRvLiBGZWNoYSB1bWEgbGFjdW5hIHF1ZSBleGlzdGlhIGRlc2RlIGEgQXVsYSAwNDoKICogYXTDqSBhcXVpLCB1bSBhZG1pbmlzdHJhZG9yIHPDsyBjb25zZWd1aWEgQ1JJQVIgdXN1w6FyaW9zCiAqIChDYWRhc3RyYXJVc3VhcmlvQ29udHJvbGxlciksIG51bmNhIGxpc3RhciBvdSBlZGl0YXIgdW0gasOhIGV4aXN0ZW50ZS4KICogU2VsZWNpb25hciB1bWEgbGluaGEgZSBjbGljYXIgZW0gRWRpdGFyIGxldmEgw6AgdGVsYSBkZSBlZGnDp8OjbwogKiAoRWRpdGFyVXN1YXJpb0NvbnRyb2xsZXIpLCBxdWUgw6kgb25kZSBvIGNvbnRyb2xlIGRlIGNvbmNvcnLDqm5jaWEKICogb3RpbWlzdGEgKGNvbHVuYSAidmVyc2FvIikgZW50cmEgZW0gYcOnw6NvLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBMaXN0YXJVc3Vhcmlvc0NvbnRyb2xsZXIgewoKICAgIEBGWE1MCiAgICBwcml2YXRlIFRhYmxlVmlldzxVc3VhcmlvPiB0YmxVc3VhcmlvczsKCiAgICBARlhNTAogICAgcHJpdmF0ZSBUYWJsZUNvbHVtbjxVc3VhcmlvLCBTdHJpbmc+IGNvbE5vbWU7CgogICAgQEZYTUwKICAgIHByaXZhdGUgVGFibGVDb2x1bW48VXN1YXJpbywgU3RyaW5nPiBjb2xFbWFpbDsKCiAgICBARlhNTAogICAgcHJpdmF0ZSBUYWJsZUNvbHVtbjxVc3VhcmlvLCBQZXJmaWw+IGNvbFBlcmZpbDsKCiAgICBARlhNTAogICAgcHJpdmF0ZSBUYWJsZUNvbHVtbjxVc3VhcmlvLCBCb29sZWFuPiBjb2xBdGl2bzsKCiAgICBARlhNTAogICAgcHJpdmF0ZSBCdXR0b24gYnRuRWRpdGFyOwoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgaW5pdGlhbGl6ZSgpIHRocm93cyBJT0V4Y2VwdGlvbiB7CiAgICAgICAgaWYgKFRlbmlzU2hvcC51c3VhcmlvTG9nYWRvID09IG51bGwgfHwgVGVuaXNTaG9wLnVzdWFyaW9Mb2dhZG8uZ2V0UGVyZmlsKCkgIT0gUGVyZmlsLkFETUlOSVNUUkFET1IpIHsKICAgICAgICAgICAgVGVuaXNTaG9wLnNldFJvb3QoInByaW5jaXBhbCIpOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICBjb2xOb21lLnNldENlbGxWYWx1ZUZhY3RvcnkobmV3IFByb3BlcnR5VmFsdWVGYWN0b3J5PD4oIm5vbWUiKSk7CiAgICAgICAgY29sRW1haWwuc2V0Q2VsbFZhbHVlRmFjdG9yeShuZXcgUHJvcGVydHlWYWx1ZUZhY3Rvcnk8PigiZW1haWwiKSk7CiAgICAgICAgY29sUGVyZmlsLnNldENlbGxWYWx1ZUZhY3RvcnkobmV3IFByb3BlcnR5VmFsdWVGYWN0b3J5PD4oInBlcmZpbCIpKTsKICAgICAgICBjb2xBdGl2by5zZXRDZWxsVmFsdWVGYWN0b3J5KG5ldyBQcm9wZXJ0eVZhbHVlRmFjdG9yeTw+KCJhdGl2byIpKTsKICAgICAgICBjb2xBdGl2by5zZXRDZWxsRmFjdG9yeShjb2x1bmEgLT4gbmV3IGphdmFmeC5zY2VuZS5jb250cm9sLlRhYmxlQ2VsbDw+KCkgewogICAgICAgICAgICBAT3ZlcnJpZGUKICAgICAgICAgICAgcHJvdGVjdGVkIHZvaWQgdXBkYXRlSXRlbShCb29sZWFuIGF0aXZvLCBib29sZWFuIHZhemlvKSB7CiAgICAgICAgICAgICAgICBzdXBlci51cGRhdGVJdGVtKGF0aXZvLCB2YXppbyk7CiAgICAgICAgICAgICAgICBzZXRUZXh0KHZhemlvIHx8IGF0aXZvID09IG51bGwgPyBudWxsIDogKGF0aXZvID8gIlNpbSIgOiAiTsOjbyIpKTsKICAgICAgICAgICAgfQogICAgICAgIH0pOwoKICAgICAgICBidG5FZGl0YXIuZGlzYWJsZVByb3BlcnR5KCkuYmluZCh0YmxVc3Vhcmlvcy5nZXRTZWxlY3Rpb25Nb2RlbCgpLnNlbGVjdGVkSXRlbVByb3BlcnR5KCkuaXNOdWxsKCkpOwoKICAgICAgICB0cnkgewogICAgICAgICAgICB0YmxVc3Vhcmlvcy5zZXRJdGVtcyhGWENvbGxlY3Rpb25zLm9ic2VydmFibGVBcnJheUxpc3QobmV3IFVzdWFyaW9EQU8oKS5saXN0YXJUb2RvcygpKSk7CiAgICAgICAgfSBjYXRjaCAoU1FMRXhjZXB0aW9uIGUpIHsKICAgICAgICAgICAgc2hvd0FsZXJ0KCJOw6NvIGZvaSBwb3Nzw612ZWwgY2FycmVnYXIgYSBsaXN0YSBkZSB1c3XDoXJpb3MuIFZlcmlmaXF1ZSBzZSBvIE15U1FMIGVzdMOhIGF0aXZvLiIsIEFsZXJ0VHlwZS5FUlJPUik7CiAgICAgICAgfQogICAgfQoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgYnRuRWRpdGFyQWN0aW9uKEFjdGlvbkV2ZW50IGV2ZW50KSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIFVzdWFyaW8gc2VsZWNpb25hZG8gPSB0YmxVc3Vhcmlvcy5nZXRTZWxlY3Rpb25Nb2RlbCgpLmdldFNlbGVjdGVkSXRlbSgpOwogICAgICAgIGlmIChzZWxlY2lvbmFkbyA9PSBudWxsKSB7CiAgICAgICAgICAgIHJldHVybjsKICAgICAgICB9CiAgICAgICAgVGVuaXNTaG9wLnVzdWFyaW9FbUVkaWNhbyA9IHNlbGVjaW9uYWRvOwogICAgICAgIFRlbmlzU2hvcC5zZXRSb290KCJlZGl0YXItdXN1YXJpbyIpOwogICAgfQoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgaXJQYXJhUHJpbmNpcGFsKEFjdGlvbkV2ZW50IGV2ZW50KSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIFRlbmlzU2hvcC5zZXRSb290KCJwcmluY2lwYWwiKTsKICAgIH0KCiAgICBwcml2YXRlIHZvaWQgc2hvd0FsZXJ0KFN0cmluZyBtZXNzYWdlLCBBbGVydFR5cGUgYWxlcnRUeXBlKSB7CiAgICAgICAgQWxlcnQgYWxlcnQgPSBuZXcgQWxlcnQoYWxlcnRUeXBlKTsKICAgICAgICBhbGVydC5zZXRUaXRsZSgiVXN1w6FyaW9zIENhZGFzdHJhZG9zIik7CiAgICAgICAgYWxlcnQuc2V0SGVhZGVyVGV4dChudWxsKTsKICAgICAgICBhbGVydC5zZXRDb250ZW50VGV4dChtZXNzYWdlKTsKICAgICAgICBhbGVydC5zaG93QW5kV2FpdCgpOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar ListarUsuariosController.java</span></button>
-
-      <h3>Tela de Edição: onde a Versão é Conferida</h3>
-      <p>A regra mais importante desta tela: ela nunca reaproveita o objeto <code>Usuario</code> que veio da tabela de listagem. Assim que abre, ela busca o usuário <strong>de novo</strong> no banco (<code>buscarPorId</code>), garantindo que a <code>versao</code> usada na hora de salvar é a mais atual possível, não uma foto antiga que já pode estar desatualizada há vários segundos ou minutos. A senha nunca aparece aqui: trocar senha continua sendo função exclusiva da tela da Aula 04.</p>
-      <p class="file-path">Local: <code>src/main/resources/br/edu/ifsul/venancio/tenisshop/view/editar-usuario.fxml</code></p>
-      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-
-&lt;?import javafx.geometry.Insets?&gt;
-&lt;?import javafx.scene.control.Button?&gt;
-&lt;?import javafx.scene.control.CheckBox?&gt;
-&lt;?import javafx.scene.control.ComboBox?&gt;
-&lt;?import javafx.scene.control.Label?&gt;
-&lt;?import javafx.scene.control.TextField?&gt;
-&lt;?import javafx.scene.layout.HBox?&gt;
-&lt;?import javafx.scene.layout.VBox?&gt;
-
-&lt;<span class="tok-kw">VBox</span> alignment=&quot;CENTER&quot; prefHeight=&quot;440.0&quot; prefWidth=&quot;420.0&quot; spacing=&quot;12.0&quot; xmlns=&quot;http://javafx.com/javafx/21&quot; xmlns:fx=&quot;http://javafx.com/fxml/1&quot; fx:controller=&quot;br.edu.ifsul.venancio.tenisshop.view.EditarUsuarioController&quot;&gt;
-   &lt;<span class="tok-kw">padding</span>&gt;
-      &lt;<span class="tok-kw">Insets</span> bottom=&quot;24.0&quot; left=&quot;24.0&quot; right=&quot;24.0&quot; top=&quot;24.0&quot; /&gt;
-   &lt;/<span class="tok-kw">padding</span>&gt;
-   &lt;<span class="tok-kw">children</span>&gt;
-      &lt;<span class="tok-kw">Label</span> style=&quot;-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1f6b2c;&quot; text=&quot;Editar Usuário&quot; /&gt;
-      &lt;<span class="tok-kw">Label</span> style=&quot;-fx-text-fill: #525252;&quot; text=&quot;A senha não é alterada aqui: isso é feito na tela &amp;quot;Alterar Senha&amp;quot;, pelo próprio usuário.&quot; wrapText=&quot;true&quot; /&gt;
-      &lt;<span class="tok-kw">VBox</span> spacing=&quot;4.0&quot;&gt;
-         &lt;<span class="tok-kw">children</span>&gt;
-            &lt;<span class="tok-kw">Label</span> text=&quot;Nome completo&quot; /&gt;
-            &lt;<span class="tok-kw">TextField</span> fx:id=&quot;txtNome&quot; /&gt;
-         &lt;/<span class="tok-kw">children</span>&gt;
-      &lt;/<span class="tok-kw">VBox</span>&gt;
-      &lt;<span class="tok-kw">VBox</span> spacing=&quot;4.0&quot;&gt;
-         &lt;<span class="tok-kw">children</span>&gt;
-            &lt;<span class="tok-kw">Label</span> text=&quot;E-mail&quot; /&gt;
-            &lt;<span class="tok-kw">TextField</span> fx:id=&quot;txtEmail&quot; /&gt;
-         &lt;/<span class="tok-kw">children</span>&gt;
-      &lt;/<span class="tok-kw">VBox</span>&gt;
-      &lt;<span class="tok-kw">VBox</span> spacing=&quot;4.0&quot;&gt;
-         &lt;<span class="tok-kw">children</span>&gt;
-            &lt;<span class="tok-kw">Label</span> text=&quot;Perfil de acesso&quot; /&gt;
-            &lt;<span class="tok-kw">ComboBox</span> fx:id=&quot;cmbPerfil&quot; maxWidth=&quot;Infinity&quot; /&gt;
-         &lt;/<span class="tok-kw">children</span>&gt;
-      &lt;/<span class="tok-kw">VBox</span>&gt;
-      &lt;<span class="tok-kw">CheckBox</span> fx:id=&quot;chkAtivo&quot; text=&quot;Usuário ativo&quot; /&gt;
       &lt;<span class="tok-kw">HBox</span> alignment=&quot;CENTER&quot; spacing=&quot;12.0&quot;&gt;
          &lt;<span class="tok-kw">children</span>&gt;
-            &lt;<span class="tok-kw">Button</span> onAction=&quot;#btnCancelarAction&quot; text=&quot;Cancelar&quot; /&gt;
+            &lt;<span class="tok-kw">Button</span> onAction=&quot;#btnVoltarAction&quot; text=&quot;Voltar&quot; /&gt;
             &lt;<span class="tok-kw">Button</span> fx:id=&quot;btnSalvar&quot; onAction=&quot;#btnSalvarAction&quot; style=&quot;-fx-background-color: #2f9e41; -fx-text-fill: white; -fx-font-weight: bold;&quot; text=&quot;Salvar&quot; /&gt;
          &lt;/<span class="tok-kw">children</span>&gt;
       &lt;/<span class="tok-kw">HBox</span>&gt;
    &lt;/<span class="tok-kw">children</span>&gt;
 &lt;/<span class="tok-kw">VBox</span>&gt;</code></pre></div>
-      <button type="button" class="download-btn" data-filename="editar-usuario.fxml" data-b64="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KCjw/aW1wb3J0IGphdmFmeC5nZW9tZXRyeS5JbnNldHM/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5CdXR0b24/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5DaGVja0JveD8+Cjw/aW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkNvbWJvQm94Pz4KPD9pbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuTGFiZWw/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5UZXh0RmllbGQ/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUubGF5b3V0LkhCb3g/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUubGF5b3V0LlZCb3g/PgoKPFZCb3ggYWxpZ25tZW50PSJDRU5URVIiIHByZWZIZWlnaHQ9IjQ0MC4wIiBwcmVmV2lkdGg9IjQyMC4wIiBzcGFjaW5nPSIxMi4wIiB4bWxucz0iaHR0cDovL2phdmFmeC5jb20vamF2YWZ4LzIxIiB4bWxuczpmeD0iaHR0cDovL2phdmFmeC5jb20vZnhtbC8xIiBmeDpjb250cm9sbGVyPSJici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXcuRWRpdGFyVXN1YXJpb0NvbnRyb2xsZXIiPgogICA8cGFkZGluZz4KICAgICAgPEluc2V0cyBib3R0b209IjI0LjAiIGxlZnQ9IjI0LjAiIHJpZ2h0PSIyNC4wIiB0b3A9IjI0LjAiIC8+CiAgIDwvcGFkZGluZz4KICAgPGNoaWxkcmVuPgogICAgICA8TGFiZWwgc3R5bGU9Ii1meC1mb250LXNpemU6IDIycHg7IC1meC1mb250LXdlaWdodDogYm9sZDsgLWZ4LXRleHQtZmlsbDogIzFmNmIyYzsiIHRleHQ9IkVkaXRhciBVc3XDoXJpbyIgLz4KICAgICAgPExhYmVsIHN0eWxlPSItZngtdGV4dC1maWxsOiAjNTI1MjUyOyIgdGV4dD0iQSBzZW5oYSBuw6NvIMOpIGFsdGVyYWRhIGFxdWkg4oCUIGlzc28gw6kgZmVpdG8gbmEgdGVsYSAmcXVvdDtBbHRlcmFyIFNlbmhhJnF1b3Q7LCBwZWxvIHByw7NwcmlvIHVzdcOhcmlvLiIgd3JhcFRleHQ9InRydWUiIC8+CiAgICAgIDxWQm94IHNwYWNpbmc9IjQuMCI+CiAgICAgICAgIDxjaGlsZHJlbj4KICAgICAgICAgICAgPExhYmVsIHRleHQ9Ik5vbWUgY29tcGxldG8iIC8+CiAgICAgICAgICAgIDxUZXh0RmllbGQgZng6aWQ9InR4dE5vbWUiIC8+CiAgICAgICAgIDwvY2hpbGRyZW4+CiAgICAgIDwvVkJveD4KICAgICAgPFZCb3ggc3BhY2luZz0iNC4wIj4KICAgICAgICAgPGNoaWxkcmVuPgogICAgICAgICAgICA8TGFiZWwgdGV4dD0iRS1tYWlsIiAvPgogICAgICAgICAgICA8VGV4dEZpZWxkIGZ4OmlkPSJ0eHRFbWFpbCIgLz4KICAgICAgICAgPC9jaGlsZHJlbj4KICAgICAgPC9WQm94PgogICAgICA8VkJveCBzcGFjaW5nPSI0LjAiPgogICAgICAgICA8Y2hpbGRyZW4+CiAgICAgICAgICAgIDxMYWJlbCB0ZXh0PSJQZXJmaWwgZGUgYWNlc3NvIiAvPgogICAgICAgICAgICA8Q29tYm9Cb3ggZng6aWQ9ImNtYlBlcmZpbCIgbWF4V2lkdGg9IkluZmluaXR5IiAvPgogICAgICAgICA8L2NoaWxkcmVuPgogICAgICA8L1ZCb3g+CiAgICAgIDxDaGVja0JveCBmeDppZD0iY2hrQXRpdm8iIHRleHQ9IlVzdcOhcmlvIGF0aXZvIiAvPgogICAgICA8SEJveCBhbGlnbm1lbnQ9IkNFTlRFUiIgc3BhY2luZz0iMTIuMCI+CiAgICAgICAgIDxjaGlsZHJlbj4KICAgICAgICAgICAgPEJ1dHRvbiBvbkFjdGlvbj0iI2J0bkNhbmNlbGFyQWN0aW9uIiB0ZXh0PSJDYW5jZWxhciIgLz4KICAgICAgICAgICAgPEJ1dHRvbiBmeDppZD0iYnRuU2FsdmFyIiBvbkFjdGlvbj0iI2J0blNhbHZhckFjdGlvbiIgc3R5bGU9Ii1meC1iYWNrZ3JvdW5kLWNvbG9yOiAjMmY5ZTQxOyAtZngtdGV4dC1maWxsOiB3aGl0ZTsgLWZ4LWZvbnQtd2VpZ2h0OiBib2xkOyIgdGV4dD0iU2FsdmFyIiAvPgogICAgICAgICA8L2NoaWxkcmVuPgogICAgICA8L0hCb3g+CiAgIDwvY2hpbGRyZW4+CjwvVkJveD4K"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar editar-usuario.fxml</span></button>
+      <button type="button" class="download-btn" data-filename="meu-perfil.fxml" data-b64="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KCjw/aW1wb3J0IGphdmFmeC5nZW9tZXRyeS5JbnNldHM/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5CdXR0b24/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5MYWJlbD8+Cjw/aW1wb3J0IGphdmFmeC5zY2VuZS5pbWFnZS5JbWFnZVZpZXc/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUubGF5b3V0LkhCb3g/Pgo8P2ltcG9ydCBqYXZhZnguc2NlbmUubGF5b3V0LlZCb3g/PgoKPFZCb3ggYWxpZ25tZW50PSJDRU5URVIiIHByZWZIZWlnaHQ9IjQ4MC4wIiBwcmVmV2lkdGg9IjQyMC4wIiBzcGFjaW5nPSIxNC4wIiB4bWxucz0iaHR0cDovL2phdmFmeC5jb20vamF2YWZ4LzIxIiB4bWxuczpmeD0iaHR0cDovL2phdmFmeC5jb20vZnhtbC8xIiBmeDpjb250cm9sbGVyPSJici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXcuTWV1UGVyZmlsQ29udHJvbGxlciI+CiAgIDxwYWRkaW5nPgogICAgICA8SW5zZXRzIGJvdHRvbT0iMjQuMCIgbGVmdD0iMjQuMCIgcmlnaHQ9IjI0LjAiIHRvcD0iMjQuMCIgLz4KICAgPC9wYWRkaW5nPgogICA8Y2hpbGRyZW4+CiAgICAgIDxMYWJlbCBzdHlsZT0iLWZ4LWZvbnQtc2l6ZTogMjJweDsgLWZ4LWZvbnQtd2VpZ2h0OiBib2xkOyAtZngtdGV4dC1maWxsOiAjMWY2YjJjOyIgdGV4dD0iTWV1IFBlcmZpbCIgLz4KICAgICAgPExhYmVsIHN0eWxlPSItZngtdGV4dC1maWxsOiAjNTI1MjUyOyIgdGV4dD0iRXNjb2xoYSB1bWEgZm90byBkZSBwZXJmaWwgKFBORyBvdSBKUEcpLiBBIGZvdG8gZmljYSBzYWx2YSBuYSBwYXN0YSBmb3Rvc191c3Vhcmlvcy8sIG51bmNhIG5vIGJhbmNvIGRlIGRhZG9zLiIgd3JhcFRleHQ9InRydWUiIC8+CiAgICAgIDxWQm94IGFsaWdubWVudD0iQ0VOVEVSIiBzdHlsZT0iLWZ4LWJvcmRlci1jb2xvcjogI2M4YzhjODsgLWZ4LWJvcmRlci13aWR0aDogMXB4OyI+CiAgICAgICAgIDxjaGlsZHJlbj4KICAgICAgICAgICAgPEltYWdlVmlldyBmeDppZD0iaW1nRm90byIgZml0SGVpZ2h0PSIxODAuMCIgZml0V2lkdGg9IjE4MC4wIiBwaWNrT25Cb3VuZHM9InRydWUiIHByZXNlcnZlUmF0aW89InRydWUiIC8+CiAgICAgICAgIDwvY2hpbGRyZW4+CiAgICAgIDwvVkJveD4KICAgICAgPEhCb3ggYWxpZ25tZW50PSJDRU5URVIiIHNwYWNpbmc9IjEyLjAiPgogICAgICAgICA8Y2hpbGRyZW4+CiAgICAgICAgICAgIDxCdXR0b24gb25BY3Rpb249IiNidG5Fc2NvbGhlckZvdG9BY3Rpb24iIHRleHQ9IkVzY29saGVyIEZvdG8uLi4iIC8+CiAgICAgICAgICAgIDxCdXR0b24gb25BY3Rpb249IiNidG5SZW1vdmVyRm90b0FjdGlvbiIgdGV4dD0iUmVtb3ZlciBGb3RvIiAvPgogICAgICAgICA8L2NoaWxkcmVuPgogICAgICA8L0hCb3g+CiAgICAgIDxIQm94IGFsaWdubWVudD0iQ0VOVEVSIiBzcGFjaW5nPSIxMi4wIj4KICAgICAgICAgPGNoaWxkcmVuPgogICAgICAgICAgICA8QnV0dG9uIG9uQWN0aW9uPSIjYnRuVm9sdGFyQWN0aW9uIiB0ZXh0PSJWb2x0YXIiIC8+CiAgICAgICAgICAgIDxCdXR0b24gZng6aWQ9ImJ0blNhbHZhciIgb25BY3Rpb249IiNidG5TYWx2YXJBY3Rpb24iIHN0eWxlPSItZngtYmFja2dyb3VuZC1jb2xvcjogIzJmOWU0MTsgLWZ4LXRleHQtZmlsbDogd2hpdGU7IC1meC1mb250LXdlaWdodDogYm9sZDsiIHRleHQ9IlNhbHZhciIgLz4KICAgICAgICAgPC9jaGlsZHJlbj4KICAgICAgPC9IQm94PgogICA8L2NoaWxkcmVuPgo8L1ZCb3g+Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar meu-perfil.fxml</span></button>
 
-      <div class="callout">Repare que <code>usuarioEditado</code> nunca é modificado depois de carregado; os dados novos do formulário vão para um objeto <code>Usuario</code> separado, montado só na hora de salvar. Isso é o que permite comparar "antes" e "depois" logo abaixo, com <code>AuditoriaUtil</code>, explicada em detalhe (junto com o padrão de projeto por trás dela) na Aula 10 (Seção 03).</div>
-
-      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/view/EditarUsuarioController.java</code></p>
+      <p class="file-path">Local: <code>src/main/java/br/edu/ifsul/venancio/tenisshop/view/MeuPerfilController.java</code></p>
       <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">package</span> br.edu.ifsul.venancio.tenisshop.view;
 
 <span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.TenisShop;
 <span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.dao.AuditoriaDAO;
 <span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.dao.UsuarioDAO;
 <span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.AcaoAuditoria;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.Perfil;
-<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.domain.Usuario;
+<span class="tok-kw">import</span> br.edu.ifsul.venancio.tenisshop.model.util.FotoUsuarioUtil;
+<span class="tok-kw">import</span> java.io.File;
 <span class="tok-kw">import</span> java.io.IOException;
+<span class="tok-kw">import</span> java.nio.file.Files;
+<span class="tok-kw">import</span> java.nio.file.Path;
 <span class="tok-kw">import</span> java.sql.SQLException;
-<span class="tok-kw">import</span> java.util.regex.Pattern;
-<span class="tok-kw">import</span> javafx.collections.FXCollections;
 <span class="tok-kw">import</span> javafx.event.ActionEvent;
 <span class="tok-kw">import</span> javafx.fxml.FXML;
+<span class="tok-kw">import</span> javafx.scene.Node;
 <span class="tok-kw">import</span> javafx.scene.control.Alert;
 <span class="tok-kw">import</span> javafx.scene.control.Alert.AlertType;
-<span class="tok-kw">import</span> javafx.scene.control.CheckBox;
-<span class="tok-kw">import</span> javafx.scene.control.ComboBox;
-<span class="tok-kw">import</span> javafx.scene.control.TextField;
+<span class="tok-kw">import</span> javafx.scene.image.Image;
+<span class="tok-kw">import</span> javafx.scene.image.ImageView;
+<span class="tok-kw">import</span> javafx.stage.FileChooser;
+<span class="tok-kw">import</span> javafx.stage.FileChooser.ExtensionFilter;
 
 <span class="tok-comment">/**
- * Controller da tela administrativa de edição de um usuário existente.
- * Nunca mexe na senha (isso é exclusivo de AlterarSenhaController) e é
- * onde o controle de concorrência otimista é demonstrado na prática: o
- * usuário é recarregado do banco (nunca a partir da linha da tabela de
- * ListarUsuariosController, que pode já estar desatualizada) e a versão
- * lida nesse momento é conferida na hora de salvar, em UsuarioDAO.atualizar.
- * Se outra pessoa salvou uma mudança nesse meio-tempo, atualizar()
- * retorna false, e esta tela recarrega os dados em vez de sobrescrever
- * silenciosamente o que a outra pessoa salvou.
+ * Controller da tela de autosserviço &quot;Meu Perfil&quot; (Aula 09): permite à
+ * pessoa logada escolher, trocar ou remover sua própria foto de perfil.
+ * Diferente de EditarUsuarioController (tela administrativa, que edita o
+ * cadastro de qualquer usuário e usa controle de concorrência otimista,
+ * Aula 10), aqui só o próprio usuário mexe no próprio registro, e só no
+ * campo foto, então UsuarioDAO.atualizarFoto() não precisa checar versão.
+ *
+ * O botão Escolher Foto só troca a pré-visualização (imgFoto) e guarda o
+ * arquivo escolhido em arquivoFotoSelecionada; nada é copiado para a
+ * pasta fotos_usuarios/ nem gravado no banco até o clique em Salvar. Isso
+ * evita deixar arquivos &quot;perdidos&quot; na pasta caso o usuário desista e
+ * clique em Voltar.
  *
  * @author Geovane Griesang
  */</span>
-<span class="tok-kw">public</span> <span class="tok-kw">class</span> EditarUsuarioController {
+<span class="tok-kw">public</span> <span class="tok-kw">class</span> MeuPerfilController {
 
-    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> Pattern FORMATO_EMAIL = Pattern.compile(<span class="tok-str">&quot;^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$&quot;</span>);
-
-    @FXML
-    <span class="tok-kw">private</span> TextField txtNome;
+    <span class="tok-kw">private</span> <span class="tok-kw">static</span> <span class="tok-kw">final</span> ExtensionFilter FILTRO_IMAGENS =
+            <span class="tok-kw">new</span> ExtensionFilter(<span class="tok-str">&quot;Imagens (*.png, *.jpg, *.jpeg)&quot;</span>, <span class="tok-str">&quot;*.png&quot;</span>, <span class="tok-str">&quot;*.jpg&quot;</span>, <span class="tok-str">&quot;*.jpeg&quot;</span>);
 
     @FXML
-    <span class="tok-kw">private</span> TextField txtEmail;
+    <span class="tok-kw">private</span> ImageView imgFoto;
+
+    <span class="tok-kw">private</span> String fotoAtual;
+    <span class="tok-kw">private</span> File arquivoFotoSelecionada;
+    <span class="tok-kw">private</span> <span class="tok-kw">boolean</span> removerFotoPendente;
 
     @FXML
-    <span class="tok-kw">private</span> ComboBox&lt;Perfil&gt; cmbPerfil;
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> initialize() {
+        fotoAtual = TenisShop.usuarioLogado.getFoto();
+        exibirFoto(fotoAtual);
+    }
 
     @FXML
-    <span class="tok-kw">private</span> CheckBox chkAtivo;
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> btnEscolherFotoAction(ActionEvent event) {
+        FileChooser fileChooser = <span class="tok-kw">new</span> FileChooser();
+        fileChooser.setTitle(<span class="tok-str">&quot;Escolher Foto de Perfil&quot;</span>);
+        fileChooser.getExtensionFilters().add(FILTRO_IMAGENS);
 
-    <span class="tok-kw">private</span> Usuario usuarioEditado;
-    <span class="tok-kw">private</span> String emailOriginal;
-
-    @FXML
-    <span class="tok-kw">private</span> <span class="tok-kw">void</span> initialize() <span class="tok-kw">throws</span> IOException {
-        <span class="tok-kw">if</span> (TenisShop.usuarioLogado == <span class="tok-kw">null</span> || TenisShop.usuarioLogado.getPerfil() != Perfil.ADMINISTRADOR) {
-            TenisShop.setRoot(<span class="tok-str">&quot;principal&quot;</span>);
+        File arquivoEscolhido = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
+        <span class="tok-kw">if</span> (arquivoEscolhido == <span class="tok-kw">null</span>) {
             <span class="tok-kw">return</span>;
         }
 
-        <span class="tok-kw">if</span> (TenisShop.usuarioEmEdicao == <span class="tok-kw">null</span>) {
-            TenisShop.setRoot(<span class="tok-str">&quot;listar-usuarios&quot;</span>);
-            <span class="tok-kw">return</span>;
-        }
+        arquivoFotoSelecionada = arquivoEscolhido;
+        removerFotoPendente = <span class="tok-kw">false</span>;
+        imgFoto.setImage(<span class="tok-kw">new</span> Image(arquivoEscolhido.toURI().toString()));
+    }
 
-        cmbPerfil.setItems(FXCollections.observableArrayList(Perfil.values()));
-
-        <span class="tok-kw">try</span> {
-            <span class="tok-comment">// Sempre busca de novo no banco, nunca confia na linha que veio</span>
-            <span class="tok-comment">// da tabela de ListarUsuariosController; é assim que a versão</span>
-            <span class="tok-comment">// conferida no Salvar reflete o estado mais recente possível.</span>
-            usuarioEditado = <span class="tok-kw">new</span> UsuarioDAO().buscarPorId(TenisShop.usuarioEmEdicao.getId());
-            <span class="tok-kw">if</span> (usuarioEditado == <span class="tok-kw">null</span>) {
-                showAlert(<span class="tok-str">&quot;Este usuário não existe mais.&quot;</span>, AlertType.ERROR);
-                TenisShop.setRoot(<span class="tok-str">&quot;listar-usuarios&quot;</span>);
-                <span class="tok-kw">return</span>;
-            }
-
-            emailOriginal = usuarioEditado.getEmail();
-            txtNome.setText(usuarioEditado.getNome());
-            txtEmail.setText(usuarioEditado.getEmail());
-            cmbPerfil.getSelectionModel().select(usuarioEditado.getPerfil());
-            chkAtivo.setSelected(Boolean.TRUE.equals(usuarioEditado.getAtivo()));
-        } <span class="tok-kw">catch</span> (SQLException e) {
-            showAlert(<span class="tok-str">&quot;Não foi possível carregar o usuário. Verifique se o MySQL está ativo.&quot;</span>, AlertType.ERROR);
-        }
+    @FXML
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> btnRemoverFotoAction(ActionEvent event) {
+        arquivoFotoSelecionada = <span class="tok-kw">null</span>;
+        removerFotoPendente = <span class="tok-kw">true</span>;
+        imgFoto.setImage(<span class="tok-kw">null</span>);
     }
 
     @FXML
     <span class="tok-kw">private</span> <span class="tok-kw">void</span> btnSalvarAction(ActionEvent event) <span class="tok-kw">throws</span> IOException {
-        <span class="tok-kw">if</span> (!validaForm()) {
+        <span class="tok-kw">if</span> (!removerFotoPendente &amp;&amp; arquivoFotoSelecionada == <span class="tok-kw">null</span>) {
+            TenisShop.setRoot(<span class="tok-str">&quot;principal&quot;</span>);
             <span class="tok-kw">return</span>;
         }
 
-        String email = txtEmail.getText().trim();
-        UsuarioDAO usuarioDAO = <span class="tok-kw">new</span> UsuarioDAO();
+        <span class="tok-kw">int</span> usuarioId = TenisShop.usuarioLogado.getId();
 
         <span class="tok-kw">try</span> {
-            <span class="tok-kw">boolean</span> emailMudou = !email.equalsIgnoreCase(emailOriginal);
-            <span class="tok-kw">if</span> (emailMudou &amp;&amp; usuarioDAO.existeEmail(email)) {
-                showAlert(<span class="tok-str">&quot;Já existe outro usuário cadastrado com este e-mail.&quot;</span>, AlertType.ERROR);
-                <span class="tok-kw">return</span>;
+            String fotoFinal;
+            String detalhe;
+
+            <span class="tok-kw">if</span> (removerFotoPendente) {
+                FotoUsuarioUtil.excluir(fotoAtual);
+                fotoFinal = <span class="tok-kw">null</span>;
+                detalhe = <span class="tok-str">&quot;Foto de perfil removida.&quot;</span>;
+            } <span class="tok-kw">else</span> {
+                fotoFinal = FotoUsuarioUtil.salvar(usuarioId, arquivoFotoSelecionada);
+                detalhe = <span class="tok-str">&quot;Foto de perfil atualizada.&quot;</span>;
             }
 
-            usuarioEditado.setNome(txtNome.getText().trim());
-            usuarioEditado.setEmail(email);
-            usuarioEditado.setPerfil(cmbPerfil.getValue());
-            usuarioEditado.setAtivo(chkAtivo.isSelected());
+            <span class="tok-kw">new</span> UsuarioDAO().atualizarFoto(usuarioId, fotoFinal);
+            <span class="tok-kw">new</span> AuditoriaDAO().registrar(usuarioId, AcaoAuditoria.FOTO_ALTERADA, <span class="tok-str">&quot;USUARIO&quot;</span>, usuarioId, detalhe);
+            TenisShop.usuarioLogado.setFoto(fotoFinal);
 
-            <span class="tok-kw">boolean</span> atualizado = usuarioDAO.atualizar(usuarioEditado);
-
-            <span class="tok-kw">if</span> (!atualizado) {
-                showAlert(<span class="tok-str">&quot;Este usuário foi alterado por outra pessoa desde que esta tela foi aberta.\n\n&quot;</span>
-                        + <span class="tok-str">&quot;Os dados serão recarregados, refaça as alterações necessárias.&quot;</span>, AlertType.ERROR);
-                TenisShop.setRoot(<span class="tok-str">&quot;editar-usuario&quot;</span>);
-                <span class="tok-kw">return</span>;
-            }
-
-            <span class="tok-kw">new</span> AuditoriaDAO().registrar(TenisShop.usuarioLogado.getId(), AcaoAuditoria.USUARIO_ATUALIZADO,
-                    <span class="tok-str">&quot;USUARIO&quot;</span>, usuarioEditado.getId(), <span class="tok-str">&quot;Dados cadastrais atualizados.&quot;</span>);
-
-            showAlert(<span class="tok-str">&quot;Usuário atualizado com sucesso!&quot;</span>, AlertType.INFORMATION);
-            TenisShop.setRoot(<span class="tok-str">&quot;listar-usuarios&quot;</span>);
+            showAlert(<span class="tok-str">&quot;Foto de perfil atualizada com sucesso!&quot;</span>, AlertType.INFORMATION);
+            TenisShop.setRoot(<span class="tok-str">&quot;principal&quot;</span>);
         } <span class="tok-kw">catch</span> (SQLException e) {
-            showAlert(<span class="tok-str">&quot;Não foi possível salvar as alterações. Verifique se o MySQL está ativo.&quot;</span>, AlertType.ERROR);
+            showAlert(<span class="tok-str">&quot;Não foi possível salvar a foto. Verifique se o MySQL está ativo.&quot;</span>, AlertType.ERROR);
         }
     }
 
     @FXML
-    <span class="tok-kw">private</span> <span class="tok-kw">void</span> btnCancelarAction(ActionEvent event) <span class="tok-kw">throws</span> IOException {
-        TenisShop.setRoot(<span class="tok-str">&quot;listar-usuarios&quot;</span>);
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> btnVoltarAction(ActionEvent event) <span class="tok-kw">throws</span> IOException {
+        TenisShop.setRoot(<span class="tok-str">&quot;principal&quot;</span>);
     }
 
-    <span class="tok-kw">private</span> <span class="tok-kw">boolean</span> validaForm() {
-        <span class="tok-kw">if</span> (txtNome.getText().isBlank()) {
-            showAlert(<span class="tok-str">&quot;Preencha o campo Nome!&quot;</span>, AlertType.ERROR);
-            txtNome.requestFocus();
-            <span class="tok-kw">return</span> <span class="tok-kw">false</span>;
+    <span class="tok-kw">private</span> <span class="tok-kw">void</span> exibirFoto(String nomeArquivo) {
+        <span class="tok-kw">if</span> (nomeArquivo == <span class="tok-kw">null</span>) {
+            imgFoto.setImage(<span class="tok-kw">null</span>);
+            <span class="tok-kw">return</span>;
         }
 
-        <span class="tok-kw">if</span> (txtEmail.getText().isBlank() || !FORMATO_EMAIL.matcher(txtEmail.getText().trim()).matches()) {
-            showAlert(<span class="tok-str">&quot;Digite um e-mail em um formato válido (ex.: nome@dominio.com).&quot;</span>, AlertType.ERROR);
-            txtEmail.requestFocus();
-            <span class="tok-kw">return</span> <span class="tok-kw">false</span>;
+        Path caminho = FotoUsuarioUtil.caminhoCompleto(nomeArquivo);
+        <span class="tok-kw">if</span> (!Files.exists(caminho)) {
+            imgFoto.setImage(<span class="tok-kw">null</span>);
+            <span class="tok-kw">return</span>;
         }
 
-        <span class="tok-kw">if</span> (cmbPerfil.getValue() == <span class="tok-kw">null</span>) {
-            showAlert(<span class="tok-str">&quot;Selecione o perfil de acesso!&quot;</span>, AlertType.ERROR);
-            <span class="tok-kw">return</span> <span class="tok-kw">false</span>;
-        }
-
-        <span class="tok-kw">return</span> <span class="tok-kw">true</span>;
+        imgFoto.setImage(<span class="tok-kw">new</span> Image(caminho.toUri().toString()));
     }
 
     <span class="tok-kw">private</span> <span class="tok-kw">void</span> showAlert(String message, AlertType alertType) {
         Alert alert = <span class="tok-kw">new</span> Alert(alertType);
-        alert.setTitle(<span class="tok-str">&quot;Editar Usuário&quot;</span>);
+        alert.setTitle(<span class="tok-str">&quot;Meu Perfil&quot;</span>);
         alert.setHeaderText(<span class="tok-kw">null</span>);
         alert.setContentText(message);
         alert.showAndWait();
     }
 }</code></pre></div>
-      <button type="button" class="download-btn" data-filename="EditarUsuarioController.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXc7CgppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5UZW5pc1Nob3A7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhby5BdWRpdG9yaWFEQU87CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhby5Vc3VhcmlvREFPOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC5kb21haW4uQWNhb0F1ZGl0b3JpYTsKaW1wb3J0IGJyLmVkdS5pZnN1bC52ZW5hbmNpby50ZW5pc3Nob3AubW9kZWwuZG9tYWluLlBlcmZpbDsKaW1wb3J0IGJyLmVkdS5pZnN1bC52ZW5hbmNpby50ZW5pc3Nob3AubW9kZWwuZG9tYWluLlVzdWFyaW87CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLnV0aWwuQXVkaXRvcmlhVXRpbDsKaW1wb3J0IGphdmEuaW8uSU9FeGNlcHRpb247CmltcG9ydCBqYXZhLnNxbC5TUUxFeGNlcHRpb247CmltcG9ydCBqYXZhLnV0aWwucmVnZXguUGF0dGVybjsKaW1wb3J0IGphdmFmeC5jb2xsZWN0aW9ucy5GWENvbGxlY3Rpb25zOwppbXBvcnQgamF2YWZ4LmV2ZW50LkFjdGlvbkV2ZW50OwppbXBvcnQgamF2YWZ4LmZ4bWwuRlhNTDsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkFsZXJ0OwppbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuQWxlcnQuQWxlcnRUeXBlOwppbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuQ2hlY2tCb3g7CmltcG9ydCBqYXZhZnguc2NlbmUuY29udHJvbC5Db21ib0JveDsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLlRleHRGaWVsZDsKCi8qKgogKiBDb250cm9sbGVyIGRhIHRlbGEgYWRtaW5pc3RyYXRpdmEgZGUgZWRpw6fDo28gZGUgdW0gdXN1w6FyaW8gZXhpc3RlbnRlLgogKiBOdW5jYSBtZXhlIG5hIHNlbmhhIChpc3NvIMOpIGV4Y2x1c2l2byBkZSBBbHRlcmFyU2VuaGFDb250cm9sbGVyKSBlIMOpCiAqIG9uZGUgbyBjb250cm9sZSBkZSBjb25jb3Jyw6puY2lhIG90aW1pc3RhIMOpIGRlbW9uc3RyYWRvIG5hIHByw6F0aWNhOiBvCiAqIHVzdcOhcmlvIMOpIHJlY2FycmVnYWRvIGRvIGJhbmNvIChudW5jYSBhIHBhcnRpciBkYSBsaW5oYSBkYSB0YWJlbGEgZGUKICogTGlzdGFyVXN1YXJpb3NDb250cm9sbGVyLCBxdWUgcG9kZSBqw6EgZXN0YXIgZGVzYXR1YWxpemFkYSkgZSBhIHZlcnPDo28KICogbGlkYSBuZXNzZSBtb21lbnRvIMOpIGNvbmZlcmlkYSBuYSBob3JhIGRlIHNhbHZhciwgZW0gVXN1YXJpb0RBTy5hdHVhbGl6YXIuCiAqIFNlIG91dHJhIHBlc3NvYSBzYWx2b3UgdW1hIG11ZGFuw6dhIG5lc3NlIG1laW8tdGVtcG8sIGF0dWFsaXphcigpCiAqIHJldG9ybmEgZmFsc2UsIGUgZXN0YSB0ZWxhIHJlY2FycmVnYSBvcyBkYWRvcyBlbSB2ZXogZGUgc29icmVzY3JldmVyCiAqIHNpbGVuY2lvc2FtZW50ZSBvIHF1ZSBhIG91dHJhIHBlc3NvYSBzYWx2b3UuCiAqCiAqIE8gY2FtcG8gdXN1YXJpb0VkaXRhZG8gbnVuY2Egw6kgbW9kaWZpY2FkbyBkZXBvaXMgZGUgY2FycmVnYWRvOyBlbGUKICogZnVuY2lvbmEgY29tbyBvICJyZXRyYXRvIiAobWVtZW50bykgZG8gZXN0YWRvIGFudGVyaW9yLCB1c2FkbyBzw7MgcGFyYQogKiBjb21wYXJhw6fDo28gZW0gQXVkaXRvcmlhVXRpbC5kZXNjcmV2ZXJBbHRlcmFjb2VzVXN1YXJpbygpLiBPcyBkYWRvcwogKiBub3ZvcyBkbyBmb3JtdWzDoXJpbyB2w6NvIHBhcmEgdW0gb2JqZXRvIFVzdWFyaW8gc2VwYXJhZG8sIG1vbnRhZG8gc8OzCiAqIG5hIGhvcmEgZGUgc2FsdmFyLgogKgogKiBAYXV0aG9yIEdlb3ZhbmUgR3JpZXNhbmcKICovCnB1YmxpYyBjbGFzcyBFZGl0YXJVc3VhcmlvQ29udHJvbGxlciB7CgogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgUGF0dGVybiBGT1JNQVRPX0VNQUlMID0gUGF0dGVybi5jb21waWxlKCJeW15cXHNAXStAW15cXHNAXStcXC5bXlxcc0BdKyQiKTsKCiAgICBARlhNTAogICAgcHJpdmF0ZSBUZXh0RmllbGQgdHh0Tm9tZTsKCiAgICBARlhNTAogICAgcHJpdmF0ZSBUZXh0RmllbGQgdHh0RW1haWw7CgogICAgQEZYTUwKICAgIHByaXZhdGUgQ29tYm9Cb3g8UGVyZmlsPiBjbWJQZXJmaWw7CgogICAgQEZYTUwKICAgIHByaXZhdGUgQ2hlY2tCb3ggY2hrQXRpdm87CgogICAgcHJpdmF0ZSBVc3VhcmlvIHVzdWFyaW9FZGl0YWRvOwogICAgcHJpdmF0ZSBTdHJpbmcgZW1haWxPcmlnaW5hbDsKCiAgICBARlhNTAogICAgcHJpdmF0ZSB2b2lkIGluaXRpYWxpemUoKSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIGlmIChUZW5pc1Nob3AudXN1YXJpb0xvZ2FkbyA9PSBudWxsIHx8IFRlbmlzU2hvcC51c3VhcmlvTG9nYWRvLmdldFBlcmZpbCgpICE9IFBlcmZpbC5BRE1JTklTVFJBRE9SKSB7CiAgICAgICAgICAgIFRlbmlzU2hvcC5zZXRSb290KCJwcmluY2lwYWwiKTsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KCiAgICAgICAgaWYgKFRlbmlzU2hvcC51c3VhcmlvRW1FZGljYW8gPT0gbnVsbCkgewogICAgICAgICAgICBUZW5pc1Nob3Auc2V0Um9vdCgibGlzdGFyLXVzdWFyaW9zIik7CiAgICAgICAgICAgIHJldHVybjsKICAgICAgICB9CgogICAgICAgIGNtYlBlcmZpbC5zZXRJdGVtcyhGWENvbGxlY3Rpb25zLm9ic2VydmFibGVBcnJheUxpc3QoUGVyZmlsLnZhbHVlcygpKSk7CgogICAgICAgIHRyeSB7CiAgICAgICAgICAgIC8vIFNlbXByZSBidXNjYSBkZSBub3ZvIG5vIGJhbmNvLCBudW5jYSBjb25maWEgbmEgbGluaGEgcXVlIHZlaW8KICAgICAgICAgICAgLy8gZGEgdGFiZWxhIGRlIExpc3RhclVzdWFyaW9zQ29udHJvbGxlcjsgw6kgYXNzaW0gcXVlIGEgdmVyc8OjbwogICAgICAgICAgICAvLyBjb25mZXJpZGEgbm8gU2FsdmFyIHJlZmxldGUgbyBlc3RhZG8gbWFpcyByZWNlbnRlIHBvc3PDrXZlbC4KICAgICAgICAgICAgdXN1YXJpb0VkaXRhZG8gPSBuZXcgVXN1YXJpb0RBTygpLmJ1c2NhclBvcklkKFRlbmlzU2hvcC51c3VhcmlvRW1FZGljYW8uZ2V0SWQoKSk7CiAgICAgICAgICAgIGlmICh1c3VhcmlvRWRpdGFkbyA9PSBudWxsKSB7CiAgICAgICAgICAgICAgICBzaG93QWxlcnQoIkVzdGUgdXN1w6FyaW8gbsOjbyBleGlzdGUgbWFpcy4iLCBBbGVydFR5cGUuRVJST1IpOwogICAgICAgICAgICAgICAgVGVuaXNTaG9wLnNldFJvb3QoImxpc3Rhci11c3VhcmlvcyIpOwogICAgICAgICAgICAgICAgcmV0dXJuOwogICAgICAgICAgICB9CgogICAgICAgICAgICBlbWFpbE9yaWdpbmFsID0gdXN1YXJpb0VkaXRhZG8uZ2V0RW1haWwoKTsKICAgICAgICAgICAgdHh0Tm9tZS5zZXRUZXh0KHVzdWFyaW9FZGl0YWRvLmdldE5vbWUoKSk7CiAgICAgICAgICAgIHR4dEVtYWlsLnNldFRleHQodXN1YXJpb0VkaXRhZG8uZ2V0RW1haWwoKSk7CiAgICAgICAgICAgIGNtYlBlcmZpbC5nZXRTZWxlY3Rpb25Nb2RlbCgpLnNlbGVjdCh1c3VhcmlvRWRpdGFkby5nZXRQZXJmaWwoKSk7CiAgICAgICAgICAgIGNoa0F0aXZvLnNldFNlbGVjdGVkKEJvb2xlYW4uVFJVRS5lcXVhbHModXN1YXJpb0VkaXRhZG8uZ2V0QXRpdm8oKSkpOwogICAgICAgIH0gY2F0Y2ggKFNRTEV4Y2VwdGlvbiBlKSB7CiAgICAgICAgICAgIHNob3dBbGVydCgiTsOjbyBmb2kgcG9zc8OtdmVsIGNhcnJlZ2FyIG8gdXN1w6FyaW8uIFZlcmlmaXF1ZSBzZSBvIE15U1FMIGVzdMOhIGF0aXZvLiIsIEFsZXJ0VHlwZS5FUlJPUik7CiAgICAgICAgfQogICAgfQoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgYnRuU2FsdmFyQWN0aW9uKEFjdGlvbkV2ZW50IGV2ZW50KSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIGlmICghdmFsaWRhRm9ybSgpKSB7CiAgICAgICAgICAgIHJldHVybjsKICAgICAgICB9CgogICAgICAgIFN0cmluZyBlbWFpbCA9IHR4dEVtYWlsLmdldFRleHQoKS50cmltKCk7CiAgICAgICAgVXN1YXJpb0RBTyB1c3VhcmlvREFPID0gbmV3IFVzdWFyaW9EQU8oKTsKCiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgYm9vbGVhbiBlbWFpbE11ZG91ID0gIWVtYWlsLmVxdWFsc0lnbm9yZUNhc2UoZW1haWxPcmlnaW5hbCk7CiAgICAgICAgICAgIGlmIChlbWFpbE11ZG91ICYmIHVzdWFyaW9EQU8uZXhpc3RlRW1haWwoZW1haWwpKSB7CiAgICAgICAgICAgICAgICBzaG93QWxlcnQoIkrDoSBleGlzdGUgb3V0cm8gdXN1w6FyaW8gY2FkYXN0cmFkbyBjb20gZXN0ZSBlLW1haWwuIiwgQWxlcnRUeXBlLkVSUk9SKTsKICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgLy8gdXN1YXJpb0VkaXRhZG8gKGNhcnJlZ2FkbyBlbSBpbml0aWFsaXplKCkpIG51bmNhIMOpIHRvY2FkbwogICAgICAgICAgICAvLyBkYXF1aSBwcmEgZnJlbnRlOyDDqSBvICJhbnRlcyIgcXVlIEF1ZGl0b3JpYVV0aWwgdmFpIGNvbXBhcmFyCiAgICAgICAgICAgIC8vIGNvbnRyYSBvICJkZXBvaXMiIG1vbnRhZG8gYWJhaXhvLiBpZCwgc2VuaGEsIHZlcnNhbyBlCiAgICAgICAgICAgIC8vIGRldmVUcm9jYXJTZW5oYSB2w6ptIGNvcGlhZG9zIGRlbGUgcG9ycXVlIGVzdGEgdGVsYSBuw6NvIGVkaXRhCiAgICAgICAgICAgIC8vIG5lbmh1bSBkZXNzZXMgY2FtcG9zLgogICAgICAgICAgICBVc3VhcmlvIHVzdWFyaW9Db21EYWRvc05vdm9zID0gbmV3IFVzdWFyaW8oKTsKICAgICAgICAgICAgdXN1YXJpb0NvbURhZG9zTm92b3Muc2V0SWQodXN1YXJpb0VkaXRhZG8uZ2V0SWQoKSk7CiAgICAgICAgICAgIHVzdWFyaW9Db21EYWRvc05vdm9zLnNldFNlbmhhKHVzdWFyaW9FZGl0YWRvLmdldFNlbmhhKCkpOwogICAgICAgICAgICB1c3VhcmlvQ29tRGFkb3NOb3Zvcy5zZXRWZXJzYW8odXN1YXJpb0VkaXRhZG8uZ2V0VmVyc2FvKCkpOwogICAgICAgICAgICB1c3VhcmlvQ29tRGFkb3NOb3Zvcy5zZXREZXZlVHJvY2FyU2VuaGEodXN1YXJpb0VkaXRhZG8uZ2V0RGV2ZVRyb2NhclNlbmhhKCkpOwogICAgICAgICAgICB1c3VhcmlvQ29tRGFkb3NOb3Zvcy5zZXROb21lKHR4dE5vbWUuZ2V0VGV4dCgpLnRyaW0oKSk7CiAgICAgICAgICAgIHVzdWFyaW9Db21EYWRvc05vdm9zLnNldEVtYWlsKGVtYWlsKTsKICAgICAgICAgICAgdXN1YXJpb0NvbURhZG9zTm92b3Muc2V0UGVyZmlsKGNtYlBlcmZpbC5nZXRWYWx1ZSgpKTsKICAgICAgICAgICAgdXN1YXJpb0NvbURhZG9zTm92b3Muc2V0QXRpdm8oY2hrQXRpdm8uaXNTZWxlY3RlZCgpKTsKCiAgICAgICAgICAgIGJvb2xlYW4gYXR1YWxpemFkbyA9IHVzdWFyaW9EQU8uYXR1YWxpemFyKHVzdWFyaW9Db21EYWRvc05vdm9zKTsKCiAgICAgICAgICAgIGlmICghYXR1YWxpemFkbykgewogICAgICAgICAgICAgICAgc2hvd0FsZXJ0KCJFc3RlIHVzdcOhcmlvIGZvaSBhbHRlcmFkbyBwb3Igb3V0cmEgcGVzc29hIGRlc2RlIHF1ZSBlc3RhIHRlbGEgZm9pIGFiZXJ0YS5cblxuIgogICAgICAgICAgICAgICAgICAgICAgICArICJPcyBkYWRvcyBzZXLDo28gcmVjYXJyZWdhZG9zLCByZWZhw6dhIGFzIGFsdGVyYcOnw7VlcyBuZWNlc3PDoXJpYXMuIiwgQWxlcnRUeXBlLkVSUk9SKTsKICAgICAgICAgICAgICAgIFRlbmlzU2hvcC5zZXRSb290KCJlZGl0YXItdXN1YXJpbyIpOwogICAgICAgICAgICAgICAgcmV0dXJuOwogICAgICAgICAgICB9CgogICAgICAgICAgICByZWdpc3RyYXJBdWRpdG9yaWEodXN1YXJpb0NvbURhZG9zTm92b3MpOwoKICAgICAgICAgICAgc2hvd0FsZXJ0KCJVc3XDoXJpbyBhdHVhbGl6YWRvIGNvbSBzdWNlc3NvISIsIEFsZXJ0VHlwZS5JTkZPUk1BVElPTik7CiAgICAgICAgICAgIFRlbmlzU2hvcC5zZXRSb290KCJsaXN0YXItdXN1YXJpb3MiKTsKICAgICAgICB9IGNhdGNoIChTUUxFeGNlcHRpb24gZSkgewogICAgICAgICAgICBzaG93QWxlcnQoIk7Do28gZm9pIHBvc3PDrXZlbCBzYWx2YXIgYXMgYWx0ZXJhw6fDtWVzLiBWZXJpZmlxdWUgc2UgbyBNeVNRTCBlc3TDoSBhdGl2by4iLCBBbGVydFR5cGUuRVJST1IpOwogICAgICAgIH0KICAgIH0KCiAgICAvKioKICAgICAqIFJlZ2lzdHJhIGEgYXVkaXRvcmlhIGRhIGVkacOnw6NvLCBlc2NvbGhlbmRvIGEgYcOnw6NvIGNlcnRhIGNvbmZvcm1lIG8KICAgICAqIHF1ZSBtdWRvdTogdW1hIG11ZGFuw6dhIGRlIGF0aXZvPXRydWUgcGFyYSBhdGl2bz1mYWxzZSDDqSBvIG1haXMKICAgICAqIHByw7N4aW1vIHF1ZSBlc3RlIHNpc3RlbWEgdGVtIGRlICJyZW1vdmVyIiB1bSB1c3XDoXJpbyAobsOjbyBleGlzdGUKICAgICAqIGV4Y2x1c8OjbyBkZWZpbml0aXZhICh2ZXIgbyBwb3JxdcOqIG5hIEF1bGEgMTApLCBlbnTDo28gZ2FuaGEgdW1hCiAgICAgKiBhw6fDo28gcHLDs3ByaWEgZSBtYWlzIHZpc8OtdmVsIChVU1VBUklPX0RFU0FUSVZBRE8pIGVtIHZleiBkZSBjYWlyIG5vCiAgICAgKiBnZW7DqXJpY28gVVNVQVJJT19BVFVBTElaQURPLiBPIGRldGFsaGUsIG5vcyB0csOqcyBjYXNvcywgw6kgc2VtcHJlIGEKICAgICAqIGRlc2NyacOnw6NvIGNvbXBsZXRhIGRlIHR1ZG8gcXVlIG11ZG91LCBuw6NvIHPDsyBkbyBjYW1wbyBhdGl2by4KICAgICAqIEBwYXJhbSB1c3VhcmlvQ29tRGFkb3NOb3ZvcyB1c3XDoXJpbyBqw6Egc2Fsdm8sIGNvbSBvcyBkYWRvcyBub3ZvcwogICAgICogQHRocm93cyBTUUxFeGNlcHRpb24gY2FzbyBvY29ycmEgZmFsaGEgYW8gZ3JhdmFyIGEgYXVkaXRvcmlhCiAgICAgKi8KICAgIHByaXZhdGUgdm9pZCByZWdpc3RyYXJBdWRpdG9yaWEoVXN1YXJpbyB1c3VhcmlvQ29tRGFkb3NOb3ZvcykgdGhyb3dzIFNRTEV4Y2VwdGlvbiB7CiAgICAgICAgU3RyaW5nIGRldGFsaGUgPSBBdWRpdG9yaWFVdGlsLmRlc2NyZXZlckFsdGVyYWNvZXNVc3VhcmlvKHVzdWFyaW9FZGl0YWRvLCB1c3VhcmlvQ29tRGFkb3NOb3Zvcyk7CgogICAgICAgIGJvb2xlYW4gZXN0YXZhQXRpdm8gPSBCb29sZWFuLlRSVUUuZXF1YWxzKHVzdWFyaW9FZGl0YWRvLmdldEF0aXZvKCkpOwogICAgICAgIGJvb2xlYW4gY29udGludWFBdGl2byA9IEJvb2xlYW4uVFJVRS5lcXVhbHModXN1YXJpb0NvbURhZG9zTm92b3MuZ2V0QXRpdm8oKSk7CgogICAgICAgIEFjYW9BdWRpdG9yaWEgYWNhbzsKICAgICAgICBpZiAoZXN0YXZhQXRpdm8gJiYgIWNvbnRpbnVhQXRpdm8pIHsKICAgICAgICAgICAgYWNhbyA9IEFjYW9BdWRpdG9yaWEuVVNVQVJJT19ERVNBVElWQURPOwogICAgICAgIH0gZWxzZSBpZiAoIWVzdGF2YUF0aXZvICYmIGNvbnRpbnVhQXRpdm8pIHsKICAgICAgICAgICAgYWNhbyA9IEFjYW9BdWRpdG9yaWEuVVNVQVJJT19SRUFUSVZBRE87CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgYWNhbyA9IEFjYW9BdWRpdG9yaWEuVVNVQVJJT19BVFVBTElaQURPOwogICAgICAgIH0KCiAgICAgICAgbmV3IEF1ZGl0b3JpYURBTygpLnJlZ2lzdHJhcihUZW5pc1Nob3AudXN1YXJpb0xvZ2Fkby5nZXRJZCgpLCBhY2FvLAogICAgICAgICAgICAgICAgIlVTVUFSSU8iLCB1c3VhcmlvQ29tRGFkb3NOb3Zvcy5nZXRJZCgpLCBkZXRhbGhlKTsKICAgIH0KCiAgICBARlhNTAogICAgcHJpdmF0ZSB2b2lkIGJ0bkNhbmNlbGFyQWN0aW9uKEFjdGlvbkV2ZW50IGV2ZW50KSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIFRlbmlzU2hvcC5zZXRSb290KCJsaXN0YXItdXN1YXJpb3MiKTsKICAgIH0KCiAgICBwcml2YXRlIGJvb2xlYW4gdmFsaWRhRm9ybSgpIHsKICAgICAgICBpZiAodHh0Tm9tZS5nZXRUZXh0KCkuaXNCbGFuaygpKSB7CiAgICAgICAgICAgIHNob3dBbGVydCgiUHJlZW5jaGEgbyBjYW1wbyBOb21lISIsIEFsZXJ0VHlwZS5FUlJPUik7CiAgICAgICAgICAgIHR4dE5vbWUucmVxdWVzdEZvY3VzKCk7CiAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICB9CgogICAgICAgIGlmICh0eHRFbWFpbC5nZXRUZXh0KCkuaXNCbGFuaygpIHx8ICFGT1JNQVRPX0VNQUlMLm1hdGNoZXIodHh0RW1haWwuZ2V0VGV4dCgpLnRyaW0oKSkubWF0Y2hlcygpKSB7CiAgICAgICAgICAgIHNob3dBbGVydCgiRGlnaXRlIHVtIGUtbWFpbCBlbSB1bSBmb3JtYXRvIHbDoWxpZG8gKGV4Ljogbm9tZUBkb21pbmlvLmNvbSkuIiwgQWxlcnRUeXBlLkVSUk9SKTsKICAgICAgICAgICAgdHh0RW1haWwucmVxdWVzdEZvY3VzKCk7CiAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICB9CgogICAgICAgIGlmIChjbWJQZXJmaWwuZ2V0VmFsdWUoKSA9PSBudWxsKSB7CiAgICAgICAgICAgIHNob3dBbGVydCgiU2VsZWNpb25lIG8gcGVyZmlsIGRlIGFjZXNzbyEiLCBBbGVydFR5cGUuRVJST1IpOwogICAgICAgICAgICByZXR1cm4gZmFsc2U7CiAgICAgICAgfQoKICAgICAgICByZXR1cm4gdHJ1ZTsKICAgIH0KCiAgICBwcml2YXRlIHZvaWQgc2hvd0FsZXJ0KFN0cmluZyBtZXNzYWdlLCBBbGVydFR5cGUgYWxlcnRUeXBlKSB7CiAgICAgICAgQWxlcnQgYWxlcnQgPSBuZXcgQWxlcnQoYWxlcnRUeXBlKTsKICAgICAgICBhbGVydC5zZXRUaXRsZSgiRWRpdGFyIFVzdcOhcmlvIik7CiAgICAgICAgYWxlcnQuc2V0SGVhZGVyVGV4dChudWxsKTsKICAgICAgICBhbGVydC5zZXRDb250ZW50VGV4dChtZXNzYWdlKTsKICAgICAgICBhbGVydC5zaG93QW5kV2FpdCgpOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar EditarUsuarioController.java</span></button>
+      <button type="button" class="download-btn" data-filename="MeuPerfilController.java" data-b64="cGFja2FnZSBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLnZpZXc7CgppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5UZW5pc1Nob3A7CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhby5BdWRpdG9yaWFEQU87CmltcG9ydCBici5lZHUuaWZzdWwudmVuYW5jaW8udGVuaXNzaG9wLm1vZGVsLmRhby5Vc3VhcmlvREFPOwppbXBvcnQgYnIuZWR1Lmlmc3VsLnZlbmFuY2lvLnRlbmlzc2hvcC5tb2RlbC5kb21haW4uQWNhb0F1ZGl0b3JpYTsKaW1wb3J0IGJyLmVkdS5pZnN1bC52ZW5hbmNpby50ZW5pc3Nob3AubW9kZWwudXRpbC5Gb3RvVXN1YXJpb1V0aWw7CmltcG9ydCBqYXZhLmlvLkZpbGU7CmltcG9ydCBqYXZhLmlvLklPRXhjZXB0aW9uOwppbXBvcnQgamF2YS5uaW8uZmlsZS5GaWxlczsKaW1wb3J0IGphdmEubmlvLmZpbGUuUGF0aDsKaW1wb3J0IGphdmEuc3FsLlNRTEV4Y2VwdGlvbjsKaW1wb3J0IGphdmFmeC5ldmVudC5BY3Rpb25FdmVudDsKaW1wb3J0IGphdmFmeC5meG1sLkZYTUw7CmltcG9ydCBqYXZhZnguc2NlbmUuTm9kZTsKaW1wb3J0IGphdmFmeC5zY2VuZS5jb250cm9sLkFsZXJ0OwppbXBvcnQgamF2YWZ4LnNjZW5lLmNvbnRyb2wuQWxlcnQuQWxlcnRUeXBlOwppbXBvcnQgamF2YWZ4LnNjZW5lLmltYWdlLkltYWdlOwppbXBvcnQgamF2YWZ4LnNjZW5lLmltYWdlLkltYWdlVmlldzsKaW1wb3J0IGphdmFmeC5zdGFnZS5GaWxlQ2hvb3NlcjsKaW1wb3J0IGphdmFmeC5zdGFnZS5GaWxlQ2hvb3Nlci5FeHRlbnNpb25GaWx0ZXI7CgovKioKICogQ29udHJvbGxlciBkYSB0ZWxhIGRlIGF1dG9zc2VydmnDp28gIk1ldSBQZXJmaWwiIChBdWxhIDA5KTogcGVybWl0ZSDDoAogKiBwZXNzb2EgbG9nYWRhIGVzY29saGVyLCB0cm9jYXIgb3UgcmVtb3ZlciBzdWEgcHLDs3ByaWEgZm90byBkZSBwZXJmaWwuCiAqIERpZmVyZW50ZSBkZSBFZGl0YXJVc3VhcmlvQ29udHJvbGxlciAodGVsYSBhZG1pbmlzdHJhdGl2YSwgcXVlIGVkaXRhIG8KICogY2FkYXN0cm8gZGUgcXVhbHF1ZXIgdXN1w6FyaW8gZSB1c2EgY29udHJvbGUgZGUgY29uY29ycsOqbmNpYSBvdGltaXN0YSwKICogQXVsYSAxMCksIGFxdWkgc8OzIG8gcHLDs3ByaW8gdXN1w6FyaW8gbWV4ZSBubyBwcsOzcHJpbyByZWdpc3RybywgZSBzw7Mgbm8KICogY2FtcG8gZm90bywgZW50w6NvIFVzdWFyaW9EQU8uYXR1YWxpemFyRm90bygpIG7Do28gcHJlY2lzYSBjaGVjYXIgdmVyc8Ojby4KICoKICogTyBib3TDo28gRXNjb2xoZXIgRm90byBzw7MgdHJvY2EgYSBwcsOpLXZpc3VhbGl6YcOnw6NvIChpbWdGb3RvKSBlIGd1YXJkYSBvCiAqIGFycXVpdm8gZXNjb2xoaWRvIGVtIGFycXVpdm9Gb3RvU2VsZWNpb25hZGE7IG5hZGEgw6kgY29waWFkbyBwYXJhIGEKICogcGFzdGEgZm90b3NfdXN1YXJpb3MvIG5lbSBncmF2YWRvIG5vIGJhbmNvIGF0w6kgbyBjbGlxdWUgZW0gU2FsdmFyLiBJc3NvCiAqIGV2aXRhIGRlaXhhciBhcnF1aXZvcyAicGVyZGlkb3MiIG5hIHBhc3RhIGNhc28gbyB1c3XDoXJpbyBkZXNpc3RhIGUKICogY2xpcXVlIGVtIFZvbHRhci4KICoKICogQGF1dGhvciBHZW92YW5lIEdyaWVzYW5nCiAqLwpwdWJsaWMgY2xhc3MgTWV1UGVyZmlsQ29udHJvbGxlciB7CgogICAgcHJpdmF0ZSBzdGF0aWMgZmluYWwgRXh0ZW5zaW9uRmlsdGVyIEZJTFRST19JTUFHRU5TID0KICAgICAgICAgICAgbmV3IEV4dGVuc2lvbkZpbHRlcigiSW1hZ2VucyAoKi5wbmcsICouanBnLCAqLmpwZWcpIiwgIioucG5nIiwgIiouanBnIiwgIiouanBlZyIpOwoKICAgIEBGWE1MCiAgICBwcml2YXRlIEltYWdlVmlldyBpbWdGb3RvOwoKICAgIHByaXZhdGUgU3RyaW5nIGZvdG9BdHVhbDsKICAgIHByaXZhdGUgRmlsZSBhcnF1aXZvRm90b1NlbGVjaW9uYWRhOwogICAgcHJpdmF0ZSBib29sZWFuIHJlbW92ZXJGb3RvUGVuZGVudGU7CgogICAgQEZYTUwKICAgIHByaXZhdGUgdm9pZCBpbml0aWFsaXplKCkgewogICAgICAgIGZvdG9BdHVhbCA9IFRlbmlzU2hvcC51c3VhcmlvTG9nYWRvLmdldEZvdG8oKTsKICAgICAgICBleGliaXJGb3RvKGZvdG9BdHVhbCk7CiAgICB9CgogICAgQEZYTUwKICAgIHByaXZhdGUgdm9pZCBidG5Fc2NvbGhlckZvdG9BY3Rpb24oQWN0aW9uRXZlbnQgZXZlbnQpIHsKICAgICAgICBGaWxlQ2hvb3NlciBmaWxlQ2hvb3NlciA9IG5ldyBGaWxlQ2hvb3NlcigpOwogICAgICAgIGZpbGVDaG9vc2VyLnNldFRpdGxlKCJFc2NvbGhlciBGb3RvIGRlIFBlcmZpbCIpOwogICAgICAgIGZpbGVDaG9vc2VyLmdldEV4dGVuc2lvbkZpbHRlcnMoKS5hZGQoRklMVFJPX0lNQUdFTlMpOwoKICAgICAgICBGaWxlIGFycXVpdm9Fc2NvbGhpZG8gPSBmaWxlQ2hvb3Nlci5zaG93T3BlbkRpYWxvZygoKE5vZGUpIGV2ZW50LmdldFNvdXJjZSgpKS5nZXRTY2VuZSgpLmdldFdpbmRvdygpKTsKICAgICAgICBpZiAoYXJxdWl2b0VzY29saGlkbyA9PSBudWxsKSB7CiAgICAgICAgICAgIHJldHVybjsKICAgICAgICB9CgogICAgICAgIGFycXVpdm9Gb3RvU2VsZWNpb25hZGEgPSBhcnF1aXZvRXNjb2xoaWRvOwogICAgICAgIHJlbW92ZXJGb3RvUGVuZGVudGUgPSBmYWxzZTsKICAgICAgICBpbWdGb3RvLnNldEltYWdlKG5ldyBJbWFnZShhcnF1aXZvRXNjb2xoaWRvLnRvVVJJKCkudG9TdHJpbmcoKSkpOwogICAgfQoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgYnRuUmVtb3ZlckZvdG9BY3Rpb24oQWN0aW9uRXZlbnQgZXZlbnQpIHsKICAgICAgICBhcnF1aXZvRm90b1NlbGVjaW9uYWRhID0gbnVsbDsKICAgICAgICByZW1vdmVyRm90b1BlbmRlbnRlID0gdHJ1ZTsKICAgICAgICBpbWdGb3RvLnNldEltYWdlKG51bGwpOwogICAgfQoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgYnRuU2FsdmFyQWN0aW9uKEFjdGlvbkV2ZW50IGV2ZW50KSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIGlmICghcmVtb3ZlckZvdG9QZW5kZW50ZSAmJiBhcnF1aXZvRm90b1NlbGVjaW9uYWRhID09IG51bGwpIHsKICAgICAgICAgICAgVGVuaXNTaG9wLnNldFJvb3QoInByaW5jaXBhbCIpOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICBpbnQgdXN1YXJpb0lkID0gVGVuaXNTaG9wLnVzdWFyaW9Mb2dhZG8uZ2V0SWQoKTsKCiAgICAgICAgdHJ5IHsKICAgICAgICAgICAgU3RyaW5nIGZvdG9GaW5hbDsKICAgICAgICAgICAgU3RyaW5nIGRldGFsaGU7CgogICAgICAgICAgICBpZiAocmVtb3ZlckZvdG9QZW5kZW50ZSkgewogICAgICAgICAgICAgICAgRm90b1VzdWFyaW9VdGlsLmV4Y2x1aXIoZm90b0F0dWFsKTsKICAgICAgICAgICAgICAgIGZvdG9GaW5hbCA9IG51bGw7CiAgICAgICAgICAgICAgICBkZXRhbGhlID0gIkZvdG8gZGUgcGVyZmlsIHJlbW92aWRhLiI7CiAgICAgICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAgICAgICBmb3RvRmluYWwgPSBGb3RvVXN1YXJpb1V0aWwuc2FsdmFyKHVzdWFyaW9JZCwgYXJxdWl2b0ZvdG9TZWxlY2lvbmFkYSk7CiAgICAgICAgICAgICAgICBkZXRhbGhlID0gIkZvdG8gZGUgcGVyZmlsIGF0dWFsaXphZGEuIjsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgbmV3IFVzdWFyaW9EQU8oKS5hdHVhbGl6YXJGb3RvKHVzdWFyaW9JZCwgZm90b0ZpbmFsKTsKICAgICAgICAgICAgbmV3IEF1ZGl0b3JpYURBTygpLnJlZ2lzdHJhcih1c3VhcmlvSWQsIEFjYW9BdWRpdG9yaWEuRk9UT19BTFRFUkFEQSwgIlVTVUFSSU8iLCB1c3VhcmlvSWQsIGRldGFsaGUpOwogICAgICAgICAgICBUZW5pc1Nob3AudXN1YXJpb0xvZ2Fkby5zZXRGb3RvKGZvdG9GaW5hbCk7CgogICAgICAgICAgICBzaG93QWxlcnQoIkZvdG8gZGUgcGVyZmlsIGF0dWFsaXphZGEgY29tIHN1Y2Vzc28hIiwgQWxlcnRUeXBlLklORk9STUFUSU9OKTsKICAgICAgICAgICAgVGVuaXNTaG9wLnNldFJvb3QoInByaW5jaXBhbCIpOwogICAgICAgIH0gY2F0Y2ggKFNRTEV4Y2VwdGlvbiBlKSB7CiAgICAgICAgICAgIHNob3dBbGVydCgiTsOjbyBmb2kgcG9zc8OtdmVsIHNhbHZhciBhIGZvdG8uIFZlcmlmaXF1ZSBzZSBvIE15U1FMIGVzdMOhIGF0aXZvLiIsIEFsZXJ0VHlwZS5FUlJPUik7CiAgICAgICAgfQogICAgfQoKICAgIEBGWE1MCiAgICBwcml2YXRlIHZvaWQgYnRuVm9sdGFyQWN0aW9uKEFjdGlvbkV2ZW50IGV2ZW50KSB0aHJvd3MgSU9FeGNlcHRpb24gewogICAgICAgIFRlbmlzU2hvcC5zZXRSb290KCJwcmluY2lwYWwiKTsKICAgIH0KCiAgICBwcml2YXRlIHZvaWQgZXhpYmlyRm90byhTdHJpbmcgbm9tZUFycXVpdm8pIHsKICAgICAgICBpZiAobm9tZUFycXVpdm8gPT0gbnVsbCkgewogICAgICAgICAgICBpbWdGb3RvLnNldEltYWdlKG51bGwpOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICBQYXRoIGNhbWluaG8gPSBGb3RvVXN1YXJpb1V0aWwuY2FtaW5ob0NvbXBsZXRvKG5vbWVBcnF1aXZvKTsKICAgICAgICBpZiAoIUZpbGVzLmV4aXN0cyhjYW1pbmhvKSkgewogICAgICAgICAgICBpbWdGb3RvLnNldEltYWdlKG51bGwpOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICBpbWdGb3RvLnNldEltYWdlKG5ldyBJbWFnZShjYW1pbmhvLnRvVXJpKCkudG9TdHJpbmcoKSkpOwogICAgfQoKICAgIHByaXZhdGUgdm9pZCBzaG93QWxlcnQoU3RyaW5nIG1lc3NhZ2UsIEFsZXJ0VHlwZSBhbGVydFR5cGUpIHsKICAgICAgICBBbGVydCBhbGVydCA9IG5ldyBBbGVydChhbGVydFR5cGUpOwogICAgICAgIGFsZXJ0LnNldFRpdGxlKCJNZXUgUGVyZmlsIik7CiAgICAgICAgYWxlcnQuc2V0SGVhZGVyVGV4dChudWxsKTsKICAgICAgICBhbGVydC5zZXRDb250ZW50VGV4dChtZXNzYWdlKTsKICAgICAgICBhbGVydC5zaG93QW5kV2FpdCgpOwogICAgfQp9Cg=="><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0l-4.5-4.5M12 14l4.5-4.5M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="download-btn-label">Baixar MeuPerfilController.java</span></button>
 
-      <div class="callout"><strong>O caminho de recarregamento "vem de graça":</strong> quando <code>atualizar()</code> retorna <code>false</code>, o Controller chama <code>TenisShop.setRoot("editar-usuario")</code> de novo; o que dispara <code>initialize()</code> outra vez, que já busca os dados atuais do zero. Não foi preciso escrever nenhum código extra de "recarregar": reentrar na mesma tela já faz isso.</div>
-    </section>
+      <div class="callout">Repare na chamada a <code>AuditoriaDAO.registrar(...)</code> dentro de <code>btnSalvarAction</code>: ela já está aqui, mas <code>AuditoriaDAO</code> só é explicada na Aula 11 (Seção 04), que também mostra por que o texto de <code>detalhe</code> já é montado desde já, mesmo sem a trilha de auditoria existir ainda.</div>
 
-    <section id="s6">
-      <h2><span class="num">06</span>Testando o Conflito de Versão na Prática</h2>
-      <p>Este conflito só aparece de verdade com duas edições sobrepostas: vale reproduzir isso antes de seguir em frente.</p>
+      <h3>Conectando à Tela Principal</h3>
+      <p>Um botão novo em <code>principal.fxml</code>, ao lado de "Alterar minha senha" (fora da área exclusiva de administrador, porque qualquer perfil pode ter foto de perfil):</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">xml</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>&lt;<span class="tok-kw">Button</span> onAction=&quot;#irParaAlterarSenha&quot; text=&quot;Alterar minha senha&quot; /&gt;
+&lt;<span class="tok-kw">Button</span> onAction=&quot;#irParaMeuPerfil&quot; text=&quot;Meu Perfil (foto)&quot; /&gt;</code></pre></div>
+      <p>E o método correspondente em <code>PrincipalController</code>:</p>
+      <div class="code-block"><div class="code-head"><span class="code-lang">java</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code>@FXML
+<span class="tok-kw">private</span> <span class="tok-kw">void</span> irParaMeuPerfil(ActionEvent event) <span class="tok-kw">throws</span> IOException {
+    TenisShop.setRoot(<span class="tok-str">&quot;meu-perfil&quot;</span>);
+}</code></pre></div>
+      <div class="callout">Os arquivos completos e atualizados de <code>principal.fxml</code> e <code>PrincipalController.java</code> (já com todos os botões que existirão até o fim do semestre) são entregues por inteiro na Aula 11 (Seção 04), a última a acrescentar um botão de navegação nesta tela.</div>
+
+      <h3>Testando</h3>
       <ol class="plain">
-        <li>Rode a aplicação duas vezes (dois processos, ou dois computadores do laboratório apontando para o mesmo MySQL).</li>
-        <li>Em ambas, entre como administrador e abra <strong>o mesmo</strong> usuário para editar (Listar/Editar Usuários → Editar).</li>
-        <li>Na primeira janela, mude o nome e clique em Salvar. Confirme que funcionou e voltou para a listagem.</li>
-        <li>Na segunda janela (que ainda está com os dados antigos na tela), mude o e-mail e clique em Salvar.</li>
-        <li>Confirme que aparece o alerta de conflito, e que a tela recarrega com os dados já atualizados pela primeira janela; a mudança de e-mail que você acabou de tentar salvar <strong>não</strong> foi perdida silenciosamente, foi só recusada, e agora dá para refazer sobre os dados corretos.</li>
+        <li>Faça login com qualquer usuário, abra "Meu Perfil" e clique em "Escolher Foto...": selecione uma imagem PNG ou JPG qualquer.</li>
+        <li>Clique em Salvar; confirme que a pasta <code>fotos_usuarios/</code> foi criada na raiz do módulo <code>TenisShop</code>, com um arquivo nomeado como o id do seu usuário.</li>
+        <li>Saia e faça login novamente: a foto deve aparecer já carregada em "Meu Perfil", lida a partir de <code>usuarios.foto</code>.</li>
+        <li>Escolha uma foto diferente, com outra extensão (ex.: troque um <code>.png</code> por um <code>.jpg</code>), e confirme que o arquivo antigo desaparece da pasta (não fica um <code>.png</code> e um <code>.jpg</code> ao mesmo tempo).</li>
+        <li>Clique em "Remover Foto" e Salvar; confirme que o arquivo some da pasta e que <code>usuarios.foto</code> volta a <code>NULL</code>.</li>
       </ol>
-      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">checkout</span> <span class="tok-flag">-b</span> feature/controle-concorrencia-otimista
 
-<span class="tok-kw">git</span> <span class="tok-fn">add</span> .
-<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: adiciona controle de concorrencia otimista e telas de listar/editar usuario"</span>
+      <div class="code-block"><div class="code-head"><span class="code-lang">bash</span><button type="button" class="copy-btn" aria-label="Copiar codigo"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10" fill="none" stroke="currentColor" stroke-width="2"></path></svg><span class="copy-btn-label">Copiar</span></button></div><pre><code><span class="tok-kw">git</span> <span class="tok-fn">add</span> .
+<span class="tok-kw">git</span> <span class="tok-fn">commit</span> <span class="tok-flag">-m</span> <span class="tok-str">"feat: adiciona acesso ao banco pela rede e upload de foto de perfil"</span>
 
 <span class="tok-kw">git</span> <span class="tok-fn">checkout</span> main
-<span class="tok-kw">git</span> <span class="tok-fn">merge</span> feature/controle-concorrencia-otimista
+<span class="tok-kw">git</span> <span class="tok-fn">merge</span> feature/foto-de-perfil
 <span class="tok-kw">git</span> <span class="tok-fn">push</span> origin main</code></pre></div>
     </section>
-
 
     <section id="s7">
       <h2><span class="num">07</span>Referências e Materiais Complementares</h2>
       <ul class="refs">
-        <li><span class="ref-kind">Livro</span>ELMASRI, Ramez; NAVATHE, Shamkant B. <strong>Sistemas de Banco de Dados</strong>. 7. ed. São Paulo, SP: Pearson, 2018.</li>
-        <li><span class="ref-kind">Padrão de projeto</span>FOWLER, Martin. <strong>Patterns of Enterprise Application Architecture</strong>: padrão "Optimistic Offline Lock", a base conceitual do controle de concorrência desta aula. Disponível em: <a href="https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html" target="_blank" rel="noreferrer">martinfowler.com/eaaCatalog/optimisticOfflineLock</a>.</li>
-        <li><span class="ref-kind">Documentação</span>Documentação Oficial do JavaFX: <code>TableView</code>. Disponível em: <a href="https://openjfx.io" target="_blank" rel="noreferrer">openjfx.io</a>.</li>
+        <li><span class="ref-kind">Aula anterior</span><a href="aula-08.html">Aula 08</a>: acompanhamento da evolução dos projetos.</li>
+        <li><span class="ref-kind">Próxima aula</span><a href="aula-10.html">Aula 10</a>: controle de concorrência otimista no TenisShop.</li>
+        <li><span class="ref-kind">Aula futura</span><a href="aula-11.html">Aula 11</a>: trilha de auditoria no TenisShop.</li>
+        <li><span class="ref-kind">Documentação</span>MySQL 8.0 Reference Manual: <em>Configuring MySQL to Accept Any Incoming Connection</em>. Disponível em: <a href="https://dev.mysql.com/doc/" target="_blank" rel="noreferrer">dev.mysql.com/doc</a>.</li>
+        <li><span class="ref-kind">Documentação</span>Documentação Oficial do JavaFX: <code>FileChooser</code> e <code>ImageView</code>. Disponível em: <a href="https://openjfx.io" target="_blank" rel="noreferrer">openjfx.io</a>.</li>
         <li><span class="ref-kind">Documentação</span>Documentação Oficial do Git. Disponível em: <a href="https://git-scm.com/doc" target="_blank" rel="noreferrer">git-scm.com/doc</a>.</li>
         <li><span class="ref-kind">Ferramenta</span>Flyway: mesma convenção de scripts versionados já referenciada na Aula 04. Disponível em: <a href="https://flywaydb.org" target="_blank" rel="noreferrer">flywaydb.org</a>.</li>
       </ul>

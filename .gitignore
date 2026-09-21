@@ -9,3 +9,7 @@
 # Copie TenisShop/src/main/resources/db.properties.example para
 # db.properties e preencha localmente; só o .example é commitado.
 /TenisShop/src/main/resources/db.properties
+
+# Fotos de perfil dos usuários (Aula 09) - arquivos de cada máquina,
+# nunca versionar; o banco guarda só o nome do arquivo (ver FotoUsuarioUtil).
+/TenisShop/fotos_usuarios/

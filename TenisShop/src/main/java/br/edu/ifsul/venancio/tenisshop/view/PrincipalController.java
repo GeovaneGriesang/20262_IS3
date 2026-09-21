@@ -50,6 +50,11 @@ public class PrincipalController {
     }
 
     @FXML
+    private void irParaMeuPerfil(ActionEvent event) throws IOException {
+        TenisShop.setRoot("meu-perfil");
+    }
+
+    @FXML
     private void irParaCadastrarUsuario(ActionEvent event) throws IOException {
         TenisShop.setRoot("cadastrar-usuario");
     }
