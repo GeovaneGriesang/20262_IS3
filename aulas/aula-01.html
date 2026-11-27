@@ -15,6 +15,10 @@
     --accent-soft-strong: rgba(47, 158, 65, 0.18);
     --red: #cd191e;
     --red-soft: rgba(205, 25, 30, 0.1);
+    --red-row: rgba(205, 25, 30, 0.06);
+    --red-row-strong: rgba(205, 25, 30, 0.11);
+    --blue: #1d5fb8;
+    --blue-soft: rgba(29, 95, 184, 0.1);
     --shadow: 0 1px 2px rgba(23, 23, 23, 0.04), 0 8px 24px -12px rgba(23, 23, 23, 0.12);
     --code-bg: #f6f8fa;
     --code-kw: #0550ae;
@@ -41,6 +45,10 @@
       --accent-soft-strong: rgba(63, 180, 84, 0.24);
       --red: #e6484e;
       --red-soft: rgba(230, 72, 78, 0.14);
+    --red-row: rgba(230, 72, 78, 0.09);
+    --red-row-strong: rgba(230, 72, 78, 0.15);
+    --blue: #6ea8fe;
+    --blue-soft: rgba(110, 168, 254, 0.14);
       --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
       --code-bg: #161b22;
       --code-kw: #79c0ff;
@@ -67,6 +75,10 @@
     --accent-soft-strong: rgba(47, 158, 65, 0.18);
     --red: #cd191e;
     --red-soft: rgba(205, 25, 30, 0.1);
+    --red-row: rgba(205, 25, 30, 0.06);
+    --red-row-strong: rgba(205, 25, 30, 0.11);
+    --blue: #1d5fb8;
+    --blue-soft: rgba(29, 95, 184, 0.1);
     --shadow: 0 1px 2px rgba(23, 23, 23, 0.04), 0 8px 24px -12px rgba(23, 23, 23, 0.12);
     --code-bg: #f6f8fa;
     --code-kw: #0550ae;
@@ -92,6 +104,10 @@
     --accent-soft-strong: rgba(63, 180, 84, 0.24);
     --red: #e6484e;
     --red-soft: rgba(230, 72, 78, 0.14);
+    --red-row: rgba(230, 72, 78, 0.09);
+    --red-row-strong: rgba(230, 72, 78, 0.15);
+    --blue: #6ea8fe;
+    --blue-soft: rgba(110, 168, 254, 0.14);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
     --code-bg: #161b22;
     --code-kw: #79c0ff;
@@ -481,7 +497,10 @@
     white-space: nowrap;
   }
   .tag-eval { background: var(--accent-soft); color: var(--accent-ink); }
-  .tag-remote { background: var(--red-soft); color: var(--red); }
+  .tag-remote { background: var(--blue-soft); color: var(--blue); }
+  .tag-off { background: var(--red-soft); color: var(--red); }
+  tr.off-row td { background: var(--red-row); }
+  tr.off-row:hover td { background: var(--red-row-strong); }
   tr.eval-row td { background: var(--accent-soft); }
   tr.eval-row:hover td { background: var(--accent-soft-strong); }
 
@@ -888,23 +907,23 @@
             <tr><td class="num">07/08/2026</td><td>Conceitos de Git/GitHub, configuração do ambiente e criação do projeto TenisShop.</td><td>Repositórios Iniciais do GitHub</td></tr>
             <tr><td class="num">14/08/2026</td><td>Estudo dos conteúdos do plano de ensino e articulação com as demandas das entidades.</td><td>Início do Desenvolvimento do Software</td></tr>
             <tr><td class="num">21/08/2026</td><td>Desenvolvimento da classe de usuário contemplando perfis e níveis de acesso.</td><td>Arquitetura de Usuários</td></tr>
-            <tr><td class="num">28/08/2026</td><td>Sem aula presencial (professor acompanha os JIFs em Pelotas): semana de trabalho remoto e assíncrono para evolução dos projetos.</td><td>Trabalho Remoto</td></tr>
+            <tr><td class="num">28/08/2026</td><td>Sem aula presencial (professor acompanha os JIFs em Pelotas): semana de trabalho remoto e assíncrono para evolução dos projetos.</td><td><span class="tag tag-remote">Trabalho Remoto</span></td></tr>
             <tr><td class="num">04/09/2026</td><td>Controle de concorrência (bloqueio otimista) e trilha de auditoria no TenisShop.</td><td>Integridade e Rastreabilidade de Dados</td></tr>
-            <tr><td class="num">08/09/2026</td><td>Preparação remota para a MOVACI: revisão do projeto, do progresso já desenvolvido e do convite à entidade parceira.</td><td>Trabalho Remoto</td></tr>
+            <tr><td class="num">08/09/2026</td><td>Preparação remota para a MOVACI: revisão do projeto, do progresso já desenvolvido e do convite à entidade parceira.</td><td><span class="tag tag-remote">Trabalho Remoto</span></td></tr>
             <tr class="eval-row"><td class="num">09/09/2026</td><td><strong>MOVACI</strong> (Mostra Venâncio-airense de Cultura e Inovação) – Apresentação pública, dia 1.</td><td><span class="tag tag-eval">Avaliativa · 20%</span></td></tr>
             <tr class="eval-row"><td class="num">10/09/2026</td><td><strong>MOVACI</strong> (Mostra Venâncio-airense de Cultura e Inovação) – Apresentação pública, dia 2.</td><td><span class="tag tag-eval">Avaliativa</span></td></tr>
-            <tr><td class="num">11/09/2026</td><td>Retorno remoto da MOVACI: registro do feedback recebido e próximos passos do projeto.</td><td>Trabalho Remoto</td></tr>
+            <tr><td class="num">11/09/2026</td><td>Retorno remoto da MOVACI: registro do feedback recebido e próximos passos do projeto.</td><td><span class="tag tag-remote">Trabalho Remoto</span></td></tr>
             <tr><td class="num">18/09/2026</td><td>Desenvolvimento do modelo físico de banco de dados (Script SQL) no NetBeans 28.</td><td>Script SQL + Versionamento</td></tr>
             <tr><td class="num">25/09/2026</td><td>Desenvolvimento das classes de domínio, classes Exception e Utils.</td><td>Regras de Negócio e Pacotes Úteis</td></tr>
             <tr><td class="num">02/10/2026</td><td>Desenvolvimento da camada de conexão segura JDBC com o MySQL.</td><td>Camada de Conexão</td></tr>
             <tr><td class="num">09/10/2026</td><td>Desenvolvimento das classes DAO (Data Access Object).</td><td>Persistência de Dados</td></tr>
             <tr><td class="num">16/10/2026</td><td>Desenvolvimento das classes Services. (Trabalho autônomo / Visitas às entidades).</td><td>Camada de Serviços</td></tr>
             <tr><td class="num">23/10/2026</td><td>Desenvolvimento das telas gráficas e interfaces do sistema (FXML/JavaFX).</td><td>Protótipo Gráfico Ativo</td></tr>
-            <tr><td class="num">30/10/2026</td><td><strong>Sem aula:</strong> o feriado de 28/10 foi transferido para esta data. A integração entre as telas gráficas e a lógica de negócio (Controllers) segue no trabalho de cada grupo; o dia letivo é reposto em 16/12/2026, com a recuperação final.</td><td><span class="tag tag-remote">Não letivo</span></td></tr>
+            <tr class="off-row"><td class="num">30/10/2026</td><td><strong>Sem aula:</strong> o feriado de 28/10 foi transferido para esta data. A integração entre as telas gráficas e a lógica de negócio (Controllers) segue no trabalho de cada grupo; o dia letivo é reposto em 16/12/2026, com a recuperação final.</td><td><span class="tag tag-off">Não letivo</span></td></tr>
             <tr><td class="num">06/11/2026</td><td>Testes de usabilidade e testes funcionais do software (durante o IFGAMES).</td><td>Homologação do Sistema</td></tr>
             <tr><td class="num">07/11/2026</td><td>Sábado Letivo (Remoto): registro do IFGAMES, ajustes e correções pós-testes.</td><td><span class="tag tag-remote">Remoto</span></td></tr>
             <tr><td class="num">13/11/2026</td><td>Aula remota: evolução dos projetos pelos grupos (revisão do software, documentação técnica e preparação da apresentação final).</td><td><span class="tag tag-remote">Remoto</span></td></tr>
-            <tr><td class="num">20/11/2026</td><td><strong>Sem aula:</strong> Dia da Consciência Negra (não letivo).</td><td><span class="tag tag-remote">Não letivo</span></td></tr>
+            <tr class="off-row"><td class="num">20/11/2026</td><td><strong>Sem aula:</strong> Dia da Consciência Negra (não letivo).</td><td><span class="tag tag-off">Não letivo</span></td></tr>
             <tr class="eval-row"><td class="num">27/11/2026</td><td><strong>Apresentação Final dos Projetos</strong> para as entidades parceiras e comunidade (orientações na <a href="aula-17.html">Aula 17</a>).</td><td><span class="tag tag-eval">Avaliativa · 40%</span></td></tr>
             <tr class="eval-row"><td class="num">04/12/2026</td><td>Produção do vídeo demonstrativo e documentação para registro do software.</td><td><span class="tag tag-eval">Avaliativa · 10%</span></td></tr>
             <tr><td class="num">11/12/2026</td><td>Reunião de encerramento, retorno das avaliações e consolidação dos diários.</td><td>Fechamento do Semestre</td></tr>
